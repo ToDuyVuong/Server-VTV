@@ -2,3 +2,9 @@
 
 -- Để tìm kiếm fulltext trong MySQL, chúng ta cần tạo một fulltext index trên các cột mà chúng ta muốn tìm kiếm.
 ALTER TABLE product ADD FULLTEXT INDEX full_text_index (name, description);
+
+
+where like '%keyword%'   .... keyword ...
+
+iphone 6s = ... 6s iphone ...
+iphone 6s = ... iphone 6s ..., ... iphone ..., ... 6s ...
