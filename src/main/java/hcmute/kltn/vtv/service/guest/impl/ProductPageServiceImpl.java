@@ -1,14 +1,12 @@
 package hcmute.kltn.vtv.service.guest.impl;
 
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.entity.vtv.Product;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.repository.vtv.ProductRepository;
 import hcmute.kltn.vtv.service.guest.IProductPageService;
-import hcmute.kltn.vtv.service.vendor.IProductShopService;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

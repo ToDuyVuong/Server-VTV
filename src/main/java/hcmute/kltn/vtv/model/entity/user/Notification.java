@@ -1,9 +1,11 @@
-package hcmute.kltn.vtv.model.entity.vtv;
+package hcmute.kltn.vtv.model.entity.user;
 
 
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -29,8 +31,12 @@ public class Notification {
 
     private String type;
 
-    private boolean isRead;
+    @Column( columnDefinition = "boolean default false")
+    private boolean read;
 
-    private boolean isDeleted;
+//    @Column(columnDefinition = "boolean default false")
+//    private boolean deleted;
+
+    private LocalDateTime createAt;
 }
 

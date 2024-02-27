@@ -1,8 +1,7 @@
 package hcmute.kltn.vtv.service.user.impl;
 
 import com.google.firebase.messaging.*;
-import hcmute.kltn.vtv.controller.test.PnsRequest;
-import hcmute.kltn.vtv.model.entity.vtv.Notification;
+import hcmute.kltn.vtv.model.entity.user.Notification;
 import hcmute.kltn.vtv.model.entity.user.FcmToken;
 import hcmute.kltn.vtv.repository.user.FcmTokenRepository;
 import hcmute.kltn.vtv.service.user.IFcmService;
@@ -92,20 +91,7 @@ public class FcmServiceImpl implements IFcmService {
 
 
 
-    public String pushNotification(PnsRequest pnsRequest) {
-        Message message = Message.builder()
-                .putData("content", pnsRequest.getContent())
-                .setToken(pnsRequest.getFcmToken())
-                .build();
 
-        String response = null;
-        try {
-            response = FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            System.out.println("e.getMessage()" + e.getMessage());
-        }
-        return response;
-    }
 
 
 }

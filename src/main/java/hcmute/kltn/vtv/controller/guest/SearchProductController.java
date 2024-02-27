@@ -1,29 +1,16 @@
 package hcmute.kltn.vtv.controller.guest;
 
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
-import hcmute.kltn.vtv.model.data.user.response.SearchHistoryPageResponse;
-import hcmute.kltn.vtv.model.dto.user.SearchHistoryDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
-import hcmute.kltn.vtv.model.extra.Role;
-import hcmute.kltn.vtv.repository.vtv.ProductRepository;
 import hcmute.kltn.vtv.service.guest.IPageService;
-import hcmute.kltn.vtv.service.guest.IProductPageService;
 import hcmute.kltn.vtv.service.user.ISearchHistoryService;
 import hcmute.kltn.vtv.service.user.ISearchProductService;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/search/product")

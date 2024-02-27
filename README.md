@@ -339,7 +339,10 @@
   - Theo mã danh mục con, cha. (truyền category id server tự phân loại)
 
 
-
+- Quản lý thông báo:
+  - Xem danh sách thông báo.
+  - Đọc thông báo.
+  - Xóa thông báo.
 
 
 

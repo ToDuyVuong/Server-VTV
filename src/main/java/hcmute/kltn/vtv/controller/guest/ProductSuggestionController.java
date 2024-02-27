@@ -3,7 +3,6 @@ package hcmute.kltn.vtv.controller.guest;
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.service.guest.IPageService;
 import hcmute.kltn.vtv.service.guest.IProductSuggestionService;
-import hcmute.kltn.vtv.service.user.IProductSuggestionCustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
