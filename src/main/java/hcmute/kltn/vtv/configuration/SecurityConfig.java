@@ -43,7 +43,7 @@ public class SecurityConfig {
             "/api/vendor/product/add2",
 
             "/api/payment/**",
-            "/api/vendor/shop/category/all-parent",
+            "/api/category/**",
 
             "/api/chat/room/**",
             "/api/chat/message/**",
