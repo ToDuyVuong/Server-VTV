@@ -27,5 +27,7 @@ public interface IJwtService {
 
     Boolean isTokenExpired(String token);
 
+    Boolean  tokenExpired(String token);
+
     Date extractExpiration(String token);
 }

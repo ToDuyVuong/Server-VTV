@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.controller.vtv;
 
+import hcmute.kltn.vtv.service.vtv.ITokenSchedulerService;
 import hcmute.kltn.vtv.service.vtv.IVoucherSchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,15 @@ public class DailyUpdateScheduler {
 
     @Autowired
     private final IVoucherSchedulerService voucherSchedulerService;
-
+    @Autowired
+    private final ITokenSchedulerService tokenSchedulerService;
 
     @PostConstruct
     public void onServerStart() {
         System.out.println("Server started at " + LocalDate.now() + " - Performing initial update...");
-       voucherSchedulerService.checkExpirationVoucher();
+        voucherSchedulerService.checkExpirationVoucher();
+        tokenSchedulerService.checkExpirationToken();
+        tokenSchedulerService.deleteTokenExpiredAndRevoked();
     }
 
     // This method will be executed every day at midnight
@@ -28,6 +32,8 @@ public class DailyUpdateScheduler {
     public void performDailyUpdate() {
         System.out.println("Daily update at " + LocalDate.now() + " - Performing daily update...");
         voucherSchedulerService.checkExpirationVoucher();
+        tokenSchedulerService.checkExpirationToken();
+        tokenSchedulerService.deleteTokenExpiredAndRevoked();
     }
 }
 

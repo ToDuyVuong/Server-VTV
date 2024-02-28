@@ -18,6 +18,10 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
       """)
   List<Token> findAllValidTokenByCustomer(Long customerId);
 
+  List<Token> findAllByExpired(boolean expired);
+
+  List<Token> findAllByExpiredAndRevoked(boolean expired, boolean revoked);
+
 
   Optional<Token> findByCustomerCustomerIdAndToken(Long customerId, String token);
 
