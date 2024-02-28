@@ -9,10 +9,10 @@ import hcmute.kltn.vtv.model.dto.user.OrderDTO;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.OrderRepository;
 import hcmute.kltn.vtv.service.user.*;
-import hcmute.kltn.vtv.shippingstrategy.GiaoHangHoaTocShipping;
-import hcmute.kltn.vtv.shippingstrategy.GiaoHangNhanhShipping;
-import hcmute.kltn.vtv.shippingstrategy.GiaoHangTietKiemShipping;
-import hcmute.kltn.vtv.shippingstrategy.IShipping;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangHoaTocShipping;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangNhanhShipping;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangTietKiemShipping;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.IShipping;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -275,6 +275,8 @@ public class OrderServiceImpl implements IOrderService {
         order.setShippingFee(shippingFee);
         return order;
     }
+
+//    private Order createOrder(Customer customer, )
 
     private OrderResponse orderResponse(String username, Order order, String message, boolean created) {
 

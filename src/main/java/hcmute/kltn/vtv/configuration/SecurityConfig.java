@@ -51,6 +51,7 @@ public class SecurityConfig {
             "/api/product-suggestion/**",
 
             "/api/customer/notification",
+            "/api/delivery/**",
 
 
 

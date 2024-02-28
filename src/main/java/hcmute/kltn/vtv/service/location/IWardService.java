@@ -9,6 +9,8 @@ import java.util.List;
 public interface IWardService {
     String getWardNameByWardCode(String wardCode);
 
+    Ward getWardByWardCode(String wardCode);
+
     ListWardResponse getAllWardByDistrictCode(String districtCode);
 
 

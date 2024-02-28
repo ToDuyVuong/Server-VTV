@@ -14,6 +14,8 @@ import lombok.*;
 @AllArgsConstructor
 public class LocationResponse extends ResponseAbstract {
 
+    private String administrativeRegionName;
+
     private ProvinceDTO provinceDTO;
 
     private DistrictDTO districtDTO;
@@ -25,6 +27,7 @@ public class LocationResponse extends ResponseAbstract {
         locationResponse.setWardDTO(WardDTO.convertEntityToDTO(ward));
         locationResponse.setDistrictDTO(DistrictDTO.convertEntityToDTO(ward.getDistrict()));
         locationResponse.setProvinceDTO(ProvinceDTO.convertEntityToDTO(ward.getDistrict().getProvince()));
+        locationResponse.setAdministrativeRegionName(ward.getDistrict().getProvince().getAdministrativeRegion().getName());
         return locationResponse;
     }
 
