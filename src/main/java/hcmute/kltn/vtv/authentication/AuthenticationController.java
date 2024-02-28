@@ -42,7 +42,7 @@ public class AuthenticationController {
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logout(
             @CookieValue(name = "refreshToken") String refreshToken,
-            @Param("fcmToken") String fcmToken,
+            @RequestBody String fcmToken,
             HttpServletResponse response) {
 
         if (fcmToken == null || fcmToken.isEmpty()) {
