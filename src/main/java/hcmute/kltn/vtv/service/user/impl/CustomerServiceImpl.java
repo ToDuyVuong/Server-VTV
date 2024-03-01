@@ -111,6 +111,9 @@ public class CustomerServiceImpl implements ICustomerService {
         otpService.verifyOtp(request.getUsername(), request.getOtp());
 
         Customer customerUpdate = getCustomerByUsername(request.getUsername());
+        if (customerUpdate.getStatus().equals(Status.INACTIVE)) {
+            customerUpdate.setStatus(Status.ACTIVE);
+        }
         customerUpdate.setPassword(passwordEncoder.encode(request.getNewPassword()));
         customerUpdate.setUpdateAt(LocalDateTime.now());
         try {
@@ -197,9 +200,6 @@ public class CustomerServiceImpl implements ICustomerService {
 
         return response;
     }
-
-
-
 
 
     @Override
