@@ -44,7 +44,10 @@ public class OtpServiceImpl implements IOtpService {
                 throw new BadRequestException("OTP đã hết hạn");
             } else if (!otpDetails.getOtp().equals(otp)) {
                 throw new BadRequestException("OTP không hợp lệ");
+            } else {
+                otpMap.remove(username);
             }
+
         } else {
             throw new BadRequestException("OTP không tồn tại");
         }

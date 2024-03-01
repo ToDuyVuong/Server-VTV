@@ -30,8 +30,6 @@ public class SecurityConfig {
 
     private static final String[] NO_AUTH = {
             "/api/auth/**",
-            "/api/customer/forgot-password",
-            "/api/customer/reset-password",
             "/api/product/**",
             "/api/search/**",
             "/api/shop-detail/shop/**",
@@ -53,6 +51,11 @@ public class SecurityConfig {
             "/api/customer/notification",
             "/api/delivery/**",
 
+
+            "/api/customer/reset-password",
+            "/api/customer/active-account",
+            "/api/customer/active-account/send-email",
+            "/api/customer/forgot-password",
 
 
             "/v2/api-docs",
@@ -209,8 +212,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 
 
     private AccessDeniedHandler accessDeniedHandler() {

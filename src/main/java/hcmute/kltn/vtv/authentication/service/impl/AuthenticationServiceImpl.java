@@ -67,7 +67,15 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         try {
             customerRepository.save(customer);
-            return registerResponse(customer);
+
+            String message = "Đăng ký tài khoản khách hàng thành công, " +
+                    "vui lòng kiểm tra email để kích hoạt tài khoản." +
+                    "Mã kích hoạt của tài khoản: " + customer.getUsername() +
+                    " đã được gửi đến email: " + customer.getEmail()
+                    + "Nếu không nhận được email, vui lòng kiểm tra hòm thư rác. " +
+                    "Mã kích hoạt có hiệu lực trong 5 phút. ";
+
+            return RegisterResponse.registerResponse(customer.getUsername(), customer.getEmail(), message);
         } catch (Exception e) {
             throw new InternalServerErrorException("Đăng ký tài khoản khách hàng thất bại");
         }
@@ -107,7 +115,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
 
-
     @Override
     public RefreshTokenResponse refreshToken(String refreshToken, HttpServletRequest request,
                                              HttpServletResponse response)
@@ -131,8 +138,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
         return null;
     }
-
-
 
 
     @Override
@@ -185,7 +190,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private Customer createCustomer(RegisterRequest customerRequest) {
 
         Set<Role> roles = new HashSet<>();
-        roles.add(Role.CUSTOMER); // Every customer has a CUSTOMER role
+        roles.add(Role.CUSTOMER);
 
         Customer customer = new Customer();
         customer.setUsername(customerRequest.getUsername());
@@ -197,20 +202,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         customer.setPassword(passwordEncoder.encode(customerRequest.getPassword()));
         customer.setCreateAt(LocalDateTime.now());
         customer.setUpdateAt(LocalDateTime.now());
-        customer.setStatus(Status.ACTIVE);
+        customer.setStatus(Status.INACTIVE);
 
         return customer;
     }
 
 
-    private RegisterResponse registerResponse(Customer customer) {
-        RegisterResponse registerResponse = new RegisterResponse();
-        registerResponse.setUsername(customer.getUsername());
-        registerResponse.setEmail(customer.getEmail());
-        registerResponse.setStatus("success");
-        registerResponse.setMessage("Đăng ký tài khoản khách hàng thành công");
-        return registerResponse;
-    }
+
 
 
     private LoginResponse loginResponse(Customer customer, String jwtToken, String refreshToken) {

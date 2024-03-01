@@ -20,4 +20,6 @@ public class LoginResponse extends ResponseAbstract {
 
     private CustomerDTO customerDTO;
 
+
+
 }

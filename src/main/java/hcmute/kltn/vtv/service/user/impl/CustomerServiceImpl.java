@@ -1,11 +1,14 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.authentication.response.RegisterResponse;
+import hcmute.kltn.vtv.model.data.user.request.ActiveAccountRequest;
 import hcmute.kltn.vtv.model.extra.Role;
+import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.request.ChangePasswordRequest;
 import hcmute.kltn.vtv.model.data.user.request.ForgotPasswordRequest;
 import hcmute.kltn.vtv.model.data.user.request.ProfileCustomerRequest;
-import hcmute.kltn.vtv.model.data.user.response.ForgotPasswordResponse;
+import hcmute.kltn.vtv.model.data.user.response.SendEmailResponse;
 import hcmute.kltn.vtv.model.data.user.response.ProfileCustomerResponse;
 import hcmute.kltn.vtv.model.dto.user.CustomerDTO;
 import hcmute.kltn.vtv.model.entity.user.Customer;
@@ -37,6 +40,8 @@ public class CustomerServiceImpl implements ICustomerService {
     private ModelMapper modelMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private final IMailService mailService;
 
     @Override
     public Customer getCustomerByUsername(String username) {
@@ -73,7 +78,6 @@ public class CustomerServiceImpl implements ICustomerService {
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật thông tin khách hàng thất bại!");
         }
-
     }
 
     @Override
@@ -102,7 +106,7 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     @Transactional
-    public ForgotPasswordResponse resetPassword(ForgotPasswordRequest request) {
+    public RegisterResponse resetPassword(ForgotPasswordRequest request) {
         request.validate();
         otpService.verifyOtp(request.getUsername(), request.getOtp());
 
@@ -112,7 +116,10 @@ public class CustomerServiceImpl implements ICustomerService {
         try {
             customerRepository.save(customerUpdate);
 
-            return forgotPasswordResponse(customerUpdate.getUsername(), customerUpdate.getEmail());
+            return RegisterResponse.registerResponse(
+                    customerUpdate.getUsername(),
+                    customerUpdate.getEmail(),
+                    "Cài lại mật khẩu của tài khoản thành công.");
         } catch (Exception e) {
             throw new InternalServerErrorException("Cài lại mật khẩu của tài khoản thất bại!");
         }
@@ -120,7 +127,38 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
 
+    @Override
+    @Transactional
+    public RegisterResponse activateAccount(ActiveAccountRequest request) {
+        request.validate();
+        otpService.verifyOtp(request.getUsername(), request.getOtp());
 
+        Customer customerUpdate = getCustomerByUsername(request.getUsername());
+        customerUpdate.setStatus(Status.ACTIVE);
+        customerUpdate.setUpdateAt(LocalDateTime.now());
+        try {
+            customerRepository.save(customerUpdate);
+
+            return RegisterResponse.registerResponse(
+                    customerUpdate.getUsername(),
+                    customerUpdate.getEmail(),
+                    "Kích hoạt tài khoản thành công.");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Kích hoạt tài khoản thất bại!");
+        }
+    }
+
+
+    @Override
+    public void checkAccountUnActive(String username) {
+        Customer customer = getCustomerByUsername(username);
+        if (customer.getStatus().equals(Status.INACTIVE)) {
+            return;
+        }
+        throw new BadRequestException("Tài khoản của bạn đã được kích hoạt.");
+
+
+    }
 
 
     @Override
@@ -161,16 +199,6 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
 
-    private ForgotPasswordResponse forgotPasswordResponse (String username, String email) {
-        ForgotPasswordResponse response = new ForgotPasswordResponse();
-        response.setUsername(username);
-        response.setEmail(email);
-        response.setMessage("Mật khẩu của tài khoản " + username + " đã được cài lại thành công.");
-        response.setStatus("Success");
-        response.setCode(200);
-
-        return response;
-    }
 
 
 

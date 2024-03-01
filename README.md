@@ -32,6 +32,8 @@
     - Cập nhật thông tin tài khoản.
     - Đổi mật khẩu.
     - Lấy lại mật khẩu.
+    - Xác nhận tài khoản.
+    - Gửi mã xác nhận tài khoản.
 
 
 - Quản lý địa chỉ:

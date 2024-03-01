@@ -21,8 +21,6 @@ public class TokenSchedulerServiceImpl implements ITokenSchedulerService {
     @Autowired
     private final TokenRepository tokenRepository;
     @Autowired
-    private final IAuthenticationService authenticationService;
-    @Autowired
     private final IJwtService jwtService;
 
 
