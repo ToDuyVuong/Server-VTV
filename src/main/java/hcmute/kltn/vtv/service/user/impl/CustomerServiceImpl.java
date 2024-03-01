@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Set;
 
 @Service
@@ -49,15 +50,8 @@ public class CustomerServiceImpl implements ICustomerService {
             throw new BadRequestException("Tài khoản không được để trống.");
         }
         Customer customer = getCustomerByUsername(username);
-        CustomerDTO customerDTO = modelMapper.map(customer, CustomerDTO.class);
 
-        ProfileCustomerResponse response = new ProfileCustomerResponse();
-        response.setCustomerDTO(customerDTO);
-        response.setMessage("Lấy thông tin khách hàng thành công.");
-        response.setStatus("ok");
-        response.setCode(200);
-
-        return response;
+        return profileCustomerResponse(customer, "Lấy thông tin khách hàng thành công.", "OK");
     }
 
     @Override
@@ -75,14 +69,7 @@ public class CustomerServiceImpl implements ICustomerService {
         try {
             customerRepository.save(customerUpdate);
 
-            CustomerDTO customerDTO = modelMapper.map(customerUpdate, CustomerDTO.class);
-            ProfileCustomerResponse response = new ProfileCustomerResponse();
-            response.setCustomerDTO(customerDTO);
-            response.setMessage("Cập nhật thông tin khách hàng thành công.");
-            response.setStatus("Success");
-            response.setCode(200);
-
-            return response;
+            return profileCustomerResponse(customerUpdate, "Cập nhật thông tin khách hàng thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật thông tin khách hàng thất bại!");
         }
@@ -106,14 +93,7 @@ public class CustomerServiceImpl implements ICustomerService {
         try {
             customerRepository.save(customerUpdate);
 
-            CustomerDTO customerDTO = modelMapper.map(customerUpdate, CustomerDTO.class);
-            ProfileCustomerResponse response = new ProfileCustomerResponse();
-            response.setCustomerDTO(customerDTO);
-            response.setMessage("Cập nhật mật khẩu của khách hàng thành công.");
-            response.setStatus("Success");
-            response.setCode(200);
-
-            return response;
+            return profileCustomerResponse(customerUpdate, "Cập nhật mật khẩu của khách hàng thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật mật khẩu của khách hàng thất bại!");
         }
@@ -132,20 +112,15 @@ public class CustomerServiceImpl implements ICustomerService {
         try {
             customerRepository.save(customerUpdate);
 
-            CustomerDTO customerDTO = modelMapper.map(customerUpdate, CustomerDTO.class);
-            ForgotPasswordResponse response = new ForgotPasswordResponse();
-            response.setUsername(customerDTO.getUsername());
-            response.setEmail(customerDTO.getEmail());
-            response.setMessage("Mật khẩu của tài khoản" + request.getUsername() + " đã được cài lại thành công.");
-            response.setStatus("Success");
-            response.setCode(200);
-
-            return response;
+            return forgotPasswordResponse(customerUpdate.getUsername(), customerUpdate.getEmail());
         } catch (Exception e) {
-            throw new BadRequestException("Cài lại mật khẩu của tài khoản thất bại!");
+            throw new InternalServerErrorException("Cài lại mật khẩu của tài khoản thất bại!");
         }
 
     }
+
+
+
 
 
     @Override
@@ -160,9 +135,10 @@ public class CustomerServiceImpl implements ICustomerService {
     public void removeAllRoleManagerOfCustomer(Customer customer) {
 
         Set<Role> roles = customer.getRoles();
-        roles.remove(Role.MANAGERSHIPPING);
-        roles.remove(Role.MANAGERCUSTOMER);
-        roles.remove(Role.MANAGERVENDOR);
+        roles.removeAll(Arrays.asList(
+                Role.MANAGERSHIPPING,
+                Role.MANAGERCUSTOMER,
+                Role.MANAGERVENDOR));
 
         try {
             customerRepository.save(customer);
@@ -172,6 +148,31 @@ public class CustomerServiceImpl implements ICustomerService {
 
 
     }
+
+
+    private ProfileCustomerResponse profileCustomerResponse(Customer customer, String message, String status) {
+        ProfileCustomerResponse response = new ProfileCustomerResponse();
+        response.setCustomerDTO(CustomerDTO.convertEntityToDTO(customer));
+        response.setMessage(message);
+        response.setStatus(status);
+        response.setCode(200);
+
+        return response;
+    }
+
+
+    private ForgotPasswordResponse forgotPasswordResponse (String username, String email) {
+        ForgotPasswordResponse response = new ForgotPasswordResponse();
+        response.setUsername(username);
+        response.setEmail(email);
+        response.setMessage("Mật khẩu của tài khoản " + username + " đã được cài lại thành công.");
+        response.setStatus("Success");
+        response.setCode(200);
+
+        return response;
+    }
+
+
 
     @Override
     public boolean checkUsernameExist(String username) {
