@@ -135,7 +135,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
     /////////////////////////////////////////// Filter On VTV ///////////////////////////////////////////
 
     @Query(value =
-            "SELECT DISTINCT p.* " +
+            "SELECT  p.* " +
                     "FROM product p " +
                     "WHERE p.status = :status " +
                     "ORDER BY p.create_at ASC",
@@ -150,7 +150,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
 
 
     @Query(value =
-            "SELECT DISTINCT p.* " +
+            "SELECT  p.* " +
                     "FROM product p " +
                     "WHERE  p.status = :status " +
                     "ORDER BY p.sold DESC",
@@ -165,11 +165,11 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
 
 
     @Query(value =
-            "SELECT DISTINCT p.* " +
+            "SELECT  p.* " +
                     "FROM product p " +
                     "WHERE p.status = :status " +
                     "ORDER BY pv.price ASC",
-            countQuery = "SELECT COUNT( DISTINCT p.product.id) " +
+            countQuery = "SELECT COUNT(  p.product.id) " +
                     "FROM product p " +
                     "WHERE p.status = :status ",
             nativeQuery = true)
@@ -179,11 +179,11 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
 
 
     @Query(value =
-            "SELECT DISTINCT p.* " +
+            "SELECT  p.* " +
                     "FROM product p " +
                     "WHERE p.status = :status " +
                     "ORDER BY pv.price DESC",
-            countQuery = "SELECT COUNT( DISTINCT p.product.id) " +
+            countQuery = "SELECT COUNT(  p.product.id) " +
                     "FROM product p " +
                     "WHERE p.status = :status ",
             nativeQuery = true)
@@ -193,11 +193,11 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
 
 
     @Query(value =
-            "SELECT DISTINCT p.* " +
+            "SELECT  p.* " +
                     "FROM product p " +
                     "WHERE p.status = :status " +
                     "ORDER BY RAND()",
-            countQuery = "SELECT COUNT( DISTINCT p.product.id) " +
+            countQuery = "SELECT COUNT(  p.product.id) " +
                     "FROM product p " +
                     "WHERE p.status = :status ",
             nativeQuery = true)
