@@ -90,7 +90,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                                         PageRequest pageRequest);
 
 
-
     Optional<Page<Product>> findAllByCategoryShopShopIdAndStatusOrderByCreateAt(Long shopId, Status status,
                                                                                 Pageable pageable);
 
@@ -102,9 +101,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     Optional<Page<Product>> findAllByStatusOrderByName(Status status, Pageable pageable);
-
-
-
 
 
     /////////////////////////////////////////// Suggestion ///////////////////////////////////////////
@@ -133,7 +129,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("searchText") String searchText,
             @Param("status") String status,
             Pageable pageable);
-
 
 
     @Query(value =
@@ -174,7 +169,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("categoryParentId") Long categoryParentId,
             @Param("status") String status,
             Pageable pageable);
-
 
 
     /////////////////////////////////////////// Search On VTV ///////////////////////////////////////////
@@ -436,8 +430,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable);
 
 
-
-
     @Query(value =
             "SELECT DISTINCT p.* " +
                     "FROM product p " +
@@ -590,11 +582,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable);
 
 
-
-
-
-
-
     /////////////////////////////////////////// OnShop ///////////////////////////////////////////
     @Query(value =
             "SELECT p.* " +
@@ -742,6 +729,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("shopId") Long shopId,
             @Param("status") String status,
             Pageable pageable);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
