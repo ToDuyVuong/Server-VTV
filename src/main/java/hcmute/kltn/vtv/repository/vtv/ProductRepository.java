@@ -210,7 +210,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "WHERE MATCH(p.name, p.description) AGAINST (:searchText IN BOOLEAN MODE) " +
                     "AND p.status = :status " +
                     "ORDER BY pv.price ASC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN product_variant pv " +
                     "ON p.product_id = pv.product_id " +
@@ -407,7 +407,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY p.create_at ASC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
@@ -445,7 +445,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY p.sold DESC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
@@ -483,7 +483,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY pv.price ASC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
@@ -521,7 +521,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY pv.price DESC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
@@ -559,7 +559,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY RAND()",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
@@ -651,7 +651,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND s.shop_id = :shopId " +
                     "AND p.status = :status " +
                     "ORDER BY pv.price ASC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
@@ -683,7 +683,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     "AND s.shop_id = :shopId " +
                     "AND p.status = :status " +
                     "ORDER BY pv.price DESC",
-            countQuery = "SELECT COUNT(DISTINCT p.productId) " +
+            countQuery = "SELECT COUNT(DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN category c " +
                     "ON p.category_id = c.category_id " +
