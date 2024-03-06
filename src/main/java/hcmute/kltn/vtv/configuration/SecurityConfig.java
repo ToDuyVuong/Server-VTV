@@ -50,6 +50,7 @@ public class SecurityConfig {
 
             "/api/customer/notification",
             "/api/shipping/**",
+            "/api/product-filter/**",
 
 
             "/api/customer/reset-password",
