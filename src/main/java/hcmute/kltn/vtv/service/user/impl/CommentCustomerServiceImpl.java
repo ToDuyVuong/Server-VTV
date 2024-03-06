@@ -24,8 +24,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class CommentCustomerServiceImpl implements ICommentCustomerService {
 
-    @Autowired
-    private ReviewRepository reviewRepository;
+
     @Autowired
     private CommentRepository commentRepository;
     @Autowired
@@ -36,23 +35,12 @@ public class CommentCustomerServiceImpl implements ICommentCustomerService {
     @Override
     @Transactional
     public CommentResponse addNewComment(CommentRequest request) {
-        Customer customer = customerService.getCustomerByUsername(request.getUsername());
-        Review review = reviewCustomerService.checkReviewRole(request.getReviewId(), request.getUsername(),
-                request.isShop());
-        String shopName = request.isShop() ? review.getProduct().getCategory().getShop().getName() : "";
-
-        Comment comment = new Comment();
-        comment.setContent(request.getContent());
-        comment.setReview(review);
-        comment.setCustomer(customer);
-        comment.setStatus(Status.ACTIVE);
-        comment.setShopName(shopName);
-        comment.setCreateDate(new Date());
-
+        Comment comment = createCommentByCommentRequest(request);
         try {
             commentRepository.save(comment);
-            return commentResponse(comment, request.getReviewId(), request.getUsername(),
-                    "Bình luận thành công vào đánh giá thành công.");
+
+            return CommentResponse.commentResponse(comment, request.getReviewId(), request.getUsername(),
+                    "Bình luận thành công vào đánh giá thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Bình luận thất bại.");
         }
@@ -62,11 +50,12 @@ public class CommentCustomerServiceImpl implements ICommentCustomerService {
     @Transactional
     public CommentResponse deleteComment(Long commentId, String username) {
         Comment comment = checkComment(commentId, username);
-
         comment.setStatus(Status.INACTIVE);
         try {
             commentRepository.save(comment);
-            return commentResponse(comment, comment.getReview().getReviewId(), username, "Xóa bình luận thành công.");
+
+            return CommentResponse.commentResponse(comment, comment.getReview().getReviewId(),
+                    username, "Xóa bình luận thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Xóa bình luận thất bại." + e.getMessage());
         }
@@ -87,15 +76,23 @@ public class CommentCustomerServiceImpl implements ICommentCustomerService {
         return comment;
     }
 
-    private CommentResponse commentResponse(Comment comment, Long reviewId, String username, String message) {
-        CommentResponse response = new CommentResponse();
-        response.setCommentDTO(CommentDTO.convertEntityToDTO(comment));
-        response.setMessage(message);
-        response.setCode(200);
-        response.setUsername(username);
-        response.setReviewId(reviewId);
-        response.setStatus("success");
-        return response;
+
+    private Comment createCommentByCommentRequest(CommentRequest request) {
+        Customer customer = customerService.getCustomerByUsername(request.getUsername());
+        Review review = reviewCustomerService.checkReviewRole(request.getReviewId(), request.getUsername(),
+                request.isShop());
+        String shopName = request.isShop() ? review.getProduct().getCategory().getShop().getName() : "";
+
+        Comment comment = new Comment();
+        comment.setContent(request.getContent());
+        comment.setReview(review);
+        comment.setCustomer(customer);
+        comment.setStatus(Status.ACTIVE);
+        comment.setShopName(shopName);
+        comment.setCreateDate(new Date());
+        return comment;
     }
+
+
 
 }
