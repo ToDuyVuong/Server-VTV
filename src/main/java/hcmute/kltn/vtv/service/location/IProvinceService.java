@@ -6,6 +6,8 @@ import hcmute.kltn.vtv.model.entity.location.Province;
 import java.util.List;
 
 public interface IProvinceService {
+    Province getProvinceByWardCode(String wardCode);
+
     ListProvinceResponse getAllProvince();
 
     List<Province> getPronvincesByProvinceCode(List<String> provincesCode);

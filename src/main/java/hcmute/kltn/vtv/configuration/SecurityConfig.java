@@ -49,7 +49,7 @@ public class SecurityConfig {
             "/api/product-suggestion/**",
 
             "/api/customer/notification",
-            "/api/delivery/**",
+            "/api/shipping/**",
 
 
             "/api/customer/reset-password",

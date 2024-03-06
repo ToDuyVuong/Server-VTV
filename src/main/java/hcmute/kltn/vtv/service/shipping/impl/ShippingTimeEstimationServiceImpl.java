@@ -1,6 +1,6 @@
-package hcmute.kltn.vtv.service.vtv.impl;
+package hcmute.kltn.vtv.service.shipping.impl;
 
-import hcmute.kltn.vtv.service.vtv.IDeliveryTimeEstimationService;
+import hcmute.kltn.vtv.service.shipping.IShippingTimeEstimationService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class DeliveryTimeEstimationServiceImpl implements IDeliveryTimeEstimationService {
+public class ShippingTimeEstimationServiceImpl implements IShippingTimeEstimationService {
 
 
     @Override

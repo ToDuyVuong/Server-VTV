@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.service.vtv.shippingstrategy;
 
-public interface IShipping {
+public interface IShippingStrategy {
     long calculateShippingCost(Long total);
 
     Long calculateShippingCost(int distanceLocation);

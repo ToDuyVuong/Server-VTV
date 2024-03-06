@@ -18,6 +18,15 @@ import java.util.List;
 public class ProvinceServiceImpl implements IProvinceService {
     private final ProvinceRepository provinceRepository;
 
+
+
+    @Override
+    public Province getProvinceByWardCode(String wardCode) {
+        return provinceRepository.findProvinceByWardCode(wardCode)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy tỉnh thành phố nào có mã là: " + wardCode));
+    }
+
+
     @Override
     public ListProvinceResponse getAllProvince() {
 
@@ -47,6 +56,7 @@ public class ProvinceServiceImpl implements IProvinceService {
             provinces.add(province);
         }
         provinces.sort(Comparator.comparing(Province::getName));
+
         return provinces;
     }
 

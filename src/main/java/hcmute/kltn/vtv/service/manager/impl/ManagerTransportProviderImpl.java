@@ -55,7 +55,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
         try {
             transportProviderRepository.save(transportProvider);
 
-            return transportProviderService.transportProviderResponse(transportProvider,
+            return TransportProviderResponse.transportProviderResponse(transportProvider,
                     "Đăng ký nhà vận chuyển thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Đăng ký nhà vận chuyển thất bại.");
@@ -75,7 +75,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
         try {
             transportProviderRepository.save(transportProvider);
 
-            return transportProviderService.transportProviderResponse(transportProvider,
+            return TransportProviderResponse.transportProviderResponse(transportProvider,
                     "Cập nhật nhà vận chuyển thành công.", "Success");
         } catch (Exception e) {
             throw new NotFoundException("Cập nhật nhà vận chuyển thất bại.");
@@ -88,7 +88,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
         List<TransportProvider> transportProviders = transportProviderRepository.findAllByStatus(Status.ACTIVE)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy nhà vận chuyển nào."));
 
-        return transportProviderService.listTransportProvidersResponse(transportProviders);
+        return ListTransportProviderResponse.listTransportProvidersResponse(transportProviders);
     }
 
 

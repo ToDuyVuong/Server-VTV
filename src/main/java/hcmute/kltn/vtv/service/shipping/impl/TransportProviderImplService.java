@@ -3,7 +3,6 @@ package hcmute.kltn.vtv.service.shipping.impl;
 import hcmute.kltn.vtv.model.data.shipping.request.UpdateTransportProviderRequest;
 import hcmute.kltn.vtv.model.data.shipping.response.ListTransportProviderResponse;
 import hcmute.kltn.vtv.model.data.shipping.response.TransportProviderResponse;
-import hcmute.kltn.vtv.model.dto.shipping.TransportProviderDTO;
 import hcmute.kltn.vtv.model.entity.shipping.TransportProvider;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.shipping.TransportProviderRepository;
@@ -36,11 +35,27 @@ public class TransportProviderImplService implements ITransportProviderService {
 
         try {
             transportProviderRepository.save(transportProvider);
-            return transportProviderResponse(transportProvider, "Cập nhật nhà vận chuyển thành công.", "Success");
+            return TransportProviderResponse.transportProviderResponse(transportProvider, "Cập nhật nhà vận chuyển thành công.", "Success");
         } catch (Exception e) {
             throw new NotFoundException("Cập nhật nhà vận chuyển thất bại.");
         }
     }
+
+
+    @Override
+    public TransportProvider getTransportProviderByShortName(String shortName) {
+        return transportProviderRepository.findByShortName(shortName)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển."));
+    }
+
+
+
+    @Override
+    public List<TransportProvider> getTransportProvidersByProvince(String provinceCodeShop, String provinceCodeCustomer) {
+        return transportProviderRepository.findAllByProvinceCodeShopAndProvinceCodeCustomerAndStatus(provinceCodeShop, provinceCodeCustomer, Status.ACTIVE)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
+    }
+
 
 
     private void checkOwnerUpdateExist(String username, Long transportProviderId) {
@@ -86,16 +101,15 @@ public class TransportProviderImplService implements ITransportProviderService {
     public TransportProviderResponse getTransportProviderById(Long id) {
         TransportProvider transportProvider = getTransportProviderByTransportProviderId(id);
 
-        return transportProviderResponse(transportProvider, "Lấy thông tin nhà vận chuyển thành công.", "OK");
+        return TransportProviderResponse.transportProviderResponse(transportProvider, "Lấy thông tin nhà vận chuyển thành công.", "OK");
     }
 
 
     @Override
     public TransportProvider getTransportProviderByTransportProviderId(Long id) {
-        TransportProvider transportProvider = transportProviderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển."));
 
-        return transportProvider;
+        return transportProviderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển."));
     }
 
 
@@ -106,7 +120,7 @@ public class TransportProviderImplService implements ITransportProviderService {
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
 
 
-        return listTransportProvidersNotProvinceResponse(transportProviders);
+        return ListTransportProviderResponse.listTransportProvidersNotProvinceResponse(transportProviders);
     }
 
     @Override
@@ -116,41 +130,15 @@ public class TransportProviderImplService implements ITransportProviderService {
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
 
 
-        return listTransportProvidersResponse(transportProviders);
-    }
-
-    @Override
-    public ListTransportProviderResponse listTransportProvidersNotProvinceResponse(List<TransportProvider> transportProviders) {
-        ListTransportProviderResponse response = new ListTransportProviderResponse();
-        response.setTransportProviderDTOs(TransportProviderDTO.convertNotProvinceEntitiesToDTOs(transportProviders));
-        response.setCount(response.getTransportProviderDTOs().size());
-        response.setMessage("Lấy danh sách nhà vận chuyển thành công.");
-        response.setStatus("OK");
-        response.setCode(200);
-        return response;
+        return ListTransportProviderResponse.listTransportProvidersResponse(transportProviders);
     }
 
 
-    @Override
-    public TransportProviderResponse transportProviderResponse(TransportProvider transportProvider, String meesage, String status) {
-        TransportProviderResponse response = new TransportProviderResponse();
-        response.setTransportProviderDTO(TransportProviderDTO.convertEntityToDTO(transportProvider));
-        response.setMessage(meesage);
-        response.setStatus(status);
-        response.setCode(200);
-        return response;
-    }
 
 
-    @Override
-    public ListTransportProviderResponse listTransportProvidersResponse(List<TransportProvider> transportProviders) {
-        ListTransportProviderResponse response = new ListTransportProviderResponse();
-        response.setTransportProviderDTOs(TransportProviderDTO.convertEntitiesToDTOs(transportProviders));
-        response.setCount(response.getTransportProviderDTOs().size());
-        response.setMessage("Lấy danh sách nhà vận chuyển thành công.");
-        response.setStatus("OK");
-        response.setCode(200);
-        return response;
-    }
+
+
+
+
 
 }

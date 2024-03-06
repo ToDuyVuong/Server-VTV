@@ -44,15 +44,8 @@ public class WardServiceImpl implements IWardService {
         if (!wards.isEmpty()) {
             wardDTOs = WardDTO.convertEntitiesToDTOs(wards);
         }
-        ListWardResponse response = new ListWardResponse();
-        response.setWardDTOs(wardDTOs);
-        response.setCount(response.getWardDTOs().size());
-        response.setDistrictCode(districtCode);
-        response.setCode(200);
-        response.setMessage("Lấy danh sách phường xã thành công.");
-        response.setStatus("OK");
-        return response;
 
+        return ListWardResponse.listWardResponse(wardDTOs, districtCode, "Lấy danh sách phường xã thành công.", "OK");
     }
 
     @Override
@@ -67,10 +60,8 @@ public class WardServiceImpl implements IWardService {
             }
             wards.add(ward);
         }
+        wards.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
 
-        if (!wards.isEmpty()){
-            wards.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
-        }
         return wards;
     }
 
@@ -79,11 +70,19 @@ public class WardServiceImpl implements IWardService {
         Ward ward = wardRepository.findByWardCode(wardCode)
                 .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy phường xã nào có mã là: " + wardCode));
-        LocationResponse response = LocationResponse.convertWardToResponse(ward);
-        response.setCode(200);
-        response.setMessage("Lấy thông tin địa chỉ thành công.");
-        response.setStatus("OK");
-        return response;
+
+        return LocationResponse.locationResponse(ward,
+                "Lấy thông tin địa chỉ thành công.", "OK");
+    }
+
+
+    @Override
+    public void checkWardCodeExist(String wardCode) {
+        if (wardRepository.existsByWardCode(wardCode)) {
+            return;
+        }
+
+        throw new NotFoundException("Không tìm thấy phường xã nào có mã là: " + wardCode);
     }
 
 }

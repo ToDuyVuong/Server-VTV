@@ -19,4 +19,6 @@ public interface WardRepository extends JpaRepository<Ward, String> {
 
     Optional<List<Ward>> findAllByWardCodeIn(List<String> wardCodes);
 
+    boolean existsByWardCode(String wardCode);
+
 }

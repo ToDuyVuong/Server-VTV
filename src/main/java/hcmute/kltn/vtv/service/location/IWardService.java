@@ -17,4 +17,6 @@ public interface IWardService {
     List<Ward> getWardsByWardsCodeWithDistrictCode(List<String> wardsCode, String districtCode);
 
     LocationResponse getLocationByWardCode(String wardCode);
+
+    void checkWardCodeExist(String wardCode);
 }

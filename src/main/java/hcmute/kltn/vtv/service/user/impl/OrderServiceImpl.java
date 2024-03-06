@@ -9,10 +9,10 @@ import hcmute.kltn.vtv.model.dto.user.OrderDTO;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.OrderRepository;
 import hcmute.kltn.vtv.service.user.*;
-import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangHoaTocShipping;
-import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangNhanhShipping;
-import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangTietKiemShipping;
-import hcmute.kltn.vtv.service.vtv.shippingstrategy.IShipping;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangHoaTocShippingStrategy;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangNhanhShippingStrategy;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangTietKiemShippingStrategy;
+import hcmute.kltn.vtv.service.vtv.shippingstrategy.IShippingStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -226,11 +226,11 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     private Long calculateShippingFee(String shippingMethod, Long totalPrice) {
-        IShipping shippingStrategy = null;
+        IShippingStrategy shippingStrategy = null;
         if (shippingMethod.equals("GHTK")) {
-            shippingStrategy = new GiaoHangTietKiemShipping();
+            shippingStrategy = new GiaoHangTietKiemShippingStrategy();
         } else {
-            shippingStrategy = new GiaoHangHoaTocShipping();
+            shippingStrategy = new GiaoHangHoaTocShippingStrategy();
         }
         return shippingStrategy.calculateShippingCost(totalPrice);
     }
@@ -247,7 +247,7 @@ public class OrderServiceImpl implements IOrderService {
         Long totalPrice = getTotalPrice(orderItems);
         Long discount = 0L;
 
-        IShipping shippingStrategy = new GiaoHangNhanhShipping();
+        IShippingStrategy shippingStrategy = new GiaoHangNhanhShippingStrategy();
         Long shippingFee = shippingStrategy.calculateShippingCost(totalPrice);
 
         Long totalPayment = totalPrice + shippingFee - discount;

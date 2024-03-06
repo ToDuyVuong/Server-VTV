@@ -14,6 +14,10 @@ public interface ITransportProviderService {
     @Transactional
     TransportProviderResponse updateTransportProviderResponse(UpdateTransportProviderRequest request);
 
+    TransportProvider getTransportProviderByShortName(String shortName);
+
+    List<TransportProvider> getTransportProvidersByProvince(String provinceCodeShop, String provinceCodeCustomer);
+
     TransportProviderResponse getTransportProviderById(Long id);
 
     TransportProvider getTransportProviderByTransportProviderId(Long id);
@@ -22,10 +26,7 @@ public interface ITransportProviderService {
 
     ListTransportProviderResponse getAllTransportProviders();
 
-    ListTransportProviderResponse listTransportProvidersNotProvinceResponse(List<TransportProvider> transportProviders);
 
 
-    TransportProviderResponse transportProviderResponse(TransportProvider transportProvider, String meesage, String status);
 
-    ListTransportProviderResponse listTransportProvidersResponse(List<TransportProvider> transportProviders);
 }

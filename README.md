@@ -348,6 +348,7 @@
 
 - Quản lý vận chuyển:
   - Tính thông tin vận chuyển(dựa vào wardCode và shippingProvider).
+  - Lấy danh sách đơn vị vẩn chuyển và tính phí vận chuyển.(dựa vào wardCode)
 
 
 

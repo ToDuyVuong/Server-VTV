@@ -22,13 +22,19 @@ public class LocationResponse extends ResponseAbstract {
 
     private WardDTO wardDTO;
 
-    public static LocationResponse convertWardToResponse(Ward ward) {
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setWardDTO(WardDTO.convertEntityToDTO(ward));
-        locationResponse.setDistrictDTO(DistrictDTO.convertEntityToDTO(ward.getDistrict()));
-        locationResponse.setProvinceDTO(ProvinceDTO.convertEntityToDTO(ward.getDistrict().getProvince()));
-        locationResponse.setAdministrativeRegionName(ward.getDistrict().getProvince().getAdministrativeRegion().getName());
-        return locationResponse;
+
+
+    public static LocationResponse locationResponse(Ward ward, String message, String status) {
+        LocationResponse response = new LocationResponse();
+        response.setWardDTO(WardDTO.convertEntityToDTO(ward));
+        response.setDistrictDTO(DistrictDTO.convertEntityToDTO(ward.getDistrict()));
+        response.setProvinceDTO(ProvinceDTO.convertEntityToDTO(ward.getDistrict().getProvince()));
+        response.setAdministrativeRegionName(ward.getDistrict().getProvince().getAdministrativeRegion().getName());
+        response.setCode(200);
+        response.setMessage(message);
+        response.setStatus(status);
+
+        return response;
     }
 
 
