@@ -193,7 +193,7 @@ public class OrderServiceImpl implements IOrderService {
         Order order = createTemporaryOrder(request.getUsername(), request.getCartIds());
 
         if (request.getAddressId() != null && request.getAddressId().equals(order.getAddress().getAddressId())) {
-            order.setAddress(addressService.getAddressByIdAndUsername(request.getAddressId(), request.getUsername()));
+            order.setAddress(addressService.checkAddress(request.getAddressId(), request.getUsername()));
         }
 
         // order.setPaymentMethod(request.getPaymentMethod());

@@ -48,12 +48,13 @@ public class AddressDTO {
 
     }
 
-    public static List<AddressDTO> convertToListDTO(List<Address> addresses) {
+    public static List<AddressDTO> convertEntitiesToDTOs(List<Address> addresses) {
         List<AddressDTO> addressDTOs = new ArrayList<>();
         for (Address address : addresses) {
             AddressDTO addressDTO = convertEntityToDTO(address);
             addressDTOs.add(addressDTO);
         }
+        addressDTOs.sort((o1, o2) -> o2.getStatus().compareTo(o1.getStatus()));
 
         return addressDTOs;
     }

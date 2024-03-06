@@ -14,7 +14,7 @@ public class AddressStatusRequest {
 
     private String username;
 
-    private String addressId;
+    private Long addressId;
 
     private Status status;
 
@@ -24,7 +24,7 @@ public class AddressStatusRequest {
             throw new BadRequestException("Tài khoản không được để trống.");
         }
 
-        if (addressId == null || addressId.isEmpty()) {
+        if (addressId == null) {
             throw new BadRequestException("Địa chỉ không được để trống.");
         }
 
@@ -35,12 +35,7 @@ public class AddressStatusRequest {
         if (Status.isValidStatus(String.valueOf(status))) {
             throw new BadRequestException("Trạng thái không hợp lệ.");
         }
-
-        trim();
     }
 
-    public void trim() {
-        this.username = this.username.trim();
-        this.addressId = this.addressId.trim();
-    }
+
 }

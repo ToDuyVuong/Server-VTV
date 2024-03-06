@@ -9,7 +9,7 @@ import hcmute.kltn.vtv.model.entity.user.Address;
 public interface IAddressService {
     AddressResponse addNewAddress(AddressRequest request);
 
-    AddressResponse getAddressById(String addressId, String username);
+    AddressResponse getAddressById(Long addressId, String username);
 
     AddressResponse updateAddress(AddressRequest request);
 
@@ -19,5 +19,7 @@ public interface IAddressService {
 
     Address getAddressActiveByUsername(String username);
 
-    Address getAddressByIdAndUsername(Long addressId, String username);
+
+
+    Address checkAddress(Long addressId, String username);
 }

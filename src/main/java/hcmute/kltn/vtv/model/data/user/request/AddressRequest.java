@@ -17,8 +17,6 @@ public class AddressRequest {
 
     private String username;
 
-    // private AddressDTO addressDTO;
-
     private Long addressId;
 
     private String province;
@@ -79,44 +77,6 @@ public class AddressRequest {
             throw new BadRequestException("Mã xã/phường không được để trống.");
         }
 
-        // if (addressDTO.getProvince() == null || addressDTO.getProvince().isEmpty()) {
-        // throw new BadRequestException("Tỉnh/Thành phố không được để trống.");
-        // }
-        //
-        // if (addressDTO.getDistrict() == null || addressDTO.getDistrict().isEmpty()) {
-        // throw new BadRequestException("Quận/Huyện không được để trống.");
-        // }
-        //
-        // if (addressDTO.getWard() == null || addressDTO.getWard().isEmpty()) {
-        // throw new BadRequestException("Phường/Xã không được để trống.");
-        // }
-        //
-        // if (addressDTO.getFullAddress() == null ||
-        // addressDTO.getFullAddress().isEmpty()) {
-        // throw new BadRequestException("Địa chỉ không được để trống.");
-        // }
-        //
-        // if (addressDTO.getFullName() == null || addressDTO.getFullName().isEmpty()) {
-        // throw new BadRequestException("Họ tên không được để trống.");
-        // }
-        //
-        // if (addressDTO.getPhone() == null || addressDTO.getPhone().isEmpty()) {
-        // throw new BadRequestException("Số điện thoại không được để trống.");
-        // }
-        //
-        // if (!Pattern.matches("[0-9]+", addressDTO.getPhone())) {
-        // throw new BadRequestException("Số điện thoại chỉ được chứa ký tự số.");
-        // }
-        //
-        // if(addressDTO.getPhone().length() < 9 || addressDTO.getPhone().length() >
-        // 11){
-        // throw new BadRequestException("Số điện thoại không hợp lệ.");
-        // }
-        //
-        // if (addressDTO.getStatus() == null ||
-        // Status.isValidStatus(String.valueOf(addressDTO.getStatus()))) {
-        // throw new BadRequestException("Trạng thái không hợp lệ.");
-        // }
 
         trim();
     }

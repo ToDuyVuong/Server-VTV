@@ -12,6 +12,10 @@ import java.util.Optional;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
+
+    boolean existsByAddressIdAndCustomerUsername(Long addressId, String username);
+
+
     Optional<List<Address>> findAllByCustomerAndStatusNot(Customer customer, Status status);
 
     Optional<Address> findFirstByCustomerUsernameAndStatus(String username, Status status);
