@@ -26,8 +26,7 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
     private IAttributeShopService attributeService;
     @Autowired
     private ProductVariantRepository productVariantRepository;
-    @Autowired
-    ModelMapper modelMapper;
+
 
     @Override
     public List<ProductVariant> addNewListProductVariant(List<ProductVariantRequest> requests, Long shopId) {
@@ -118,5 +117,8 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
 
         return productVariant;
     }
+
+
+
 
 }
