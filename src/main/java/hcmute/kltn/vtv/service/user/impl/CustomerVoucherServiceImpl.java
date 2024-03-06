@@ -43,7 +43,8 @@ public class CustomerVoucherServiceImpl implements ICustomerVoucherService {
 
         try {
             customerVoucherRepository.save(customerVoucher);
-            return customerVoucherResponse(customerVoucher.getVoucher(), "Thêm mã giảm giá thành công!", username);
+            return CustomerVoucherResponse.customerVoucherResponse(customerVoucher.getVoucher(),
+                    "Thêm mã giảm giá thành công!", username, "Success");
         } catch (Exception e) {
             throw new BadRequestException("Lưu mã giảm giá thất bại!");
         }
@@ -55,7 +56,8 @@ public class CustomerVoucherServiceImpl implements ICustomerVoucherService {
         List<Voucher> vouchers = voucherRepository.getAllByUsernameAndUsed(username, false)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy mã giảm giá!"));
 
-        return listCustomerVoucherResponse(vouchers, "Lấy danh sách mã giảm giá thành công.", username);
+        return ListCustomerVoucherResponse.listCustomerVoucherResponse(vouchers, "Lấy danh sách mã giảm giá thành công.",
+                username, "OK");
     }
 
     @Override
@@ -74,32 +76,12 @@ public class CustomerVoucherServiceImpl implements ICustomerVoucherService {
 
         try {
             customerVoucherRepository.delete(customerVoucher);
-            return customerVoucherResponse(customerVoucher.getVoucher(), "Xóa mã giảm giá thành công!", username);
+            return CustomerVoucherResponse.customerVoucherResponse(customerVoucher.getVoucher(),
+                    "Xóa mã giảm giá thành công!", username, "Success");
         } catch (Exception e) {
             throw new BadRequestException("Xóa mã giảm giá thất bại!");
         }
     }
 
-    private CustomerVoucherResponse customerVoucherResponse(Voucher voucher, String message, String username) {
-        CustomerVoucherResponse response = new CustomerVoucherResponse();
-        response.setVoucherDTO(VoucherDTO.convertEntityToDTO(voucher));
-        response.setUsername(username);
-        response.setMessage(message);
-        response.setStatus("ok");
-        return response;
-    }
-
-    private ListCustomerVoucherResponse listCustomerVoucherResponse(List<Voucher> vouchers, String message,
-            String username) {
-        ListCustomerVoucherResponse response = new ListCustomerVoucherResponse();
-        response.setVoucherDTOs(VoucherDTO.convertToListDTO(vouchers));
-        response.setUsername(username);
-        response.setMessage(message);
-        response.setStatus("ok");
-        response.setCount(vouchers.size());
-        response.setCode(200);
-
-        return response;
-    }
 
 }

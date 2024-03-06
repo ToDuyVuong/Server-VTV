@@ -201,7 +201,7 @@ public class CartServiceImpl implements ICartService {
         Customer customer = customerService.getCustomerByUsername(request.getUsername());
         ProductVariant productVariant = productVariantService
                 .checkAndProductVariantAvailableWithQuantity(request.getProductVariantId(),
-                request.getQuantity());
+                        request.getQuantity());
 
         Cart cart = new Cart();
         cart.setCustomer(customer);
@@ -213,8 +213,6 @@ public class CartServiceImpl implements ICartService {
 
         return cart;
     }
-
-
 
 
 }
