@@ -48,7 +48,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY p.sold DESC",
             countQuery =
-                    "SELECT COUNT( DISTINCT p.product.id) " +
+                    "SELECT COUNT( DISTINCT p.product_id) " +
                             "FROM product p " +
                             "JOIN product_variant pv " +
                             "ON p.product_id = pv.product_id " +
@@ -66,12 +66,13 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
     @Query(value =
             "SELECT DISTINCT p.* " +
                     "FROM product p " +
-                    "JOIN product_variant pv ON p.product_id = pv.product_id " +
+                    "JOIN product_variant pv " +
+                    "ON p.product_id = pv.product_id " +
                     "WHERE p.status = :status " +
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY pv.price ASC",
-            countQuery = "SELECT COUNT( DISTINCT p.product.id) " +
+            countQuery = "SELECT COUNT( DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN product_variant pv " +
                     "ON p.product_id = pv.product_id " +
@@ -94,7 +95,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY pv.price DESC",
-            countQuery = "SELECT COUNT( DISTINCT p.product.id) " +
+            countQuery = "SELECT COUNT( DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN product_variant pv " +
                     "ON p.product_id = pv.product_id " +
@@ -117,7 +118,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
                     "AND pv.price >= :minPrice " +
                     "AND pv.price <= :maxPrice " +
                     "ORDER BY RAND()",
-            countQuery = "SELECT COUNT( DISTINCT p.product.id) " +
+            countQuery = "SELECT COUNT( DISTINCT p.product_id) " +
                     "FROM product p " +
                     "JOIN product_variant pv " +
                     "ON p.product_id = pv.product_id " +
@@ -155,7 +156,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
                     "WHERE  p.status = :status " +
                     "ORDER BY p.sold DESC",
             countQuery =
-                    "SELECT COUNT( DISTINCT p.product.id) " +
+                    "SELECT COUNT( DISTINCT p.product_id) " +
                             "FROM product p " +
                             "WHERE p.status = :status ",
             nativeQuery = true)
@@ -167,9 +168,11 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
     @Query(value =
             "SELECT  p.* " +
                     "FROM product p " +
+                    "JOIN product_variant pv " +
+                    "ON p.product_id = pv.product_id " +
                     "WHERE p.status = :status " +
                     "ORDER BY pv.price ASC",
-            countQuery = "SELECT COUNT(  p.product.id) " +
+            countQuery = "SELECT COUNT(  p.product_id) " +
                     "FROM product p " +
                     "WHERE p.status = :status ",
             nativeQuery = true)
@@ -179,11 +182,13 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
 
 
     @Query(value =
-            "SELECT  p.* " +
+            "SELECT DISTINCT  p.* " +
                     "FROM product p " +
+                    "JOIN product_variant pv " +
+                    "ON p.product_id = pv.product_id " +
                     "WHERE p.status = :status " +
                     "ORDER BY pv.price DESC",
-            countQuery = "SELECT COUNT(  p.product.id) " +
+            countQuery = "SELECT COUNT( DISTINCT p.product_id) " +
                     "FROM product p " +
                     "WHERE p.status = :status ",
             nativeQuery = true)
@@ -197,7 +202,7 @@ public interface ProductFilterRepository extends JpaRepository<Product, Long> {
                     "FROM product p " +
                     "WHERE p.status = :status " +
                     "ORDER BY RAND()",
-            countQuery = "SELECT COUNT(  p.product.id) " +
+            countQuery = "SELECT COUNT(  p.product_id) " +
                     "FROM product p " +
                     "WHERE p.status = :status ",
             nativeQuery = true)
