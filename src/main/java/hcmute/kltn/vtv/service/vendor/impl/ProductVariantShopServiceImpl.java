@@ -30,11 +30,9 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
 
     @Override
     public List<ProductVariant> addNewListProductVariant(List<ProductVariantRequest> requests, Long shopId) {
-
         List<ProductVariant> productVariants = new ArrayList<>();
         for (ProductVariantRequest request : requests) {
-            ProductVariant productVariant = addNewProductVariant(request, shopId);
-            productVariants.add(productVariant);
+            productVariants.add(addNewProductVariant(request, shopId));
         }
         productVariants.sort(Comparator.comparing(ProductVariant::getSku));
 
@@ -42,18 +40,20 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
     }
 
     @Override
-    public List<ProductVariant> getListProductVariant(List<ProductVariantRequest> requests, Long shopId,
-            Long productId) {
+    public List<ProductVariant> getListProductVariant(List<ProductVariantRequest> requests,
+                                                      Long shopId, Long productId) {
 
-        List<ProductVariant> productVariants = new ArrayList<>();
-        for (ProductVariantRequest request : requests) {
-            ProductVariant productVariant = updateProductVariant(request, shopId);
-            if (productVariant == null) {
-                productVariant = addNewProductVariant(request, shopId);
-            }
+        List<ProductVariant> productVariants = editListProductVariantByProductVariantRequest(requests, shopId, productId);
+        productVariants.sort(Comparator.comparing(ProductVariant::getSku));
 
-            productVariants.add(productVariant);
-        }
+        return productVariants;
+    }
+
+
+    private List<ProductVariant> editListProductVariantByProductVariantRequest(List<ProductVariantRequest> requests,
+                                                                               Long shopId, Long productId) {
+
+        List<ProductVariant> productVariants = addNewProductVariantNotExisted(requests, shopId);
 
         List<ProductVariant> existingVariants = productVariantRepository.findAllByProductProductId(productId);
 
@@ -73,10 +73,24 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
             }
         }
 
-        productVariants.sort(Comparator.comparing(ProductVariant::getSku));
+        return productVariants;
+    }
+
+
+    private List<ProductVariant> addNewProductVariantNotExisted(List<ProductVariantRequest> requests, Long shopId) {
+        List<ProductVariant> productVariants = new ArrayList<>();
+        for (ProductVariantRequest request : requests) {
+            ProductVariant productVariant = updateProductVariant(request, shopId);
+            if (productVariant == null) {
+                productVariant = addNewProductVariant(request, shopId);
+            }
+            productVariants.add(productVariant);
+        }
 
         return productVariants;
     }
+
+
 
     private ProductVariant updateProductVariant(ProductVariantRequest request, Long shopId) {
         ProductVariant productVariant = productVariantRepository.findByProductVariantId(request.getProductVariantId());
@@ -84,16 +98,59 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
             return null;
         }
 
-        List<Attribute> attributes = new ArrayList<>();
-        if (request.getAttributeIds() != null && !request.getAttributeIds().isEmpty()) {
-            attributes = attributeService.getListAttributeByListId(request.getAttributeIds(), shopId);
-        }
+        List<Attribute> attributes = getListAttributeByAttributeIds(request.getAttributeIds(), shopId);
+        checkSameSkuProductVariant(request.getSku(), productVariant);
 
-        if (!request.getSku().equals(productVariant.getSku()) && productVariantRepository
-                .existsBySkuAndProductProductId(request.getSku(),
+        return editProductVariantByProductVariantRequest(productVariant, request, attributes);
+    }
+
+
+    private void checkSameSkuProductVariant(String sku, ProductVariant productVariant) {
+        if (!sku.equals(productVariant.getSku()) && productVariantRepository
+                .existsBySkuAndProductProductId(sku,
                         productVariant.getProduct().getProductId())) {
             throw new BadRequestException("Mã biến thể sản phẩm đã tồn tại trong sản phẩm!");
         }
+    }
+
+
+    private ProductVariant addNewProductVariant(ProductVariantRequest request, Long shopId) {
+        List<Attribute> attributes = getListAttributeByAttributeIds(request.getAttributeIds(), shopId);
+
+        try {
+            return createProductVariantByProductVariantRequest(request, attributes);
+        } catch (Exception e) {
+            throw new BadRequestException("Thêm biến thể sản phẩm thất bại!");
+        }
+    }
+
+
+    private List<Attribute> getListAttributeByAttributeIds(List<Long> attributeIds, Long shopId) {
+        List<Attribute> attributes = new ArrayList<>();
+        if (attributeIds != null && !attributeIds.isEmpty()) {
+            attributes = attributeService.getListAttributeByListId(attributeIds, shopId);
+        }
+        return attributes;
+    }
+
+
+    private ProductVariant createProductVariantByProductVariantRequest(ProductVariantRequest request, List<Attribute> attributes) {
+
+        ProductVariant productVariant = new ProductVariant();
+        productVariant.setSku(request.getSku());
+        productVariant.setImage(request.getImage());
+        productVariant.setOriginalPrice(request.getOriginalPrice());
+        productVariant.setPrice(request.getPrice());
+        productVariant.setQuantity(request.getQuantity());
+        productVariant.setStatus(Status.ACTIVE);
+        productVariant.setCreateAt(LocalDateTime.now());
+        productVariant.setAttributes(attributes);
+
+        return productVariant;
+    }
+
+
+    private ProductVariant editProductVariantByProductVariantRequest(ProductVariant productVariant, ProductVariantRequest request, List<Attribute> attributes) {
 
         productVariant.setSku(request.getSku());
         productVariant.setImage(request.getImage());
@@ -104,21 +161,6 @@ public class ProductVariantShopServiceImpl implements IProductVariantShopService
 
         return productVariant;
     }
-
-    private ProductVariant addNewProductVariant(ProductVariantRequest request, Long shopId) {
-        List<Attribute> attributes = new ArrayList<>();
-        if (request.getAttributeIds() != null && !request.getAttributeIds().isEmpty()) {
-            attributes = attributeService.getListAttributeByListId(request.getAttributeIds(), shopId);
-        }
-
-        ProductVariant productVariant = modelMapper.map(request, ProductVariant.class);
-        productVariant.setStatus(Status.ACTIVE);
-        productVariant.setAttributes(attributes);
-
-        return productVariant;
-    }
-
-
 
 
 }
