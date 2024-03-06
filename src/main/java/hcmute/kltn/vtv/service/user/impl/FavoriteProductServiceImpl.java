@@ -16,6 +16,7 @@ import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.user.IFavoriteProductService;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,65 +36,32 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
     @Autowired
     private IProductService productService;
     @Autowired
-    private IProductShopService productShopService;
-    @Autowired
     private FavoriteProductRepository favoriteProductRepository;
-    @Autowired
-    ModelMapper modelMapper;
+
 
     @Override
     @Transactional
     public FavoriteProductResponse addNewFavoriteProduct(Long productId, String username) {
-
-        boolean isExist = favoriteProductRepository.existsByCustomerUsernameAndProductProductId(username, productId);
-        if (isExist) {
-            throw new BadRequestException("Sản phẩm đã có trong danh sách yêu thích.");
-        }
-
-        Customer customer = customerService.getCustomerByUsername(username);
-        Product product = productService.getProductById(productId);
-
-        FavoriteProduct favoriteProduct = new FavoriteProduct();
-        favoriteProduct.setCustomer(customer);
-        favoriteProduct.setProduct(product);
-        favoriteProduct.setCreateAt(LocalDateTime.now());
-
+        checkExistFavoriteProductByProductIdAndUsername(productId, username);
+        FavoriteProduct favoriteProduct = createFavoriteProductByProductIdAndUsername(productId, username);
         try {
-            FavoriteProduct saveFavoriteProduct = favoriteProductRepository.save(favoriteProduct);
+            favoriteProductRepository.save(favoriteProduct);
 
-            FavoriteProductDTO favoriteProductDTO = FavoriteProductDTO.convertToDTO(saveFavoriteProduct);
-            FavoriteProductResponse response = new FavoriteProductResponse();
-            response.setFavoriteProductDTO(favoriteProductDTO);
-            response.setMessage("Thêm sản phẩm vào danh sách yêu thích thành công!");
-            response.setStatus("success");
-            response.setCode(200);
-            return response;
+            return FavoriteProductResponse.favoriteProductResponse(favoriteProduct,
+                    "Thêm sản phẩm vào danh sách yêu thích thành công!", "Success");
         } catch (Exception e) {
-            throw new BadRequestException("Thêm sản phẩm vào danh sách yêu thích thất bại!");
+            throw new InternalServerErrorException("Thêm sản phẩm vào danh sách yêu thích thất bại!");
         }
 
     }
 
+
     @Override
     public ProductResponse getProductByFavoriteProductId(Long favoriteProductId, String username) {
-        FavoriteProduct favoriteProduct = favoriteProductRepository.findById(favoriteProductId)
-                .orElseThrow(() -> new BadRequestException("Sản phẩm yêu thích không tồn tại."));
+        FavoriteProduct favoriteProduct = getFavoriteProductById(favoriteProductId);
 
-        if (!favoriteProduct.getCustomer().getUsername().equals(username)) {
-            throw new BadRequestException("Sản phẩm yêu thích không thuộc sở hữu của bạn.");
-        }
-
-        ProductDTO productDTO = modelMapper.map(favoriteProduct.getProduct(), ProductDTO.class);
-        productDTO.setProductVariantDTOs(
-                ProductVariantDTO.convertToListDTO(favoriteProduct.getProduct().getProductVariants()));
-
-        ProductResponse response = new ProductResponse();
-        response.setProductDTO(productDTO);
-        response.setMessage("Lấy thông tin sản phẩm yêu thích thành công.");
-        response.setStatus("ok");
-        response.setCode(200);
-
-        return response;
+        return  ProductResponse.productResponse(favoriteProduct.getProduct(),
+                "Lấy thông tin sản phẩm yêu thích thành công.", "OK");
     }
 
     @Override
@@ -103,24 +71,14 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
         List<FavoriteProduct> listFavoriteProduct = favoriteProductRepository.findByCustomer(customer)
                 .orElseThrow(() -> new BadRequestException("Không có sản phẩm yêu thích nào!"));
 
-        listFavoriteProduct.sort(Comparator.comparing(FavoriteProduct::getCreateAt).reversed());
-        List<FavoriteProductDTO> favoriteProductDTOs = FavoriteProductDTO.convertToListDTO(listFavoriteProduct);
-
-        ListFavoriteProductResponse response = new ListFavoriteProductResponse();
-        response.setCustomerDTO(modelMapper.map(customer, CustomerDTO.class));
-        response.setFavoriteProductDTOs(favoriteProductDTOs);
-        response.setCount(listFavoriteProduct.size());
-        response.setMessage("Lấy danh sách sản phẩm yêu thích thành công.");
-        response.setStatus("ok");
-        response.setCode(200);
-
-        return response;
+        return ListFavoriteProductResponse.listFavoriteProductResponse(customer, listFavoriteProduct,
+                "Lấy danh sách sản phẩm yêu thích thành công.", "OK");
     }
 
     @Override
     public FavoriteProductResponse deleteFavoriteProduct(Long favoriteProductId, String username) {
-        FavoriteProduct favoriteProduct = favoriteProductRepository.findById(favoriteProductId)
-                .orElseThrow(() -> new BadRequestException("Sản phẩm yêu thích không tồn tại."));
+        checkExistFavoriteProductByFavoriteProductIdAndUsername(favoriteProductId, username);
+        FavoriteProduct favoriteProduct = getFavoriteProductById(favoriteProductId);
 
         if (!favoriteProduct.getCustomer().getUsername().equals(username)) {
             throw new BadRequestException("Sản phẩm yêu thích không thuộc sở hữu của bạn.");
@@ -128,14 +86,53 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
 
         try {
             favoriteProductRepository.delete(favoriteProduct);
-            FavoriteProductResponse response = new FavoriteProductResponse();
-            response.setMessage("Xóa sản phẩm yêu thích thành công.");
-            response.setStatus("ok");
-            response.setCode(200);
-            return response;
+
+            return FavoriteProductResponse.favoriteProductResponse(null,
+                    "Xóa sản phẩm yêu thích thành công!", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Xóa sản phẩm yêu thích thất bại.");
         }
     }
+
+
+    private FavoriteProduct createFavoriteProductByProductIdAndUsername(Long productId, String username) {
+        Customer customer = customerService.getCustomerByUsername(username);
+        Product product = productService.getProductById(productId);
+
+        FavoriteProduct favoriteProduct = new FavoriteProduct();
+        favoriteProduct.setCustomer(customer);
+        favoriteProduct.setProduct(product);
+        favoriteProduct.setCreateAt(LocalDateTime.now());
+
+        return favoriteProduct;
+    }
+
+    private void checkExistFavoriteProductByProductIdAndUsername(Long productId, String username) {
+        if (favoriteProductRepository.existsByCustomerUsernameAndProductProductId(username, productId)) {
+            throw new BadRequestException("Sản phẩm đã có trong danh sách yêu thích của bạn.");
+        }
+    }
+
+
+    private void checkExistFavoriteProductByFavoriteProductIdAndUsername(Long favoriteProductId, String username) {
+        checkExistFavoriteProductId(favoriteProductId);
+        if (!favoriteProductRepository.existsByFavoriteProductIdAndCustomerUsername(favoriteProductId, username)) {
+            throw new BadRequestException("Mã sản phẩm yêu thích không tồn tại trong danh sách của bạn.");
+        }
+    }
+
+    private void checkExistFavoriteProductId(Long favoriteProductId) {
+        if (!favoriteProductRepository.existsById(favoriteProductId)) {
+            throw new BadRequestException("Mã sản phẩm yêu thích không tồn tại.");
+        }
+    }
+
+
+    private FavoriteProduct getFavoriteProductById(Long favoriteProductId) {
+        return favoriteProductRepository.findById(favoriteProductId)
+                .orElseThrow(() -> new BadRequestException("Sản phẩm yêu thích không tồn tại."));
+    }
+
+
 
 }

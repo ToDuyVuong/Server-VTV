@@ -23,7 +23,7 @@ public class FavoriteProductDTO {
 
     private ProductDTO productDTO;
 
-    public static FavoriteProductDTO convertToDTO(FavoriteProduct favoriteProduct) {
+    public static FavoriteProductDTO convertEntityToDTO(FavoriteProduct favoriteProduct) {
         ModelMapper modelMapper = new ModelMapper();
         FavoriteProductDTO favoriteProductDTO = new FavoriteProductDTO();
         favoriteProductDTO.setFavoriteProductId(favoriteProduct.getFavoriteProductId());
@@ -31,16 +31,18 @@ public class FavoriteProductDTO {
         return favoriteProductDTO;
     }
 
-    public static List<FavoriteProductDTO> convertToListDTO(List<FavoriteProduct> favoriteProducts) {
+    public static List<FavoriteProductDTO> convertToEntitiesDTOs(List<FavoriteProduct> favoriteProducts) {
+        favoriteProducts.sort((o1, o2) -> o2.getCreateAt().compareTo(o1.getCreateAt()));
 
-        List<FavoriteProductDTO> favoriteProductDTOS = new ArrayList<>();
+        List<FavoriteProductDTO> favoriteProductDTOs = new ArrayList<>();
         for (FavoriteProduct favoriteProduct : favoriteProducts) {
             FavoriteProductDTO favoriteProductDTO = new FavoriteProductDTO();
             favoriteProductDTO.setFavoriteProductId(favoriteProduct.getFavoriteProductId());
             favoriteProductDTO.setProductDTO(getProductToDTO(favoriteProduct.getProduct()));
-            favoriteProductDTOS.add(favoriteProductDTO);
+            favoriteProductDTOs.add(favoriteProductDTO);
         }
-        return favoriteProductDTOS;
+
+        return favoriteProductDTOs;
 
     }
 

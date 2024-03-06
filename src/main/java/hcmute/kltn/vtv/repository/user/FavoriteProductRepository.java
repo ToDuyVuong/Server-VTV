@@ -17,4 +17,5 @@ public interface FavoriteProductRepository extends JpaRepository<FavoriteProduct
 
     int countByProductProductId(Long productId);
 
+    boolean existsByFavoriteProductIdAndCustomerUsername(Long favoriteProductId, String username);
 }
