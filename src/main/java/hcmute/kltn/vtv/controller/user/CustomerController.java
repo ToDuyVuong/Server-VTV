@@ -30,9 +30,8 @@ public class CustomerController {
     @GetMapping("/profile")
     public ResponseEntity<ProfileCustomerResponse> getProfileCustomer(HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
-        ProfileCustomerResponse profileCustomerResponse = customerService.getProfileCustomer(username);
 
-        return ResponseEntity.ok(profileCustomerResponse);
+        return ResponseEntity.ok(customerService.getProfileCustomer(username));
     }
 
 
@@ -42,8 +41,9 @@ public class CustomerController {
             HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
         profileCustomerRequest.setUsername(username);
-        ProfileCustomerResponse profileCustomerResponse = customerService.updateProfileCustomer(profileCustomerRequest);
-        return ResponseEntity.ok(profileCustomerResponse);
+        profileCustomerRequest.validate();
+
+        return ResponseEntity.ok(customerService.updateProfileCustomer(profileCustomerRequest));
     }
 
 
@@ -53,9 +53,9 @@ public class CustomerController {
             HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
         changePasswordRequest.setUsername(username);
-        ProfileCustomerResponse profileCustomerResponse = customerService.changePassword(changePasswordRequest);
+        changePasswordRequest.validate();
 
-        return ResponseEntity.ok(profileCustomerResponse);
+        return ResponseEntity.ok(customerService.changePassword(changePasswordRequest));
     }
 
 
@@ -66,8 +66,7 @@ public class CustomerController {
             throw new BadRequestException("Tài khoản không được để trống.");
         }
 
-        SendEmailResponse response = mailService.forgotPasswordSendOtpToEmail(username);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(mailService.forgotPasswordSendOtpToEmail(username));
     }
 
 
@@ -92,9 +91,9 @@ public class CustomerController {
 
     @PatchMapping("/reset-password")
     public ResponseEntity<RegisterResponse> resetPassword(@RequestBody ForgotPasswordRequest request) {
-        RegisterResponse response = customerService.resetPassword(request);
+        request.validate();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(customerService.resetPassword(request));
     }
 
 

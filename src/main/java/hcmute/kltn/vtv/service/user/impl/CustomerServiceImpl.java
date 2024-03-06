@@ -37,11 +37,8 @@ public class CustomerServiceImpl implements ICustomerService {
     @Autowired
     private IOtpService otpService;
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private PasswordEncoder passwordEncoder;
-//    @Autowired
-//    private final IMailService mailService;
+
 
     @Override
     public Customer getCustomerByUsername(String username) {
@@ -51,55 +48,40 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public ProfileCustomerResponse getProfileCustomer(String username) {
-        if (username == null || username.isEmpty()) {
-            throw new BadRequestException("Tài khoản không được để trống.");
-        }
         Customer customer = getCustomerByUsername(username);
 
-        return profileCustomerResponse(customer, "Lấy thông tin khách hàng thành công.", "OK");
+        return ProfileCustomerResponse.profileCustomerResponse(customer, "Lấy thông tin khách hàng thành công.", "OK");
     }
 
     @Override
     @Transactional
     public ProfileCustomerResponse updateProfileCustomer(ProfileCustomerRequest request) {
-        request.validate();
-
-        Customer customerUpdate = getCustomerByUsername(request.getUsername());
-        customerUpdate.setBirthday(request.getBirthday());
-        customerUpdate.setEmail(request.getEmail());
-        customerUpdate.setFullName(request.getFullName());
-        customerUpdate.setGender(request.isGender());
-        customerUpdate.setUpdateAt(LocalDateTime.now());
+        Customer customer = editProfileCustomerByProfileCustomerRequest(request);
 
         try {
-            customerRepository.save(customerUpdate);
+            customerRepository.save(customer);
 
-            return profileCustomerResponse(customerUpdate, "Cập nhật thông tin khách hàng thành công.", "Success");
+            return ProfileCustomerResponse.profileCustomerResponse(customer, "Cập nhật thông tin khách hàng thành công.", "Success");
         } catch (Exception e) {
-            throw new BadRequestException("Cập nhật thông tin khách hàng thất bại!");
+            throw new InternalServerErrorException("Cập nhật thông tin khách hàng thất bại!");
         }
     }
 
     @Override
     @Transactional
     public ProfileCustomerResponse changePassword(ChangePasswordRequest request) {
-        request.validate();
         Customer customerUpdate = getCustomerByUsername(request.getUsername());
-
-        boolean checkPassword = passwordEncoder.matches(request.getOldPassword(), customerUpdate.getPassword());
-        if (!checkPassword) {
-            throw new BadRequestException("Mật khẩu cũ không chính xác.");
+        if (!passwordEncoder.matches(request.getOldPassword(), customerUpdate.getPassword())) {
+            throw new InternalServerErrorException("Mật khẩu cũ không chính xác.");
         }
-
         customerUpdate.setPassword(passwordEncoder.encode(request.getNewPassword()));
         customerUpdate.setUpdateAt(LocalDateTime.now());
-
         try {
             customerRepository.save(customerUpdate);
 
-            return profileCustomerResponse(customerUpdate, "Cập nhật mật khẩu của khách hàng thành công.", "Success");
+            return ProfileCustomerResponse.profileCustomerResponse(customerUpdate, "Cập nhật mật khẩu của khách hàng thành công.", "Success");
         } catch (Exception e) {
-            throw new BadRequestException("Cập nhật mật khẩu của khách hàng thất bại!");
+            throw new InternalServerErrorException("Cập nhật mật khẩu của khách hàng thất bại!");
         }
 
     }
@@ -107,7 +89,6 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     @Transactional
     public RegisterResponse resetPassword(ForgotPasswordRequest request) {
-        request.validate();
         otpService.verifyOtp(request.getUsername(), request.getOtp());
 
         Customer customerUpdate = getCustomerByUsername(request.getUsername());
@@ -133,9 +114,7 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     @Transactional
     public RegisterResponse activateAccount(ActiveAccountRequest request) {
-        request.validate();
         otpService.verifyOtp(request.getUsername(), request.getOtp());
-
         Customer customerUpdate = getCustomerByUsername(request.getUsername());
         customerUpdate.setStatus(Status.ACTIVE);
         customerUpdate.setUpdateAt(LocalDateTime.now());
@@ -160,9 +139,13 @@ public class CustomerServiceImpl implements ICustomerService {
         }
         throw new BadRequestException("Tài khoản của bạn đã được kích hoạt.");
 
-
     }
 
+
+    @Override
+    public boolean checkUsernameExist(String username) {
+        return customerRepository.existsByUsername(username);
+    }
 
     @Override
     public Customer getCustomerById(Long customerId) {
@@ -191,21 +174,20 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
 
-    private ProfileCustomerResponse profileCustomerResponse(Customer customer, String message, String status) {
-        ProfileCustomerResponse response = new ProfileCustomerResponse();
-        response.setCustomerDTO(CustomerDTO.convertEntityToDTO(customer));
-        response.setMessage(message);
-        response.setStatus(status);
-        response.setCode(200);
+    private Customer editProfileCustomerByProfileCustomerRequest(ProfileCustomerRequest request) {
+        Customer customer = getCustomerByUsername(request.getUsername());
+        customer.setBirthday(request.getBirthday());
+        customer.setEmail(request.getEmail());
+        customer.setFullName(request.getFullName());
+        customer.setGender(request.isGender());
+        customer.setUpdateAt(LocalDateTime.now());
 
-        return response;
+        return customer;
     }
 
 
-    @Override
-    public boolean checkUsernameExist(String username) {
-        return customerRepository.existsByUsername(username);
-    }
+
+
 
 
 }
