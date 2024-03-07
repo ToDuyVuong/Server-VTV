@@ -6,4 +6,6 @@ public interface ICategoryService {
     CategoryResponse getAllCategoryParent();
 
     CategoryResponse getAllCategoryByParentId(Long categoryId);
+
+    CategoryResponse getAllCategoryByShopId(Long shopId);
 }

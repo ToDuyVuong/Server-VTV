@@ -37,4 +37,11 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
 
+    @Override
+    public CategoryResponse getAllCategoryByShopId(Long shopId) {
+        List<Category> categories = categoryRepository.findAllByShopShopId(shopId);
+        return CategoryResponse.categoryResponse(categories, "Lấy danh mục theo cửa hàng thành công!", "OK");
+    }
+
+
 }
