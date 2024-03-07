@@ -18,9 +18,12 @@ public class ProductResponse extends ResponseAbstract {
     private ProductDTO productDTO;
 
 
-    public static ProductResponse productResponse(Product product, String message, String status) {
+    public static ProductResponse productResponse(Product product, String message, String status, float rating) {
         ProductResponse response = new ProductResponse();
         response.setProductDTO(ProductDTO.convertEntityToDTO(product));
+        response.setCategoryName(product.getCategory().getName());
+        response.setShopName(product.getCategory().getShop().getName());
+        response.setRating(rating);
         response.setMessage(message);
         response.setStatus(status);
         response.setCode(200);

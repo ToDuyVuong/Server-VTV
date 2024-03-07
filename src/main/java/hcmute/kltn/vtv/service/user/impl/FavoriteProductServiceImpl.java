@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.service.guest.IReviewService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.FavoriteProductResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListFavoriteProductResponse;
@@ -37,8 +38,8 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
     private IProductService productService;
     @Autowired
     private FavoriteProductRepository favoriteProductRepository;
-
-
+    @Autowired
+    private final IReviewService reviewService;
     @Override
     @Transactional
     public FavoriteProductResponse addNewFavoriteProduct(Long productId, String username) {
@@ -60,8 +61,10 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
     public ProductResponse getProductByFavoriteProductId(Long favoriteProductId, String username) {
         FavoriteProduct favoriteProduct = getFavoriteProductById(favoriteProductId);
 
+        float rating = reviewService.countAverageRatingByProductId(favoriteProduct.getProduct().getProductId());
+
         return  ProductResponse.productResponse(favoriteProduct.getProduct(),
-                "Lấy thông tin sản phẩm yêu thích thành công.", "OK");
+                "Lấy thông tin sản phẩm yêu thích thành công.", "OK", rating);
     }
 
     @Override

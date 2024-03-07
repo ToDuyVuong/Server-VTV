@@ -31,9 +31,7 @@ public class ProductController {
 
     @GetMapping("/detail/{productId}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long productId) {
-        if (productId == null) {
-            throw new NotFoundException("Mã sản phẩm không được để trống!");
-        }
+
         return ResponseEntity.ok(productService.getProductDetail(productId));
     }
 
@@ -49,42 +47,34 @@ public class ProductController {
 
     @GetMapping("/shop/{shopId}")
     public ResponseEntity<ListProductResponse> getListProductByShopId(@PathVariable Long shopId) {
-        if (shopId == null) {
-            throw new NotFoundException("Mã cửa hàng không được để trống!");
-        }
+
         return ResponseEntity.ok(productService.getListProductByShopId(shopId));
     }
 
     @GetMapping("/best-selling/{shopId}")
     public ResponseEntity<ListProductResponse> getBestSellingProductsOnShop(@PathVariable Long shopId,
-            @RequestParam Long limit) {
-        if (shopId == null) {
-            throw new NotFoundException("Mã cửa hàng không được để trống!");
-        }
-        int intLimit = Math.toIntExact(limit);
-        if (intLimit <= 0) {
+                                                                            @RequestParam int limit) {
+
+        if (limit <= 0) {
             throw new NotFoundException("Số lượng sản phẩm bán chạy nhất phải lớn hơn 0!");
         }
 
-        return ResponseEntity.ok(productService.getBestSellingProducts(shopId, intLimit, true));
+        return ResponseEntity.ok(productService.getBestSellingProducts(shopId, limit, true));
     }
 
     @GetMapping("/best-selling")
-    public ResponseEntity<ListProductResponse> getBestSellingProducts(@RequestParam Long limit) {
+    public ResponseEntity<ListProductResponse> getBestSellingProducts(@RequestParam int limit) {
 
-        int intLimit = Math.toIntExact(limit);
-        if (intLimit <= 0) {
+        if (limit <= 0) {
             throw new NotFoundException("Số lượng sản phẩm bán chạy nhất phải lớn hơn 0!");
         }
 
-        return ResponseEntity.ok(productService.getBestSellingProducts(null, intLimit, false));
+        return ResponseEntity.ok(productService.getBestSellingProducts(null, limit, false));
     }
 
     @GetMapping("/list-new/{shopId}")
     public ResponseEntity<ListProductResponse> getListNewProductOnShop(@PathVariable Long shopId) {
-        if (shopId == null) {
-            throw new NotFoundException("Mã cửa hàng không được để trống!");
-        }
+
         return ResponseEntity.ok(productService.getListNewProduct(shopId));
     }
 
@@ -95,59 +85,23 @@ public class ProductController {
 
     @GetMapping("/price-range/{shopId}")
     public ResponseEntity<ListProductResponse> getListProductByPriceRangeOnShop(@PathVariable Long shopId,
-            @RequestParam Long minPrice,
-            @RequestParam Long maxPrice) {
-        if (shopId == null) {
-            throw new NotFoundException("Mã cửa hàng không được để trống!");
-        }
-        checkPrice(minPrice, maxPrice);
+                                                                                @RequestParam Long minPrice,
+                                                                                @RequestParam Long maxPrice) {
+        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
         return ResponseEntity.ok(productService.getListProductByPriceRange(shopId, minPrice, maxPrice));
     }
 
     @GetMapping("/price-range")
     public ResponseEntity<ListProductResponse> getListProductByPriceRange(@RequestParam Long minPrice,
-            @RequestParam Long maxPrice) {
-        checkPrice(minPrice, maxPrice);
+                                                                          @RequestParam Long maxPrice) {
+        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
         return ResponseEntity.ok(productService.getListProductByPriceRange(null, minPrice, maxPrice));
     }
 
-    @GetMapping("/search/{shopId}")
-    public ResponseEntity<ListProductResponse> searchProductsByOnShop(@PathVariable Long shopId,
-            @RequestParam String productName) {
-        if (shopId == null) {
-            throw new NotFoundException("Mã cửa hàng không được để trống!");
-        }
-        if (productName == null) {
-            throw new NotFoundException("Tên sản phẩm không được để trống!");
-        }
-        return ResponseEntity.ok(productService.searchProducts(shopId, productName));
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<ListProductResponse> searchProducts(@RequestParam String productName) {
-        if (productName == null) {
-            throw new NotFoundException("Tên sản phẩm không được để trống!");
-        }
-        return ResponseEntity.ok(productService.searchProducts(null, productName));
-    }
-
-    public static void checkPrice(@RequestParam Long minPrice, @RequestParam Long maxPrice) {
-        if (minPrice == null || maxPrice == null) {
-            throw new NotFoundException("Giá sản phẩm không được để trống!");
-        }
-        if (minPrice <= 0 || maxPrice <= 0) {
-            throw new BadRequestException("Giá sản phẩm không được nhỏ hơn hoặc bằng 0!");
-        }
-        if (minPrice >= maxPrice) {
-            throw new BadRequestException("Giá sản phẩm tối thiểu phải nhỏ hơn hoặc bằng giá sản phẩm tối đa!");
-        }
-    }
 
     @GetMapping("/count-favorite/{productId}")
     public ResponseEntity<Integer> countFavoriteProduct(@PathVariable Long productId) {
-        if (productId == null) {
-            throw new NotFoundException("Mã sản phẩm không được để trống!");
-        }
+
         return ResponseEntity.ok(favoriteProductGuestService.countFavoriteProduct(productId));
     }
 

@@ -2,7 +2,6 @@ package hcmute.kltn.vtv.service.guest.impl;
 
 import hcmute.kltn.vtv.model.data.vendor.response.ListProductResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
 import hcmute.kltn.vtv.model.entity.vtv.Product;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.ProductRepository;
@@ -11,7 +10,6 @@ import hcmute.kltn.vtv.service.guest.IReviewService;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,52 +28,26 @@ public class ProductServiceImpl implements IProductService {
     private IProductShopService productShopService;
     @Autowired
     private final IReviewService reviewService;
-    @Autowired
-    ModelMapper modelMapper;
+
 
     @Override
     public ProductResponse getProductDetail(Long productId) {
-        Product product = productRepository
-                .findById(productId)
+        checkExistProductById(productId);
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
 
-        ProductDTO productDTO = ProductDTO.convertEntityToDTO(product);
+        float rating = reviewService.countAverageRatingByProductId(productId);
 
-        ProductResponse response = new ProductResponse();
-        response.setCategoryName(product.getCategory().getName());
-        response.setProductDTO(productDTO);
-        response.setRating(reviewService.countAverageRatingByProductId(productId));
-        response.setShopName(product.getCategory().getShop().getName());
-        response.setMessage("Lấy thông tin sản phẩm thành công!");
-        response.setStatus("ok");
-        response.setCode(200);
-        return response;
+        return ProductResponse.productResponse(product, "Lấy thông tin sản phẩm thành công!", "OK", rating);
     }
 
-//    @Override
-//    public ListProductResponse getListProductByCategoryId(Long categoryId, boolean isParent) {
-//        List<Product> products;
-//        if (isParent) {
-//            products = productRepository.findByCategoryParentCategoryIdAndStatus(categoryId, Status.ACTIVE)
-//                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục cha này!"));
-//        } else {
-//            products = productRepository.findByCategoryCategoryIdAndStatus(categoryId, Status.ACTIVE)
-//                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục này!"));
-//        }
-//
-//        return productShopService.getListProductResponseSort(products,
-//                "Lấy danh sách sản phẩm thành công!",
-//                true);
-//    }
 
     @Override
     public ListProductResponse getListProductByShopId(Long shopId) {
         List<Product> products = productRepository.findByCategoryShopShopIdAndStatus(shopId, Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));
 
-        return productShopService.getListProductResponseSort(products,
-                "Lấy danh sách sản phẩm thành công!",
-                true);
+        return ListProductResponse.listProductResponse(products, "Lấy danh sách sản phẩm theo cửa hàng thành công!", "OK");
     }
 
     @Override
@@ -92,21 +64,9 @@ public class ProductServiceImpl implements IProductService {
         String message = isShop ? "Lấy danh sách sản phẩm bán chạy trong cửa hàng thành công!"
                 : "Lấy danh sách sản phẩm bán chạy thành công!";
 
-        return responseWithLimit(products, limit, message);
+        return ListProductResponse.listProductResponse(products, message, "OK");
     }
 
-    private ListProductResponse responseWithLimit(List<Product> products, int limit, String message) {
-        ListProductResponse response = productShopService.getListProductResponseSort(products,
-                message,
-                false);
-
-        if (response.getCount() > limit) {
-            response.setProductDTOs(response.getProductDTOs().subList(0, limit));
-            response.setCount(limit);
-        }
-
-        return response;
-    }
 
     @Override
     public ListProductResponse getListNewProduct(Long shopId) {
@@ -172,6 +132,13 @@ public class ProductServiceImpl implements IProductService {
         return productRepository
                 .findById(productId)
                 .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
+    }
+
+
+    private void checkExistProductById(Long productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new NotFoundException("Sản phẩm không tồn tại!");
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.model.data.vendor.response;
 
 import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
+import hcmute.kltn.vtv.model.entity.vtv.Product;
 import hcmute.kltn.vtv.model.extra.ResponseAbstract;
 import lombok.*;
 
@@ -13,7 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 public class ListProductResponse extends ResponseAbstract {
 
-        private int count;
+    private int count;
 
-        private List<ProductDTO> productDTOs;
+    private List<ProductDTO> productDTOs;
+
+    public static ListProductResponse listProductResponse(List<Product> products, String message, String status) {
+        ListProductResponse response = new ListProductResponse();
+        response.setProductDTOs(ProductDTO.convertToListDTO(products));
+        response.setCode(200);
+        response.setMessage(message);
+        response.setStatus(status);
+        return response;
+    }
 }
