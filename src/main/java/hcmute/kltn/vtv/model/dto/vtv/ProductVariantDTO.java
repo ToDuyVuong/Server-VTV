@@ -59,19 +59,7 @@ public class ProductVariantDTO {
         List<ProductVariantDTO> productVariantDTOs = new ArrayList<>();
 
         for (ProductVariant productVariant : productVariants) {
-
-            ProductVariantDTO productVariantDTO = convertEntityToDTO(productVariant);
-            // ProductVariantDTO productVariantDTO = new ProductVariantDTO();
-            // productVariantDTO.setProductVariantId(productVariant.getProductVariantId());
-            // productVariantDTO.setSku(productVariant.getSku());
-            // productVariantDTO.setImage(productVariant.getImage());
-            // productVariantDTO.setPrice(productVariant.getPrice());
-            // productVariantDTO.setQuantity(productVariant.getQuantity());
-            // productVariantDTO.setStatus(productVariant.getStatus());
-            // productVariantDTO.setAttributeDTOs(AttributeDTO.convertToListDTO(productVariant.getAttributes()));
-            // productVariantDTO.setProductId(productVariant.getProduct().getProductId());
-
-            productVariantDTOs.add(productVariantDTO);
+            productVariantDTOs.add(convertEntityToDTO(productVariant));
         }
         return productVariantDTOs;
     }

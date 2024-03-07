@@ -34,25 +34,23 @@ public class ProductDTO {
 
     private Long brandId;
 
+    private Long maxPrice;  // New field to store the maximum price
+
+    private Long minPrice;  // New field to store the minimum price
+
     private List<ProductVariantDTO> productVariantDTOs;
+
 
     public static List<ProductDTO> convertToListDTO(List<Product> products) {
         List<ProductDTO> productDTOs = new ArrayList<>();
-        // ModelMapper modelMapper = new ModelMapper();
-
         for (Product product : products) {
-            // ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
-            ProductDTO productDTO = convertEntityToDTO(product);
-
-            // productDTO.setProductVariantDTOs(ProductVariantDTO.convertToListDTO(product.getProductVariants()));
-            productDTOs.add(productDTO);
+            productDTOs.add(convertEntityToDTO(product));
         }
         return productDTOs;
     }
 
     public static ProductDTO convertEntityToDTO(Product product) {
-        // ModelMapper modelMapper = new ModelMapper();
-        // ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+
         ProductDTO productDTO = new ProductDTO();
         productDTO.setProductId(product.getProductId());
         productDTO.setName(product.getName());
@@ -65,9 +63,32 @@ public class ProductDTO {
         productDTO.setBrandId(product.getBrand() != null ? product.getBrand().getBrandId() : null);
         productDTO.setProductVariantDTOs(ProductVariantDTO.convertToListDTO(product.getProductVariants()));
 
-        // System.out.println("productDTO: " + productDTO.toString());
+        productDTO.setMinPrice(calculateMinPrices(productDTO.getProductVariantDTOs()));
+        productDTO.setMaxPrice(calculateMaxPrices(productDTO.getProductVariantDTOs()));
 
         return productDTO;
     }
+
+    private static Long calculateMinPrices(List<ProductVariantDTO> productVariantDTOs) {
+        Long minPrice = Long.MAX_VALUE;
+        for (ProductVariantDTO productVariantDTO : productVariantDTOs) {
+            if (productVariantDTO.getPrice() < minPrice) {
+                minPrice = productVariantDTO.getPrice();
+            }
+        }
+        return minPrice;
+    }
+
+    private static Long calculateMaxPrices(List<ProductVariantDTO> productVariantDTOs) {
+        Long maxPrice = Long.MIN_VALUE;
+        for (ProductVariantDTO productVariantDTO : productVariantDTOs) {
+            if (productVariantDTO.getPrice() > maxPrice) {
+                maxPrice = productVariantDTO.getPrice();
+            }
+        }
+        return maxPrice;
+    }
+
+
 
 }

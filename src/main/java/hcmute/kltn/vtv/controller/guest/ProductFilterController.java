@@ -59,7 +59,7 @@ public class ProductFilterController {
         pageService.checkRequestProductPageParams(page, size);
         pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
 
-        return ResponseEntity.ok(productFilterService.getFilterProductPage(page, size, filter));
+        return ResponseEntity.ok(productFilterService.getFilterProductPageByPriceRange(page, size, filter, minPrice, maxPrice));
     }
 
 
