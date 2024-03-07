@@ -6,6 +6,7 @@ import lombok.*;
 import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -31,14 +32,28 @@ public class CategoryDTO {
 
     private Long parentId;
 
+
+    public static CategoryDTO convertEntityToDTO(Category category) {
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setCategoryId(category.getCategoryId());
+        categoryDTO.setName(category.getName());
+        categoryDTO.setImage(category.getImage());
+        categoryDTO.setDescription(category.getDescription());
+        categoryDTO.setAdminOnly(category.isAdminOnly());
+        categoryDTO.setStatus(category.getStatus());
+        categoryDTO.setShopId(category.getShop() == null ? null : category.getShop().getShopId());
+        categoryDTO.setParentId(category.getParent() == null ? null : category.getParent().getCategoryId());
+
+        return categoryDTO;
+    }
+
     public static List<CategoryDTO> convertToListDTO(List<Category> categories) {
-        List<CategoryDTO> categoryDTOS = new ArrayList<>();
+        List<CategoryDTO> categoryDTOs = new ArrayList<>();
+        categories.sort(Comparator.comparing(Category::getName));
         for (Category category : categories) {
-            ModelMapper modelMapper = new ModelMapper();
-            CategoryDTO addressDTO = modelMapper.map(category, CategoryDTO.class);
-            categoryDTOS.add(addressDTO);
+            categoryDTOs.add(convertEntityToDTO(category));
         }
-        return categoryDTOS;
+        return categoryDTOs;
     }
 
 }

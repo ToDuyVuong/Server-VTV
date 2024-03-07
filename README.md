@@ -350,6 +350,10 @@
   - Tính thông tin vận chuyển(dựa vào wardCode và shippingProvider).
   - Lấy danh sách đơn vị vẩn chuyển và tính phí vận chuyển.(dựa vào wardCode)
 
+- Xem danh mục sản phẩm:
+  - Xem danh sách danh mục con theo danh mục cha.
+  - Xem danh sách danh mục cha.
+
 
 
 

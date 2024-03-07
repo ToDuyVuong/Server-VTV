@@ -81,7 +81,8 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
     @Override
     @Transactional
     public AllCategoryAdminResponse getAllCategoryParent() {
-        List<Category> categories = categoryRepository.findAllByAdminOnlyAndStatus(true, Status.ACTIVE);
+        List<Category> categories = categoryRepository.findAllByAdminOnlyAndStatus(true, Status.ACTIVE)
+                .orElseThrow(() -> new BadRequestException("Không tìm thấy danh mục cha nào!"));
         if (categories.isEmpty()) {
             AllCategoryAdminResponse response = new AllCategoryAdminResponse();
             response.setCode(404);

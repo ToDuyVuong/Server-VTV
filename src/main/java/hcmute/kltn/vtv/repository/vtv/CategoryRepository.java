@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    List<Category> findAllByAdminOnlyAndStatus(boolean adminOnly, Status status);
+    Optional<List<Category>> findAllByAdminOnlyAndStatus(boolean adminOnly, Status status);
 
     List<Category> findAllByParent(Category parent);
 
