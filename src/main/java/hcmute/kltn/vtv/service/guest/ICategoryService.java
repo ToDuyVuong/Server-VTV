@@ -1,11 +1,11 @@
 package hcmute.kltn.vtv.service.guest;
 
-import hcmute.kltn.vtv.model.data.guest.CategoryResponse;
+import hcmute.kltn.vtv.model.data.guest.CategoriesResponse;
 
 public interface ICategoryService {
-    CategoryResponse getAllCategoryParent();
+    CategoriesResponse getAllCategoryParent();
 
-    CategoryResponse getAllCategoryByParentId(Long categoryId);
+    CategoriesResponse getAllCategoryByParentId(Long categoryId);
 
-    CategoryResponse getAllCategoryByShopId(Long shopId);
+    CategoriesResponse getAllCategoryByShopId(Long shopId);
 }

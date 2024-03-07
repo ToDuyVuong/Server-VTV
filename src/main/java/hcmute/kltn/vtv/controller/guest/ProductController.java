@@ -1,8 +1,11 @@
 package hcmute.kltn.vtv.controller.guest;
 
+import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListProductResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
 import hcmute.kltn.vtv.service.guest.IFavoriteProductGuestService;
+import hcmute.kltn.vtv.service.guest.IPageService;
+import hcmute.kltn.vtv.service.guest.IProductPageService;
 import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
@@ -21,6 +24,10 @@ public class ProductController {
     private IProductService productService;
     @Autowired
     private IFavoriteProductGuestService favoriteProductGuestService;
+    @Autowired
+    private final IPageService pageService;
+    @Autowired
+    private IProductPageService productPageService;
 
     @GetMapping("/detail/{productId}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long productId) {
@@ -30,14 +37,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductDetail(productId));
     }
 
-    @Hidden
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ListProductResponse> getListProductByCategoryParentId(@PathVariable Long categoryId,
-            @RequestParam boolean isParent) {
-        if (categoryId == null) {
-            throw new NotFoundException("Mã danh mục không được để trống!");
-        }
-        return ResponseEntity.ok(productService.getListProductByCategoryId(categoryId, isParent));
+
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<ListProductPageResponse> getListProductPageByCategoryId(@RequestParam int page,
+                                                                                  @RequestParam int size,
+                                                                                  @PathVariable Long categoryId) {
+        pageService.checkRequestProductPageParams(page, size);
+
+        return ResponseEntity.ok(productPageService.getListProductPageByCategoryId(categoryId, page, size));
     }
 
     @GetMapping("/shop/{shopId}")

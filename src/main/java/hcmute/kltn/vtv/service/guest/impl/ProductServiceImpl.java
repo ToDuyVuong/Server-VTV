@@ -52,21 +52,21 @@ public class ProductServiceImpl implements IProductService {
         return response;
     }
 
-    @Override
-    public ListProductResponse getListProductByCategoryId(Long categoryId, boolean isParent) {
-        List<Product> products;
-        if (isParent) {
-            products = productRepository.findByCategoryParentCategoryIdAndStatus(categoryId, Status.ACTIVE)
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục cha này!"));
-        } else {
-            products = productRepository.findByCategoryCategoryIdAndStatus(categoryId, Status.ACTIVE)
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục này!"));
-        }
-
-        return productShopService.getListProductResponseSort(products,
-                "Lấy danh sách sản phẩm thành công!",
-                true);
-    }
+//    @Override
+//    public ListProductResponse getListProductByCategoryId(Long categoryId, boolean isParent) {
+//        List<Product> products;
+//        if (isParent) {
+//            products = productRepository.findByCategoryParentCategoryIdAndStatus(categoryId, Status.ACTIVE)
+//                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục cha này!"));
+//        } else {
+//            products = productRepository.findByCategoryCategoryIdAndStatus(categoryId, Status.ACTIVE)
+//                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục này!"));
+//        }
+//
+//        return productShopService.getListProductResponseSort(products,
+//                "Lấy danh sách sản phẩm thành công!",
+//                true);
+//    }
 
     @Override
     public ListProductResponse getListProductByShopId(Long shopId) {

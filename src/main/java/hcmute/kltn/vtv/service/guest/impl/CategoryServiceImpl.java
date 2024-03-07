@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.service.guest.impl;
 
 
-import hcmute.kltn.vtv.model.data.guest.CategoryResponse;
+import hcmute.kltn.vtv.model.data.guest.CategoriesResponse;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
@@ -21,26 +21,26 @@ public class CategoryServiceImpl implements ICategoryService {
 
 
     @Override
-    public CategoryResponse getAllCategoryParent() {
+    public CategoriesResponse getAllCategoryParent() {
         List<Category> categories = categoryRepository.findAllByAdminOnlyAndStatus(true, Status.ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục cha!"));
 
-        return CategoryResponse.categoryResponse(categories, "Lấy danh mục thành công!", "OK");
+        return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục thành công!", "OK");
     }
 
 
     @Override
-    public CategoryResponse getAllCategoryByParentId(Long categoryId) {
+    public CategoriesResponse getAllCategoryByParentId(Long categoryId) {
         List<Category> categories = categoryRepository.findAllByParentCategoryIdAndStatus(categoryId, Status.ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục con nào trong danh mục cha này!"));
-        return CategoryResponse.categoryResponse(categories, "Lấy danh mục con theo danh mục cha thành công!", "OK");
+        return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục con theo danh mục cha thành công!", "OK");
     }
 
 
     @Override
-    public CategoryResponse getAllCategoryByShopId(Long shopId) {
+    public CategoriesResponse getAllCategoryByShopId(Long shopId) {
         List<Category> categories = categoryRepository.findAllByShopShopId(shopId);
-        return CategoryResponse.categoryResponse(categories, "Lấy danh mục theo cửa hàng thành công!", "OK");
+        return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục theo cửa hàng thành công!", "OK");
     }
 
 

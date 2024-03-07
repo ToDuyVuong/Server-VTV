@@ -7,7 +7,7 @@ import hcmute.kltn.vtv.model.entity.vtv.Product;
 public interface IProductService {
     ProductResponse getProductDetail(Long productId);
 
-    ListProductResponse getListProductByCategoryId(Long categoryId, boolean isParent);
+//    ListProductResponse getListProductByCategoryId(Long categoryId, boolean isParent);
 
     ListProductResponse getListProductByShopId(Long shopId);
 

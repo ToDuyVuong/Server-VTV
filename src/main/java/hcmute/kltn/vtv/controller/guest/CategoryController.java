@@ -1,11 +1,8 @@
 package hcmute.kltn.vtv.controller.guest;
 
 
-import hcmute.kltn.vtv.model.data.admin.response.AllCategoryAdminResponse;
-import hcmute.kltn.vtv.model.data.guest.CategoryResponse;
-import hcmute.kltn.vtv.service.admin.ICategoryAdminService;
+import hcmute.kltn.vtv.model.data.guest.CategoriesResponse;
 import hcmute.kltn.vtv.service.guest.ICategoryService;
-import hcmute.kltn.vtv.service.vendor.ICategoryShopService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,19 +21,19 @@ public class CategoryController {
     private final ICategoryService categoryService;
 
     @GetMapping("/all-parent")
-    public ResponseEntity<CategoryResponse> getParentCategory() {
+    public ResponseEntity<CategoriesResponse> getParentCategory() {
         return ResponseEntity.ok(categoryService.getAllCategoryParent());
     }
 
 
     @GetMapping("/all-category/by-parent/{categoryId}")
-    public ResponseEntity<CategoryResponse> getCategoryByParentId(@PathVariable Long categoryId) {
+    public ResponseEntity<CategoriesResponse> getCategoryByParentId(@PathVariable Long categoryId) {
         return ResponseEntity.ok(categoryService.getAllCategoryByParentId(categoryId));
     }
 
 
     @GetMapping("/all-category/by-shop/{shopId}")
-    public ResponseEntity<CategoryResponse> getCategoryByShopId(@PathVariable Long shopId) {
+    public ResponseEntity<CategoriesResponse> getCategoryByShopId(@PathVariable Long shopId) {
         return ResponseEntity.ok(categoryService.getAllCategoryByShopId(shopId));
     }
 

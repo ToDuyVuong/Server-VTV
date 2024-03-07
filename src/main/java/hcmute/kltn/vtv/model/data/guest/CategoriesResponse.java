@@ -13,14 +13,14 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponse extends ResponseAbstract {
+public class CategoriesResponse extends ResponseAbstract {
 
     private List<CategoryDTO> categoryDTOs;
 
 
-    public static CategoryResponse categoryResponse(List<Category> categories, String message, String status) {
+    public static CategoriesResponse categoriesResponse(List<Category> categories, String message, String status) {
 
-        CategoryResponse response = new CategoryResponse();
+        CategoriesResponse response = new CategoriesResponse();
         response.setCategoryDTOs(CategoryDTO.convertToListDTO(categories));
         response.setCode(200);
         response.setMessage(message);
