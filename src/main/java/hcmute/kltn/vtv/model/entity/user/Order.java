@@ -9,6 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -20,8 +21,8 @@ public class Order {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID orderId;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

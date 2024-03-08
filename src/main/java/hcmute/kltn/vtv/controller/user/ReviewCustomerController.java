@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/customer/review")
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class ReviewCustomerController {
     }
 
     @GetMapping("/detail/by-order-item/{orderItemId}")
-    public ResponseEntity<ReviewResponse> getReviewDetailByOrderItemId(@PathVariable Long orderItemId) {
+    public ResponseEntity<ReviewResponse> getReviewDetailByOrderItemId(@PathVariable UUID orderItemId) {
         if (orderItemId == null) {
             throw new BadRequestException("Mã đánh giá không được để trống!");
         }
@@ -40,7 +42,7 @@ public class ReviewCustomerController {
     }
 
     @PatchMapping("/delete/{reviewId}")
-    public ResponseEntity<ReviewResponse> deleteReview(@PathVariable Long reviewId,
+    public ResponseEntity<ReviewResponse> deleteReview(@PathVariable UUID reviewId,
             HttpServletRequest request) {
         if (reviewId == null) {
             throw new BadRequestException("Mã đánh giá không được để trống!");
@@ -50,7 +52,7 @@ public class ReviewCustomerController {
     }
 
     @GetMapping("exist/{orderItemId}")
-    public ResponseEntity<Boolean> checkReviewExist(@PathVariable Long orderItemId) {
+    public ResponseEntity<Boolean> checkReviewExist(@PathVariable UUID orderItemId) {
         if (orderItemId == null) {
             throw new BadRequestException("Mã đánh giá không được để trống!");
         }

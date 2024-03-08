@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class CommentServiceImpl implements ICommentService {
     private final IReviewCustomerService reviewCustomerService;
 
     @Override
-    public List<CommentDTO> getListCommentDTO(Long reviewId) {
+    public List<CommentDTO> getListCommentDTO(UUID reviewId) {
         reviewCustomerService.checkReview(reviewId);
 
         List<Comment> comments = commentRepository.findAllByReviewReviewIdAndStatus(reviewId, Status.ACTIVE)
@@ -37,7 +38,7 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public ListCommentResponse getComments(Long reviewId) {
+    public ListCommentResponse getComments(UUID reviewId) {
         reviewCustomerService.checkReview(reviewId);
 
         List<Comment> comments = commentRepository.findAllByReviewReviewIdAndStatus(reviewId, Status.ACTIVE)
@@ -46,7 +47,7 @@ public class CommentServiceImpl implements ICommentService {
         return listCommentResponse(comments, reviewId);
     }
 
-    private ListCommentResponse listCommentResponse(List<Comment> comments, Long reviewId) {
+    private ListCommentResponse listCommentResponse(List<Comment> comments, UUID reviewId) {
         ListCommentResponse response = new ListCommentResponse();
         response.setCommentDTOs(CommentDTO.convertEntitiesToDTOs(comments));
 

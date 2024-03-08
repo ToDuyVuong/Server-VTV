@@ -4,14 +4,16 @@ import hcmute.kltn.vtv.model.data.user.request.ReviewRequest;
 import hcmute.kltn.vtv.model.data.user.response.ReviewResponse;
 import hcmute.kltn.vtv.model.entity.user.Review;
 
+import java.util.UUID;
+
 public interface IReviewCustomerService {
     ReviewResponse addNewReview(ReviewRequest request, String username);
 
-    ReviewResponse getReviewByOrderItemId(Long orderItemId);
+    ReviewResponse getReviewByOrderItemId(UUID orderItemId);
 
-    ReviewResponse deleteReview(Long reviewId, String username);
+    ReviewResponse deleteReview(UUID reviewId, String username);
 
-    Review checkReviewRole(Long reviewId, String username, boolean isShop);
+    Review checkReviewRole(UUID reviewId, String username, boolean isShop);
 
-    Review checkReview(Long reviewId);
+    Review checkReview(UUID reviewId);
 }

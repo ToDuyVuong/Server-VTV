@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @ToString
@@ -16,6 +17,6 @@ import java.util.List;
 public class ListCommentResponse extends ResponseAbstract {
 
     private int count;
-    private Long reviewId;
+    private UUID reviewId;
     private List<CommentDTO> commentDTOs;
 }

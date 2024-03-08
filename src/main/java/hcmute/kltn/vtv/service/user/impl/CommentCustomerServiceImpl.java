@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class CommentCustomerServiceImpl implements ICommentCustomerService {
 
     @Override
     @Transactional
-    public CommentResponse deleteComment(Long commentId, String username) {
+    public CommentResponse deleteComment(UUID commentId, String username) {
         Comment comment = checkComment(commentId, username);
         comment.setStatus(Status.INACTIVE);
         try {
@@ -61,7 +62,7 @@ public class CommentCustomerServiceImpl implements ICommentCustomerService {
         }
     }
 
-    private Comment checkComment(Long commentId, String username) {
+    private Comment checkComment(UUID commentId, String username) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException("Bình luận không tồn tại."));
 

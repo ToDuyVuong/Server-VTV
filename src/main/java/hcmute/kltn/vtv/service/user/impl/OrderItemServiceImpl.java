@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
     private final ProductRepository productRepository;
 
     @Override
-    public OrderItemResponse getOrderItemByOrderItemId(Long orderItemId) {
+    public OrderItemResponse getOrderItemByOrderItemId(UUID orderItemId) {
         OrderItem orderItem = orderItemRepository.findById(orderItemId)
                 .orElseThrow(() -> new BadRequestException("Mã đơn hàng không tồn tại!"));
 
@@ -63,7 +64,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
         return response;
     }
 
-    public OrderItem createOrderItem(Long cartId, String username) {
+    public OrderItem createOrderItem(UUID cartId, String username) {
         OrderItem orderItem = new OrderItem();
         Cart cart = cartService.getCartByUserNameAndId(username, cartId);
         orderItem.setOrder(null);
@@ -72,10 +73,10 @@ public class OrderItemServiceImpl implements IOrderItemService {
     }
 
     @Override
-    public List<OrderItem> createOrderItems(String username, List<Long> cartIds) {
+    public List<OrderItem> createOrderItems(String username, List<UUID> cartIds) {
         List<OrderItem> orderItems = new ArrayList<>();
 
-        for (Long cartId : cartIds) {
+        for (UUID cartId : cartIds) {
             orderItems.add(createOrderItem(cartId, username));
         }
 

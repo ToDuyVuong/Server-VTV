@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @ToString
@@ -19,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewDTO {
 
-    private Long reviewId;
+    private UUID reviewId;
 
     private String content;
 
@@ -31,7 +28,7 @@ public class ReviewDTO {
 
     private String username;
 
-    private Long orderItemId;
+    private UUID orderItemId;
 
     private Date createdAt;
 

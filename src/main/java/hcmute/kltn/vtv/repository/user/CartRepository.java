@@ -8,11 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CartRepository extends JpaRepository<Cart, Long> {
+public interface CartRepository extends JpaRepository<Cart, UUID> {
 
-    boolean existsByCartIdAndCustomerUsername(Long cartId, String username);
+    boolean existsByCartIdAndCustomerUsername(UUID cartId, String username);
 
     boolean existsByProductVariantProductVariantIdAndCustomerUsernameAndStatus(Long productVariantId, String username,
                                                                                CartStatus status);
@@ -20,14 +21,14 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     Optional<Cart> findByProductVariantProductVariantIdAndCustomerUsernameAndStatus(Long productVariantId,
             String username, CartStatus status);
 
-    Optional<Cart> findByCustomerUsernameAndCartId(String username, Long cartId);
+    Optional<Cart> findByCustomerUsernameAndCartId(String username, UUID cartId);
 
 
 
     Optional<List<Cart>> findAllByCustomerUsernameAndStatus(String username, CartStatus status);
 
     Optional<List<Cart>> findAllByCustomerUsernameAndStatusAndCartIdIn(String username, CartStatus status,
-            List<Long> cartIds);
+            List<UUID> cartIds);
 
     Optional<List<Cart>> findAllByCustomerUsernameAndProductVariantProductShopShopIdAndStatus(String username,
             Long shopId, CartStatus status);

@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @ToString
@@ -23,7 +24,7 @@ public class VoucherOrderDTO {
 
     private boolean type; // true: voucher system, false: voucher shop
 
-    private Long orderId;
+    private UUID orderId;
 
     public static VoucherOrderDTO convertEntityToDTO(VoucherOrder voucherOrder) {
         VoucherOrderDTO voucherOrderDTO = new VoucherOrderDTO();

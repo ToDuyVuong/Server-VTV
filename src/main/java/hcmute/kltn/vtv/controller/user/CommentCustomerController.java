@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/customer/comment")
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class CommentCustomerController {
     }
 
     @PatchMapping("/delete/{commentId}")
-    public ResponseEntity<CommentResponse> deleteComment(@PathVariable Long commentId,
+    public ResponseEntity<CommentResponse> deleteComment(@PathVariable UUID commentId,
             HttpServletRequest httpServletRequest) {
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(commentCustomerService.deleteComment(commentId, username));

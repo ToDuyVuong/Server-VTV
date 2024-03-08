@@ -7,6 +7,7 @@ import hcmute.kltn.vtv.model.entity.user.Cart;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ICartService {
     @Transactional
@@ -16,18 +17,18 @@ public interface ICartService {
     CartResponse updateCart(CartRequest request);
 
     @Transactional
-    CartResponse deleteCart(Long cartId, String username);
+    CartResponse deleteCart(UUID cartId, String username);
 
     ListCartResponse getListCartByUsername(String username);
 
-    ListCartResponse getListCartByUsernameAndListCartId(String username, List<Long> cartIds);
+    ListCartResponse getListCartByUsernameAndListCartId(String username, List<UUID> cartIds);
 
-    List<Cart> getListCartByUsernameAndIds(String username, List<Long> cartIds);
+    List<Cart> getListCartByUsernameAndIds(String username, List<UUID> cartIds);
 
-    Cart getCartByUserNameAndId(String username, Long cartId);
+    Cart getCartByUserNameAndId(String username, UUID cartId);
 
     @Transactional
     ListCartResponse deleteCartByShopId(Long shopId, String username);
 
-    boolean checkCartsSameShop(String username, List<Long> cartIds);
+    boolean checkCartsSameShop(String username, List<UUID> cartIds);
 }

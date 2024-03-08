@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -194,7 +195,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
     @Override
-    public OrderResponse getOrderById(String username, Long orderId) {
+    public OrderResponse getOrderById(String username, UUID orderId) {
         Shop shop = shopService.getShopByUsername(username);
 
         Order order = orderRepository.findById(orderId)
@@ -208,7 +209,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
     @Override
-    public OrderResponse updateStatusOrder(String username, Long orderId, OrderStatus status) {
+    public OrderResponse updateStatusOrder(String username, UUID orderId, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
 
         Order order = orderRepository.findById(orderId)

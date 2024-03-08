@@ -8,9 +8,10 @@ import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IOrderService {
-    OrderResponse createOrder(String username, List<Long> cartIds);
+    OrderResponse createOrder(String username, List<UUID> cartIds);
 
     OrderResponse createOrderUpdate(CreateOrderUpdateRequest request);
 
@@ -21,10 +22,10 @@ public interface IOrderService {
 
     ListOrderResponse getOrdersByStatus(String username, OrderStatus status);
 
-    OrderResponse getOrderDetail(String username, Long orderId);
+    OrderResponse getOrderDetail(String username, UUID orderId);
 
     @Transactional
-    OrderResponse cancelOrder(String username, Long orderId);
+    OrderResponse cancelOrder(String username, UUID orderId);
 
     String messageByOrderStatus(OrderStatus status);
 }

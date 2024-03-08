@@ -7,21 +7,22 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
-    boolean existsByOrderItemOrderItemId(Long orderItemId);
+    boolean existsByOrderItemOrderItemId(UUID orderItemId);
 
-    boolean existsByReviewIdAndStatus(Long reviewId, Status status);
+    boolean existsByReviewIdAndStatus(UUID reviewId, Status status);
 
-    boolean existsByReviewId(Long reviewId);
+    boolean existsByReviewId(UUID reviewId);
 
-    boolean existsByOrderItemOrderItemIdAndCustomerUsername(Long orderItemId, String username);
+    boolean existsByOrderItemOrderItemIdAndCustomerUsername(UUID orderItemId, String username);
 
-    Optional<Review> findByOrderItemOrderItemId(Long orderItemId);
+    Optional<Review> findByOrderItemOrderItemId(UUID orderItemId);
 
-    Optional<Review> findByReviewIdAndStatus(Long reviewId, Status status);
+    Optional<Review> findByReviewIdAndStatus(UUID reviewId, Status status);
 
     Optional<List<Review>> findAllByProductProductIdAndStatus(Long productId, Status status);
 
@@ -31,5 +32,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     int countByProductProductId(Long productId);
 
-    float countAverageRatingByProductProductId(Long productId);
 }

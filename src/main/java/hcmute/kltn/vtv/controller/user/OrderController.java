@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customer/order")
@@ -29,7 +30,7 @@ public class OrderController {
     private OrderItemServiceImpl orderItemService;
 
     @GetMapping("/create")
-    public ResponseEntity<OrderResponse> createOrder(@RequestParam List<Long> cartIds,
+    public ResponseEntity<OrderResponse> createOrder(@RequestParam List<UUID> cartIds,
             HttpServletRequest request) {
 
         String username = (String) request.getAttribute("username");
@@ -75,21 +76,21 @@ public class OrderController {
     }
 
     @GetMapping("/detail/{orderId}")
-    public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable UUID orderId,
             HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.getOrderDetail(username, orderId));
     }
 
     @PostMapping("/cancel/{orderId}")
-    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable UUID orderId,
             HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.cancelOrder(username, orderId));
     }
 
     @GetMapping("/order-item/detail/{orderItemId}")
-    public ResponseEntity<OrderItemResponse> getOrderItemByOrderItemId(@PathVariable Long orderItemId,
+    public ResponseEntity<OrderItemResponse> getOrderItemByOrderItemId(@PathVariable UUID orderItemId,
             HttpServletRequest requestHttp) {
         return ResponseEntity.ok(orderItemService.getOrderItemByOrderItemId(orderItemId));
     }

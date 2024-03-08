@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class ReviewServiceImpl implements IReviewService {
     private final IReviewCustomerService reviewCustomerService;
 
     @Override
-    public ReviewResponse getReviewDetailById(Long reviewId) {
+    public ReviewResponse getReviewDetailById(UUID reviewId) {
         Review review = reviewCustomerService.checkReview(reviewId);
         // List<CommentDTO> commentDTOs = commentService.getListCommentDTO(reviewId);
         //

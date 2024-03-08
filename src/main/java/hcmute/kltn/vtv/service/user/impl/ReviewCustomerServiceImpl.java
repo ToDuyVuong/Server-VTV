@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +59,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
     }
 
     @Override
-    public ReviewResponse getReviewByOrderItemId(Long orderItemId) {
+    public ReviewResponse getReviewByOrderItemId(UUID orderItemId) {
         Review review = reviewRepository.findByOrderItemOrderItemId(orderItemId)
                 .orElseThrow(() -> new BadRequestException("Đánh giá không tồn tại!"));
         return reviewResponse(review, review.getCustomer().getUsername(), "Lấy đánh giá thành công!", false);
@@ -66,7 +67,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
 
     @Override
     @Transactional
-    public ReviewResponse deleteReview(Long reviewId, String username) {
+    public ReviewResponse deleteReview(UUID reviewId, String username) {
         Review review = checkDeleteReview(reviewId, username);
 
         try {
@@ -80,7 +81,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
     }
 
     @Override
-    public Review checkReviewRole(Long reviewId, String username, boolean isShop) {
+    public Review checkReviewRole(UUID reviewId, String username, boolean isShop) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, Status.ACTIVE)
                 .orElseThrow(() -> new BadRequestException("Đánh giá không tồn tại"));
 
@@ -100,7 +101,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
     }
 
     @Override
-    public Review checkReview(Long reviewId) {
+    public Review checkReview(UUID reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BadRequestException("Đánh giá không tồn tại!"));
         if (review.getStatus() == Status.INACTIVE) {
@@ -110,7 +111,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
         return review;
     }
 
-    private Review checkDeleteReview(Long reviewId, String username) {
+    private Review checkDeleteReview(UUID reviewId, String username) {
         Review review = checkReview(reviewId);
         if (!review.getCustomer().getUsername().equals(username)) {
             throw new BadRequestException("Bạn không có quyền xóa đánh giá này!");
@@ -118,19 +119,19 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
         return review;
     }
 
-    private void checkOrderItem(Long orderItemId) {
+    private void checkOrderItem(UUID orderItemId) {
         if (reviewRepository.existsByOrderItemOrderItemId(orderItemId)) {
             throw new BadRequestException("Đã đánh giá sản phẩm này!");
         }
     }
 
-    private void checkRoleReview(Long orderItemId, String username) {
+    private void checkRoleReview(UUID orderItemId, String username) {
         if (!orderItemRepository.existsByOrderItemIdAndCartCustomerUsername(orderItemId, username)) {
             throw new BadRequestException("Bạn không có quyền đánh giá sản phẩm này!");
         }
     }
 
-    private void checkOrderItemAndRoleReviewAndStatus(Long orderItemId, String username) {
+    private void checkOrderItemAndRoleReviewAndStatus(UUID orderItemId, String username) {
         checkOrderItem(orderItemId);
         checkRoleReview(orderItemId, username);
 

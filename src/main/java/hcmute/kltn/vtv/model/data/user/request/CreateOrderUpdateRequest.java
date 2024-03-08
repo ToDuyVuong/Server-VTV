@@ -4,6 +4,7 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ import java.util.List;
 public class CreateOrderUpdateRequest {
 
     private String username;
-    private List<Long> cartIds;
+    private List<UUID> cartIds;
     private Long addressId;
     private Long voucherSystemId;
     private Long voucherShopId;

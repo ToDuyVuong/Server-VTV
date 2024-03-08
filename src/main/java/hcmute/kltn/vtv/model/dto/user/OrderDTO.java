@@ -8,10 +8,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @ToString
@@ -19,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderDTO {
 
-    private Long orderId;
+    private UUID orderId;
 
     private String note;
 

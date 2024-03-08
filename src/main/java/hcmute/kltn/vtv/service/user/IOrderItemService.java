@@ -6,11 +6,12 @@ import hcmute.kltn.vtv.model.entity.user.OrderItem;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IOrderItemService {
-    OrderItemResponse getOrderItemByOrderItemId(Long orderItemId);
+    OrderItemResponse getOrderItemByOrderItemId(UUID orderItemId);
 
-    List<OrderItem> createOrderItems(String username, List<Long> cartIds);
+    List<OrderItem> createOrderItems(String username, List<UUID> cartIds);
 
     @Transactional
     List<OrderItem> saveOrderItem(Order order);

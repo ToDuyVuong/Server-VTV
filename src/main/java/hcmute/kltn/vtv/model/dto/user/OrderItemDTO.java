@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @ToString
@@ -16,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderItemDTO {
 
-    private Long orderItemId;
+    private UUID orderItemId;
 
-    private Long orderId;
+    private UUID orderId;
 
-    private Long cartId;
+    private UUID cartId;
 
     private ProductVariantDTO productVariantDTO;
 

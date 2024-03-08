@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +79,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public CartResponse deleteCart(Long cartId, String username) {
+    public CartResponse deleteCart(UUID cartId, String username) {
         checkExistsCartIdAndUsername(cartId, username);
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng."));
@@ -103,7 +104,7 @@ public class CartServiceImpl implements ICartService {
 
 
     @Override
-    public ListCartResponse getListCartByUsernameAndListCartId(String username, List<Long> cartIds) {
+    public ListCartResponse getListCartByUsernameAndListCartId(String username, List<UUID> cartIds) {
         List<Cart> carts = getListCartByUsernameAndIds(username, cartIds);
 
         return ListCartResponse.listCartResponse(username, carts, "Lấy danh sách giỏ hàng theo danh sách mã giỏ hàng thành công.", "OK");
@@ -111,7 +112,7 @@ public class CartServiceImpl implements ICartService {
 
 
     @Override
-    public List<Cart> getListCartByUsernameAndIds(String username, List<Long> cartIds) {
+    public List<Cart> getListCartByUsernameAndIds(String username, List<UUID> cartIds) {
 
         return cartRepository.findAllByCustomerUsernameAndStatusAndCartIdIn(username, CartStatus.CART, cartIds)
                 .orElseThrow(() -> new NotFoundException("Giỏ hàng trống."));
@@ -119,7 +120,7 @@ public class CartServiceImpl implements ICartService {
 
 
     @Override
-    public Cart getCartByUserNameAndId(String username, Long cartId) {
+    public Cart getCartByUserNameAndId(String username, UUID cartId) {
 
         return cartRepository.findByCustomerUsernameAndCartId(username, cartId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng."));
@@ -147,7 +148,7 @@ public class CartServiceImpl implements ICartService {
 
 
     @Override
-    public boolean checkCartsSameShop(String username, List<Long> cartIds) {
+    public boolean checkCartsSameShop(String username, List<UUID> cartIds) {
 
         List<Cart> carts = getListCartByUsernameAndIds(username, cartIds);
 
@@ -163,7 +164,7 @@ public class CartServiceImpl implements ICartService {
     }
 
 
-    private void checkExistsCartIdAndUsername(Long cartId, String username) {
+    private void checkExistsCartIdAndUsername(UUID cartId, String username) {
         checkCartIdExists(cartId);
         if (!cartRepository.existsByCartIdAndCustomerUsername(cartId, username)) {
             throw new NotFoundException("Bạn không có quyền truy cập giỏ hàng này.");
@@ -171,7 +172,7 @@ public class CartServiceImpl implements ICartService {
     }
 
 
-    private void checkCartIdExists(Long cartId) {
+    private void checkCartIdExists(UUID cartId) {
         if (!cartRepository.existsById(cartId)) {
             throw new NotFoundException("Không tìm thấy giỏ hàng.");
         }

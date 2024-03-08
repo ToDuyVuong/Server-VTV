@@ -10,8 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     // @Query("SELECT SUM(o.totalMoney) FROM Order o WHERE o.shopId = :shopId AND
     // o.status = :status AND o.orderDate BETWEEN :startDate AND :endDate")
@@ -26,7 +27,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<List<Order>> findAllByCustomerUsernameAndStatus(String username, OrderStatus status);
 
-    Optional<Order> findByOrderIdAndStatus(Long orderId, OrderStatus status);
+    Optional<Order> findByOrderIdAndStatus(UUID orderId, OrderStatus status);
 
     Optional<List<Order>> findAllByShopId(Long shopId);
 

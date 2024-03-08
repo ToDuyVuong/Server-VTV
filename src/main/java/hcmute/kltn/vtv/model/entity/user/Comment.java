@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,8 +17,8 @@ public class Comment {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID commentId;
 
     private String content;
 

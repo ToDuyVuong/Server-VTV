@@ -10,21 +10,7 @@ public enum Status {
     ACTIVE("Active"),
     INACTIVE("Inactive"),
     DELETED("Deleted"),
-    PENDING("Pending"),
     CANCEL("Cancel"),
-    WAITING("Waiting"),
-    DELIVERED("Delivered"),
-    PROCESSING("Processing"),
-    RETURNED("Returned"),
-    SHIPPING("Shipping"),
-    SHIPPED("Shipped"),
-    CART("Cart"),
-    ORDER("Order"),
-    COMPLETED("Completed"),
-    REFUNDED("Refunded"),
-    PAID("Paid"),
-    UNPAID("Unpaid"),
-    FAIL("Fail"),
     LOCKED("Locked");
 
 

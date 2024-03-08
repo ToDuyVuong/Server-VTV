@@ -3,6 +3,8 @@ package hcmute.kltn.vtv.model.data.user.response;
 import hcmute.kltn.vtv.model.extra.ResponseAbstract;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @ToString
@@ -10,9 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 public class OrderItemResponse extends ResponseAbstract {
 
-    private Long orderItemId;
-    private Long orderId;
-    private Long cartId;
+    private UUID orderItemId;
+    private UUID orderId;
+    private UUID cartId;
     private Long productVariantId;
     private String sku;
     private String productVariantImage;

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/review")
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class ReviewController {
     }
 
     @GetMapping("/detail/{reviewId}")
-    public ResponseEntity<ReviewResponse> getReviewDetailById(@PathVariable Long reviewId) {
+    public ResponseEntity<ReviewResponse> getReviewDetailById(@PathVariable UUID reviewId) {
         if (reviewId == null) {
             throw new BadRequestException("Mã đánh giá không được để trống!");
         }

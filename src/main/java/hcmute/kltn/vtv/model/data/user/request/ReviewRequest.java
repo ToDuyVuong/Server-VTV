@@ -3,6 +3,8 @@ package hcmute.kltn.vtv.model.data.user.request;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @ToString
@@ -15,7 +17,7 @@ public class ReviewRequest {
 
     private int rating;
 
-    private Long orderItemId;
+    private UUID orderItemId;
 
     private String image;
 

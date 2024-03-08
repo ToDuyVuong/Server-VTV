@@ -7,6 +7,7 @@ import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 
 import java.util.Date;
+import java.util.UUID;
 
 public interface IOrderShopService {
     PageOrderResponse getPageOrder(String username, int page, int size);
@@ -26,9 +27,9 @@ public interface IOrderShopService {
     ListOrderResponse getOrdersBetweenDateByStatus(String username, Date startOrderDate, Date endOrderDate,
                                                    OrderStatus status);
 
-    OrderResponse getOrderById(String username, Long orderId);
+    OrderResponse getOrderById(String username, UUID orderId);
 
-    OrderResponse updateStatusOrder(String username, Long orderId, OrderStatus status);
+    OrderResponse updateStatusOrder(String username, UUID orderId, OrderStatus status);
 
     void checkRequestPageParams(int page, int size);
 }

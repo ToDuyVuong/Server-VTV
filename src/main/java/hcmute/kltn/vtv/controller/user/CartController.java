@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customer/cart")
@@ -40,10 +41,8 @@ public class CartController {
     }
 
     @DeleteMapping("/delete/{cartId}")
-    public ResponseEntity<CartResponse> deleteCart(@PathVariable Long cartId, HttpServletRequest request) {
-        if (cartId == null || cartId <= 0) {
-            throw new NotFoundException("Mã giỏ hàng không hợp lệ!");
-        }
+    public ResponseEntity<CartResponse> deleteCart(@PathVariable UUID cartId, HttpServletRequest request) {
+
         String username = (String) request.getAttribute("username");
         return ResponseEntity.ok(cartService.deleteCart(cartId, username));
     }
@@ -55,7 +54,7 @@ public class CartController {
     }
 
     @GetMapping("/get-list-by-list-cart-id")
-    public ResponseEntity<ListCartResponse> getListCartByUsernameAndListCartId(@RequestParam List<Long> cartIds,
+    public ResponseEntity<ListCartResponse> getListCartByUsernameAndListCartId(@RequestParam List<UUID> cartIds,
             HttpServletRequest request) {
         if (cartIds == null || cartIds.isEmpty()) {
             throw new NotFoundException("Danh sách mã giỏ hàng không hợp lệ!");

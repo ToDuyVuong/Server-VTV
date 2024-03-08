@@ -5,6 +5,8 @@ import hcmute.kltn.vtv.model.entity.user.Comment;
 import hcmute.kltn.vtv.model.extra.ResponseAbstract;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @ToString
@@ -13,17 +15,18 @@ import lombok.*;
 public class CommentResponse extends ResponseAbstract {
 
     private String username;
-    private Long reviewId;
+    private UUID reviewId;
     private CommentDTO commentDTO;
 
-    public static CommentResponse commentResponse(Comment comment, Long reviewId, String username, String message, String status) {
+    public static CommentResponse commentResponse(Comment comment, UUID reviewId, String username, String message, String status) {
         CommentResponse response = new CommentResponse();
         response.setCommentDTO(CommentDTO.convertEntityToDTO(comment));
         response.setMessage(message);
         response.setCode(200);
         response.setUsername(username);
         response.setReviewId(reviewId);
-        response.setStatus("status");
+        response.setStatus(status);
+
         return response;
     }
 }

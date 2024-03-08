@@ -4,10 +4,7 @@ import hcmute.kltn.vtv.model.entity.user.Comment;
 import hcmute.kltn.vtv.model.extra.Status;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -16,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentDTO {
 
-    private Long commentId;
+    private UUID commentId;
 
     private String content;
 

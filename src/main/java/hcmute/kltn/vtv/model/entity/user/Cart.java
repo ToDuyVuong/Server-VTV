@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,8 +18,8 @@ public class Cart {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID cartId;
 
     private int quantity;
 

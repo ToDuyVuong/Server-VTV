@@ -4,6 +4,8 @@ import hcmute.kltn.vtv.model.extra.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @ToString
@@ -14,10 +16,10 @@ public class OrderItem {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderItemId;
-
-    private OrderStatus status;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID orderItemId;
+//
+//    private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

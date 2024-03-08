@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/comment")
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class CommentController {
     private ICommentService commentService;
 
     @GetMapping("/get/{reviewId}")
-    public ResponseEntity<ListCommentResponse> getComments(@PathVariable Long reviewId) {
+    public ResponseEntity<ListCommentResponse> getComments(@PathVariable UUID reviewId) {
         if (reviewId == null) {
             throw new NotFoundException("Mã đánh giá không được để trống!");
         }

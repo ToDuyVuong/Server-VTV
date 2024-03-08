@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/vendor/order")
@@ -146,14 +147,14 @@ public class OrderShopController {
 
     @GetMapping("/detail/{orderId}")
     public ResponseEntity<OrderResponse> getOrderById(HttpServletRequest httpServletRequest,
-            @PathVariable Long orderId) {
+            @PathVariable UUID orderId) {
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(orderShopService.getOrderById(username, orderId));
     }
 
     @PatchMapping("/update/status/{orderId}")
     public ResponseEntity<OrderResponse> updateStatusOrder(HttpServletRequest httpServletRequest,
-            @PathVariable Long orderId,
+            @PathVariable UUID orderId,
             @RequestParam OrderStatus status) {
         if (orderId == null) {
             throw new NotFoundException("Mã đơn hàng không được để trống!");

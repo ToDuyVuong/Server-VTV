@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CartDTO {
 
-    private Long cartId;
+    private UUID cartId;
 
     private int quantity;
 

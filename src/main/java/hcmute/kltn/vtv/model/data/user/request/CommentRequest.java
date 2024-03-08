@@ -3,6 +3,8 @@ package hcmute.kltn.vtv.model.data.user.request;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @ToString
@@ -13,7 +15,7 @@ public class CommentRequest {
 
     private String content;
 
-    private Long reviewId;
+    private UUID reviewId;
 
     private String username;
 

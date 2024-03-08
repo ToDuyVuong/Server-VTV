@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class OrderServiceImpl implements IOrderService {
     private final IAddressService addressService;
 
     @Override
-    public OrderResponse createOrder(String username, List<Long> cartIds) {
+    public OrderResponse createOrder(String username, List<UUID> cartIds) {
         Order order = createTemporaryOrder(username, cartIds);
         return orderResponse(username, order, "Tạo đơn hàng mới thành công.", true);
     }
@@ -123,7 +124,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public OrderResponse getOrderDetail(String username, Long orderId) {
+    public OrderResponse getOrderDetail(String username, UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng!"));
         if (!order.getCustomer().getUsername().equals(username)) {
@@ -134,7 +135,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public OrderResponse cancelOrder(String username, Long orderId) {
+    public OrderResponse cancelOrder(String username, UUID orderId) {
         Order order = orderRepository.findByOrderIdAndStatus(orderId, OrderStatus.PENDING)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng!"));
         if (order == null || !order.getCustomer().getUsername().equals(username)) {
@@ -237,7 +238,7 @@ public class OrderServiceImpl implements IOrderService {
         return shippingStrategy.calculateShippingCost(totalPrice);
     }
 
-    private Order createTemporaryOrder(String username, List<Long> cartIds) {
+    private Order createTemporaryOrder(String username, List<UUID> cartIds) {
 
         Customer customer = customerService.getCustomerByUsername(username);
 
@@ -321,7 +322,7 @@ public class OrderServiceImpl implements IOrderService {
         return count;
     }
 
-    private void checkListCartSameShop(String username, List<Long> cartIds) {
+    private void checkListCartSameShop(String username, List<UUID> cartIds) {
         boolean check = cartService.checkCartsSameShop(username, cartIds);
         if (!check) {
             throw new BadRequestException("Các sản phẩm không thuộc cùng một cửa hàng.");
