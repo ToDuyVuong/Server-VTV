@@ -1,6 +1,5 @@
 package hcmute.kltn.vtv.model.entity.vtv;
 
-import hcmute.kltn.vtv.model.data.vendor.request.CategoryShopRequest;
 import hcmute.kltn.vtv.model.extra.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,12 +47,6 @@ public class Category {
     // FetchType.EAGER)
     // private List<Category> children;
 
-    public static Category convertToEntity(CategoryShopRequest request) {
-        Category category = new Category();
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
-        category.setImage(request.getImage());
-        return category;
-    }
+
 
 }

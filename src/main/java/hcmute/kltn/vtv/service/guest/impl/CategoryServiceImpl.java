@@ -44,4 +44,18 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
 
+    @Override
+    public Category getCategoryById(Long categoryId) {
+        checkExistCategoryById(categoryId);
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục!"));
+    }
+
+    private void checkExistCategoryById(Long categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new RuntimeException("Danh mục không tồn tại!");
+        }
+    }
+
+
 }

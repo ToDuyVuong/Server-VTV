@@ -4,6 +4,7 @@ import hcmute.kltn.vtv.repository.vtv.AttributeRepository;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
 import hcmute.kltn.vtv.repository.vtv.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.ProductVariantRepository;
+import hcmute.kltn.vtv.service.guest.ICategoryService;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
@@ -15,7 +16,6 @@ import hcmute.kltn.vtv.model.dto.vtv.ProductVariantDTO;
 import hcmute.kltn.vtv.model.entity.vtv.*;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.service.guest.IReviewService;
-import hcmute.kltn.vtv.service.vendor.ICategoryShopService;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;
 import hcmute.kltn.vtv.service.vendor.IProductVariantShopService;
 import hcmute.kltn.vtv.service.vendor.IShopService;
@@ -45,7 +45,7 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Autowired
     private BrandRepository brandRepository;
     @Autowired
-    private ICategoryShopService categoryShopService;
+    private ICategoryService categoryService;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -62,7 +62,7 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Override
     @Transactional
     public ProductResponse addNewProduct(ProductRequest request) {
-        Category category = categoryShopService.getCategoryShopById(request.getCategoryId(), request.getUsername());
+        Category category = categoryService.getCategoryById(request.getCategoryId());
         Brand brand = checkBrand(request.getBrandId());
 
         if (productRepository.existsByNameAndCategoryShopShopIdAndStatus(
@@ -227,8 +227,7 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Transactional
     public ProductResponse updateProduct(ProductRequest productRequest) {
         Product product = getProductByIdOnShop(productRequest.getProductId(), productRequest.getUsername());
-        Category category = categoryShopService.getCategoryShopById(productRequest.getCategoryId(),
-                productRequest.getUsername());
+        Category category = categoryService.getCategoryById(productRequest.getCategoryId());
 
         Brand brand = checkBrand(productRequest.getBrandId());
 
