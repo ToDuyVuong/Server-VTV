@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.model.entity.user;
 
 import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
-import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.model.extra.CartStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +27,7 @@ public class Cart {
     private LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private CartStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

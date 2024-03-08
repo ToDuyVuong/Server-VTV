@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.model.extra.CartStatus;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.model.data.user.request.CartRequest;
 import hcmute.kltn.vtv.model.data.user.response.CartResponse;
@@ -112,7 +113,7 @@ public class CartServiceImpl implements ICartService {
     @Override
     public List<Cart> getListCartByUsernameAndIds(String username, List<Long> cartIds) {
 
-        return cartRepository.findAllByCustomerUsernameAndStatusAndCartIdIn(username, Status.CART, cartIds)
+        return cartRepository.findAllByCustomerUsernameAndStatusAndCartIdIn(username, CartStatus.CART, cartIds)
                 .orElseThrow(() -> new NotFoundException("Giỏ hàng trống."));
     }
 
@@ -130,7 +131,7 @@ public class CartServiceImpl implements ICartService {
     public ListCartResponse deleteCartByShopId(Long shopId, String username) {
         List<Cart> carts = cartRepository
                 .findAllByCustomerUsernameAndProductVariantProductShopShopIdAndStatus(username, shopId,
-                        Status.CART)
+                        CartStatus.CART)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng theo cửa hàng."));
         try {
             cartRepository.deleteAll(carts);
@@ -178,21 +179,21 @@ public class CartServiceImpl implements ICartService {
 
 
     private List<Cart> getCartsByUsernameAndStatus(String username) {
-        return cartRepository.findAllByCustomerUsernameAndStatus(username, Status.CART)
+        return cartRepository.findAllByCustomerUsernameAndStatus(username, CartStatus.CART)
                 .orElseThrow(() -> new NotFoundException("Giỏ hàng trống."));
     }
 
 
     private Cart getCartByProductVariantIdAndUsername(Long productVariantId, String username) {
         return cartRepository.findByProductVariantProductVariantIdAndCustomerUsernameAndStatus(
-                        productVariantId, username, Status.CART)
+                        productVariantId, username, CartStatus.CART)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm trong giỏ hàng."));
     }
 
 
     private boolean checkCardExistProductVariantId(Long productVariantId, String username) {
         return cartRepository.existsByProductVariantProductVariantIdAndCustomerUsernameAndStatus(
-                productVariantId, username, Status.CART);
+                productVariantId, username, CartStatus.CART);
     }
 
 
@@ -209,7 +210,7 @@ public class CartServiceImpl implements ICartService {
         cart.setQuantity(request.getQuantity());
         cart.setCreateAt(LocalDateTime.now());
         cart.setUpdateAt(LocalDateTime.now());
-        cart.setStatus(Status.CART);
+        cart.setStatus(CartStatus.CART);
 
         return cart;
     }

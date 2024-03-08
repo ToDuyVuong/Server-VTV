@@ -1,5 +1,7 @@
 package hcmute.kltn.vtv.service.vendor.impl;
 
+import hcmute.kltn.vtv.model.extra.CartStatus;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.entity.user.Cart;
 import hcmute.kltn.vtv.model.entity.user.Order;
@@ -54,17 +56,17 @@ public class OrderItemShopServiceImpl implements IOrderItemShopService {
     @Override
     public List<OrderItem> updateStatusOrderItemByShop(Order order, Status status) {
         List<OrderItem> orderItems = new ArrayList<>();
-        for (OrderItem orderItem : order.getOrderItems()) {
-            Cart cart = orderItem.getCart();
-            cart.setStatus(status);
-            cart.setUpdateAt(order.getUpdateAt());
-            try {
-                orderItem.setCart(cartRepository.save(cart));
-                orderItems.add(orderItem);
-            } catch (Exception e) {
-                throw new BadRequestException("Cập nhật trạng thái đơn hàng thất bại!");
-            }
-        }
+//        for (OrderItem orderItem : order.getOrderItems()) {
+//            Cart cart = orderItem.getCart();
+//            cart.setStatus(status);
+//            cart.setUpdateAt(order.getUpdateAt());
+//            try {
+//                orderItem.setCart(cartRepository.save(cart));
+//                orderItems.add(orderItem);
+//            } catch (Exception e) {
+//                throw new BadRequestException("Cập nhật trạng thái đơn hàng thất bại!");
+//            }
+//        }
         return orderItems;
     }
 }

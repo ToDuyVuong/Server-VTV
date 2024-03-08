@@ -94,7 +94,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
                 throw new BadRequestException("Sản phẩm đã bị xóa!");
             }
 
-            cart.setStatus(Status.ORDER);
+            cart.setStatus(CartStatus.ORDER);
             cart.setUpdateAt(order.getUpdateAt());
             try {
                 cartRepository.save(cart);
@@ -138,7 +138,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
         List<OrderItem> orderItems = new ArrayList<>();
         for (OrderItem orderItem : order.getOrderItems()) {
             Cart cart = orderItem.getCart();
-            cart.setStatus(Status.CANCEL);
+            cart.setStatus(CartStatus.CANCEL);
             cart.setUpdateAt(order.getUpdateAt());
             try {
 

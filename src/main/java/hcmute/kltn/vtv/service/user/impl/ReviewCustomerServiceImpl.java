@@ -139,10 +139,10 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
 
         System.out.println("aaaaaaa" + orderItem.getCart().getStatus());
 
-        if (orderItem.getCart().getStatus() == Status.DELIVERED ||
-                orderItem.getCart().getStatus() == Status.COMPLETED) {
-            return;
-        }
+//        if (orderItem.getCart().getStatus() == Status.DELIVERED ||
+//                orderItem.getCart().getStatus() == Status.COMPLETED) {
+//            return;
+//        }
         throw new BadRequestException("Bạn không thể đánh giá sản phẩm này!");
     }
 
