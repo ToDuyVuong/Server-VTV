@@ -11,25 +11,17 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Optional<List<Category>> findAllByAdminOnlyAndStatus(boolean adminOnly, Status status);
+    Optional<List<Category>> findAllByChildAndStatus(boolean child, Status status);
 
     List<Category> findAllByParent(Category parent);
 
-    Optional<Category> findByCategoryIdAndAdminOnly(Long categoryId, boolean adminOnly);
 
-    Optional<Category> findByName(String name);
 
-    Optional<Category> findByNameAndShopCustomerUsername(String name, String username);
 
-    Optional<Category> findByNameAndAdminOnly(String name, boolean adminOnly);
 
-    Optional<Category> findByNameAndAdminOnlyNot(String name, boolean adminOnly);
 
-    List<Category> findAllByShopShopId(Long shopId);
 
-    List<Category> findAllByShopCustomerUsernameAndStatus(String username, Status status);
 
-    Optional<List<Category>> findAllByShopShopIdAndStatus(Long shopId, Status status);
 
     Optional<List<Category>> findAllByParentCategoryIdAndStatus(Long categoryId, Status status);
 

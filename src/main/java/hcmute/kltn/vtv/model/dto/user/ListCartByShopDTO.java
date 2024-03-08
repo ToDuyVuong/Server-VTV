@@ -30,7 +30,7 @@ public class ListCartByShopDTO {
         carts.sort(Comparator.comparing(Cart::getUpdateAt));
 
         Map<Shop, List<Cart>> groupedAndSortedCarts = carts.stream()
-                .collect(Collectors.groupingBy(cart -> cart.getProductVariant().getProduct().getCategory().getShop(),
+                .collect(Collectors.groupingBy(cart -> cart.getProductVariant().getProduct().getShop(),
                         Collectors.toList()));
 
         List<ListCartByShopDTO> listCartByShopDTOs = new ArrayList<>();

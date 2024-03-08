@@ -24,11 +24,9 @@ public class CategoryDTO {
 
     private String description;
 
-    private boolean adminOnly;
+    private boolean child;
 
     private Status status;
-
-    private Long shopId;
 
     private Long parentId;
 
@@ -39,10 +37,9 @@ public class CategoryDTO {
         categoryDTO.setName(category.getName());
         categoryDTO.setImage(category.getImage());
         categoryDTO.setDescription(category.getDescription());
-        categoryDTO.setAdminOnly(category.isAdminOnly());
+        categoryDTO.setChild(category.isChild());
         categoryDTO.setStatus(category.getStatus());
-        categoryDTO.setShopId(category.getShop() == null ? null : category.getShop().getShopId());
-        categoryDTO.setParentId(category.getParent() == null ? null : category.getParent().getCategoryId());
+        categoryDTO.setParentId(!category.isChild() ? null : category.getParent().getCategoryId());
 
         return categoryDTO;
     }

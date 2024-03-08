@@ -35,6 +35,8 @@ public class ProductDTO {
 
     private Long categoryId;
 
+    private Long shopId;
+
     private Long brandId;
 
     private Long maxPrice;
@@ -65,6 +67,7 @@ public class ProductDTO {
         productDTO.setSold(product.getSold());
         productDTO.setStatus(product.getStatus());
         productDTO.setCategoryId(product.getCategory().getCategoryId());
+        productDTO.setShopId(product.getShop().getShopId());
         productDTO.setBrandId(product.getBrand() != null ? product.getBrand().getBrandId() : null);
         productDTO.setProductVariantDTOs(ProductVariantDTO.convertToListDTO(product.getProductVariants()));
 

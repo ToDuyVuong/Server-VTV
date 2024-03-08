@@ -34,12 +34,12 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
     @Transactional
     public CategoryAdminResponse addNewCategory(CategoryAdminRequest request) {
 
-        Optional<Category> existingCategory = categoryRepository.findByNameAndAdminOnly(request.getName(), true);
-        if (existingCategory.isPresent()) {
-            throw new BadRequestException("Tên danh mục đã tồn tại!");
-        }
+//        Optional<Category> existingCategory = categoryRepository.findByNameAndAdminOnly(request.getName(), true);
+//        if (existingCategory.isPresent()) {
+//            throw new BadRequestException("Tên danh mục đã tồn tại!");
+//        }
         Category category = modelMapper.map(request, Category.class);
-        category.setAdminOnly(true);
+        category.setChild(true);
         category.setStatus(Status.ACTIVE);
         category.setCreateAt(LocalDateTime.now());
         category.setUpdateAt(LocalDateTime.now());
@@ -81,7 +81,7 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
     @Override
     @Transactional
     public AllCategoryAdminResponse getAllCategoryParent() {
-        List<Category> categories = categoryRepository.findAllByAdminOnlyAndStatus(true, Status.ACTIVE)
+        List<Category> categories = categoryRepository.findAllByChildAndStatus(true, Status.ACTIVE)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy danh mục cha nào!"));
         if (categories.isEmpty()) {
             AllCategoryAdminResponse response = new AllCategoryAdminResponse();
@@ -111,7 +111,7 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy danh mục!"));
 
         if (!category.getName().equals(request.getName())) {
-            checkCategoryName(request.getName());
+//            checkCategoryName(request.getName());
         }
 
         category.setName(request.getName());
@@ -175,10 +175,10 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
         }
     }
 
-    private void checkCategoryName(String name) {
-        Optional<Category> category = categoryRepository.findByNameAndAdminOnly(name, true);
-        if (category.isPresent()) {
-            throw new BadRequestException("Tên danh mục đã tồn tại!");
-        }
-    }
+//    private void checkCategoryName(String name) {
+//        Optional<Category> category = categoryRepository.findByNameAndAdminOnly(name, true);
+//        if (category.isPresent()) {
+//            throw new BadRequestException("Tên danh mục đã tồn tại!");
+//        }
+//    }
 }

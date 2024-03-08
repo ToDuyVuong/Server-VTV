@@ -50,7 +50,7 @@ public class ProductPageServiceImpl implements IProductPageService {
     @Override
     public ListProductPageResponse getListProductsPageByShopId(Long shopId, int page, int size) {
 
-        Page<Product> productPage = productRepository.findAllByCategoryShopShopIdAndStatusOrderByCreateAt(
+        Page<Product> productPage = productRepository.findAllByShopShopIdAndStatusOrderByCreateAt(
                 shopId, Status.ACTIVE, PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));
 
@@ -62,7 +62,7 @@ public class ProductPageServiceImpl implements IProductPageService {
     @Override
     public ListProductPageResponse getListBestSellingProductsPageByShopId(Long shopId, int page, int size) {
 
-        Page<Product> productPage = productRepository.findAllByCategoryShopShopIdAndStatusOrderBySoldDescNameAsc(
+        Page<Product> productPage = productRepository.findAllByShopShopIdAndStatusOrderBySoldDescNameAsc(
                 shopId, Status.ACTIVE, PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));
 
@@ -74,7 +74,7 @@ public class ProductPageServiceImpl implements IProductPageService {
     @Override
     public ListProductPageResponse getListNewProductsPageByShopId(Long shopId, int page, int size) {
 
-        Page<Product> productPage = productRepository.findAllByCategoryShopShopIdAndStatusOrderByCreateAtDesc(
+        Page<Product> productPage = productRepository.findAllByShopShopIdAndStatusOrderByCreateAtDesc(
                 shopId, Status.ACTIVE, PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));
 
@@ -120,7 +120,7 @@ public class ProductPageServiceImpl implements IProductPageService {
 
     public boolean isAdminOnlyInCategory(Long categoryId) {
         Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-        return categoryOptional.map(Category::isAdminOnly).orElse(false);
+        return categoryOptional.map(Category::isChild).orElse(false);
     }
 
 

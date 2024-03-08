@@ -23,15 +23,15 @@ public class ShopDetailController {
     @Autowired
     private IFollowedGuestService followedGuestService;
 
-    @GetMapping("/shop/{shopId}")
-    public ResponseEntity<ShopDetailResponse> getShopDetailByShopId(@PathVariable Long shopId,
-            HttpServletRequest request) {
-        if (shopId == null) {
-            throw new BadRequestException("Mã cửa hàng không được để trống!");
-        }
-        String username = (String) request.getAttribute("username");
-        return ResponseEntity.ok(shopDetailService.getShopDetailByShopId(shopId, username));
-    }
+//    @GetMapping("/shop/{shopId}")
+//    public ResponseEntity<ShopDetailResponse> getShopDetailByShopId(@PathVariable Long shopId,
+//            HttpServletRequest request) {
+//        if (shopId == null) {
+//            throw new BadRequestException("Mã cửa hàng không được để trống!");
+//        }
+//        String username = (String) request.getAttribute("username");
+//        return ResponseEntity.ok(shopDetailService.getShopDetailByShopId(shopId, username));
+//    }
 
     @GetMapping("/count-followed/{shopId}")
     public ResponseEntity<Integer> countFollowedShop(@PathVariable Long shopId) {

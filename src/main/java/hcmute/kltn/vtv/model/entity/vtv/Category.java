@@ -24,7 +24,7 @@ public class Category {
 
     private String description;
 
-    private boolean adminOnly;
+    private boolean child;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -34,18 +34,22 @@ public class Category {
     private LocalDateTime updateAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "shop_id", nullable = true)
-    // @JsonIgnore
-    private Shop shop;
-
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id", nullable = true)
-    // @JsonIgnore
     private Category parent;
 
-    // @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch =
-    // FetchType.EAGER)
-    // private List<Category> children;
+
+
+
+    @PrePersist
+    protected void onCreate() {
+        createAt = LocalDateTime.now();
+        updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateAt = LocalDateTime.now();
+    }
 
 
 

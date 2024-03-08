@@ -32,10 +32,10 @@ public class CategoryController {
     }
 
 
-    @GetMapping("/all-category/by-shop/{shopId}")
-    public ResponseEntity<CategoriesResponse> getCategoryByShopId(@PathVariable Long shopId) {
-        return ResponseEntity.ok(categoryService.getAllCategoryByShopId(shopId));
-    }
+//    @GetMapping("/all-category/by-shop/{shopId}")
+//    public ResponseEntity<CategoriesResponse> getCategoryByShopId(@PathVariable Long shopId) {
+//        return ResponseEntity.ok(categoryService.getAllCategoryByShopId(shopId));
+//    }
 
 
 

@@ -64,15 +64,16 @@ public class ProductShopServiceImpl implements IProductShopService {
     public ProductResponse addNewProduct(ProductRequest request) {
         Category category = categoryService.getCategoryById(request.getCategoryId());
         Brand brand = checkBrand(request.getBrandId());
+        Long shopId = shopService.getShopByUsername(request.getUsername()).getShopId();
 
-        if (productRepository.existsByNameAndCategoryShopShopIdAndStatus(
-                request.getName(), category.getShop().getShopId(), Status.ACTIVE)) {
+
+        if (productRepository.existsByNameAndStatus(
+                request.getName(), Status.ACTIVE)) {
             throw new BadRequestException("Sản phẩm có tên đã tồn tại trong cửa hàng!");
         }
 
         List<ProductVariant> productVariants = productVariantShopService.addNewListProductVariant(
-                request.getProductVariantRequests(),
-                category.getShop().getShopId());
+                request.getProductVariantRequests(), shopId);
 
         Product product = modelMapper.map(request, Product.class);
         product.setCategory(category);
@@ -119,7 +120,7 @@ public class ProductShopServiceImpl implements IProductShopService {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Product> products = productRepository
-                .findAllByCategoryShopShopIdAndStatus(shop.getShopId(), Status.ACTIVE)
+                .findAllByShopShopIdAndStatus(shop.getShopId(), Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm đang bán!"));
         return getListProductResponseSort(products,
                 "Lấy danh sách sản phẩm đang bán trong cửa hàng thành công.",
@@ -129,30 +130,15 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Override
     public ListProductPageResponse getListProductByUsernamePage(String username, int page, int size) {
 
+        Shop shop = shopService.getShopByUsername(username);
+
         Page<Product> pageProduct = productRepository
-                .findAllByCategoryShopCustomerUsernameAndStatus(username, Status.ACTIVE, PageRequest.of(page - 1, size))
+                .findAllByShopShopIdAndStatus(shop.getShopId(), Status.ACTIVE, PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm đang bán!"));
 
-        int totalProduct = productRepository.countAllByCategoryShopCustomerUsername(username);
-        int totalPage = (int) Math.ceil((double) totalProduct / size);
-
         String message = "Lấy danh sách sản phẩm đang bán trong cửa hàng thành công.";
-        return listProductPageResponse(pageProduct.getContent(), page, size, totalPage, message);
+        return ListProductPageResponse.listProductPageResponse(pageProduct, size, message);
 
-    }
-
-    public ListProductPageResponse listProductPageResponse(List<Product> products, int page,
-                                                           int size, int totalPage, String message) {
-        ListProductPageResponse response = new ListProductPageResponse();
-        response.setProductDTOs(ProductDTO.convertToListDTO(products));
-        response.setCount(products.size());
-        response.setSize(size);
-        response.setPage(page);
-        response.setTotalPage(totalPage);
-        response.setMessage(message);
-        response.setStatus("ok");
-        response.setCode(200);
-        return response;
     }
 
 
@@ -161,7 +147,7 @@ public class ProductShopServiceImpl implements IProductShopService {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Product> products = productRepository
-                .findAllByCategoryCategoryIdAndCategoryShopShopIdAndStatus(categoryId, shop.getShopId(), Status.ACTIVE)
+                .findAllByCategoryCategoryIdAndShopShopIdAndStatus(categoryId, shop.getShopId(), Status.ACTIVE)
                 .orElseThrow(
                         () -> new NotFoundException("Cửa hàng không có sản phẩm đang bán nào thuộc danh mục này!"));
 
@@ -175,7 +161,7 @@ public class ProductShopServiceImpl implements IProductShopService {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Product> products = productRepository
-                .findAllByNameContainingAndCategoryShopShopIdAndStatus(productName, shop.getShopId(), Status.ACTIVE)
+                .findAllByNameContainingAndShopShopIdAndStatus(productName, shop.getShopId(), Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào có tên tương tự!"));
 
         return getListProductResponseSort(products, "Tìm kiếm sản phẩm theo tên trong cửa hàng thành công!",
@@ -187,7 +173,7 @@ public class ProductShopServiceImpl implements IProductShopService {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Product> products = productRepository
-                .findByCategoryShopShopIdAndStatusOrderBySoldDescNameAsc(shop.getShopId(), Status.ACTIVE)
+                .findByShopShopIdAndStatusOrderBySoldDescNameAsc(shop.getShopId(), Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm bán chạy!"));
 
         ListProductResponse response = getListProductResponseSort(products,
@@ -215,7 +201,7 @@ public class ProductShopServiceImpl implements IProductShopService {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Product> products = productRepository
-                .findByCategoryShopShopIdAndStatusOrderByCreateAtDesc(shop.getShopId(), Status.ACTIVE)
+                .findByShopShopIdAndStatusOrderByCreateAtDesc(shop.getShopId(), Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm mới!"));
 
         return getListProductResponseSort(products,
@@ -228,18 +214,19 @@ public class ProductShopServiceImpl implements IProductShopService {
     public ProductResponse updateProduct(ProductRequest productRequest) {
         Product product = getProductByIdOnShop(productRequest.getProductId(), productRequest.getUsername());
         Category category = categoryService.getCategoryById(productRequest.getCategoryId());
+        Long shopId = shopService.getShopByUsername(productRequest.getUsername()).getShopId();
 
         Brand brand = checkBrand(productRequest.getBrandId());
 
         if (!product.getName().equals(productRequest.getName()) &&
-                productRepository.existsByNameAndCategoryShopShopIdAndStatus(
-                        productRequest.getName(), category.getShop().getShopId(), Status.ACTIVE)) {
+                productRepository.existsByNameAndStatus(
+                        productRequest.getName(), Status.ACTIVE)) {
             throw new BadRequestException("Sản phẩm cập nhật đã có tên đã tồn tại trong cửa hàng!");
         }
 
         List<ProductVariant> productVariants = productVariantShopService.getListProductVariant(
                 productRequest.getProductVariantRequests(),
-                category.getShop().getShopId(), product.getProductId());
+                shopId, product.getProductId());
 
         product.setName(productRequest.getName());
         product.setImage(productRequest.getImage());
@@ -349,7 +336,7 @@ public class ProductShopServiceImpl implements IProductShopService {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Product> products = productRepository
-                .findAllByCategoryShopShopIdAndStatus(shop.getShopId(), Status.DELETED)
+                .findAllByShopShopIdAndStatus(shop.getShopId(), Status.DELETED)
                 .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm đã xóa!"));
 
         List<ProductDTO> productDTOs = new ArrayList<>();
@@ -423,18 +410,13 @@ public class ProductShopServiceImpl implements IProductShopService {
     }
 
     private Product getProductByIdOnShop(Long productId, String username) {
-        Product product = productRepository
+        Long shopId = shopService.getShopByUsername(username).getShopId();
+
+        checkProductInShop(productId, shopId);
+
+        return productRepository
                 .findById(productId)
                 .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
-
-        // su dung ham checkExistProduct
-
-        if (product.getCategory().getShop() == null ||
-                !product.getCategory().getShop().getCustomer().getUsername().equals(username)) {
-            throw new NotFoundException("Sản phẩm không tồn tại trong cửa hàng!");
-        }
-
-        return product;
     }
 
     private void updateProductVariant(Product product, List<ProductVariant> productVariants) {
@@ -446,6 +428,13 @@ public class ProductShopServiceImpl implements IProductShopService {
             } catch (Exception e) {
                 throw new InternalServerErrorException("Thêm biến thể sản phẩm thất bại!");
             }
+        }
+    }
+
+
+    private void checkProductInShop(Long productId, Long shopId) {
+        if (!productRepository.existsByProductIdAndShopShopId(productId, shopId)) {
+            throw new NotFoundException("Sản phẩm không tồn tại trong cửa hàng!");
         }
     }
 

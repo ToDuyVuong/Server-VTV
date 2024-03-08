@@ -44,7 +44,7 @@ public class ProductSuggestionServiceImpl implements IProductSuggestionService {
 
         if (inShop) {
             productPage = productRepository.searchFullTextOnShopByNameAndStatusAndSortRandomly(
-                            content, product.getCategory().getShop().getShopId(), Status.ACTIVE.toString(),
+                            content, product.getShop().getShopId(), Status.ACTIVE.toString(),
                             PageRequest.of(page - 1, size))
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm phù hợp"));
             message = "Lấy danh sách sản phẩm gợi ý trong cùng cửa hàng thành công!";

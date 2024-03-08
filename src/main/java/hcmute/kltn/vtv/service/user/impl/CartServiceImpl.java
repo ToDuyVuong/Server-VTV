@@ -129,7 +129,7 @@ public class CartServiceImpl implements ICartService {
     @Transactional
     public ListCartResponse deleteCartByShopId(Long shopId, String username) {
         List<Cart> carts = cartRepository
-                .findAllByCustomerUsernameAndProductVariantProductCategoryShopShopIdAndStatus(username, shopId,
+                .findAllByCustomerUsernameAndProductVariantProductShopShopIdAndStatus(username, shopId,
                         Status.CART)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng theo cửa hàng."));
         try {
@@ -152,7 +152,7 @@ public class CartServiceImpl implements ICartService {
 
         if (!carts.isEmpty()) {
             long distinctShopCount = carts.stream()
-                    .map(cart -> cart.getProductVariant().getProduct().getCategory().getShop().getShopId())
+                    .map(cart -> cart.getProductVariant().getProduct().getShop().getShopId())
                     .distinct()
                     .count();
 

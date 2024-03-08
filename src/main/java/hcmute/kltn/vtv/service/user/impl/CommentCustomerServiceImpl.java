@@ -81,7 +81,7 @@ public class CommentCustomerServiceImpl implements ICommentCustomerService {
         Customer customer = customerService.getCustomerByUsername(request.getUsername());
         Review review = reviewCustomerService.checkReviewRole(request.getReviewId(), request.getUsername(),
                 request.isShop());
-        String shopName = request.isShop() ? review.getProduct().getCategory().getShop().getName() : "";
+        String shopName = request.isShop() ? review.getProduct().getShop().getName() : "";
 
         Comment comment = new Comment();
         comment.setContent(request.getContent());

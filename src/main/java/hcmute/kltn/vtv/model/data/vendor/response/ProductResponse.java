@@ -27,7 +27,7 @@ public class ProductResponse extends ResponseAbstract {
         response.setCategoryParentName(product.getCategory().getParent().getName());
         response.setCategoryShopId(product.getCategory().getCategoryId());
         response.setCategoryShopName(product.getCategory().getName());
-        response.setShopName(product.getCategory().getShop().getName());
+        response.setShopName(product.getShop().getName());
         response.setMessage(message);
         response.setStatus(status);
         response.setCode(200);

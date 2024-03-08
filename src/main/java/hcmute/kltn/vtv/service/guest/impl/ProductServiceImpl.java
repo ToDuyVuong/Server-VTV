@@ -43,7 +43,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ListProductResponse getListProductByShopId(Long shopId) {
-        List<Product> products = productRepository.findByCategoryShopShopIdAndStatus(shopId, Status.ACTIVE)
+        List<Product> products = productRepository.findByShopShopIdAndStatus(shopId, Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));
 
         return ListProductResponse.listProductResponse(products, "Lấy danh sách sản phẩm theo cửa hàng thành công!", "OK");
@@ -53,7 +53,7 @@ public class ProductServiceImpl implements IProductService {
     public ListProductResponse getBestSellingProducts(Long shopId, int limit, boolean isShop) {
         List<Product> products;
         if (isShop) {
-            products = productRepository.findByCategoryShopShopIdAndStatusOrderBySoldDescNameAsc(shopId, Status.ACTIVE)
+            products = productRepository.findByShopShopIdAndStatusOrderBySoldDescNameAsc(shopId, Status.ACTIVE)
                     .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm bán chạy!"));
         } else {
             products = productRepository.findByStatusOrderBySoldDescNameAsc(Status.ACTIVE)
@@ -77,7 +77,7 @@ public class ProductServiceImpl implements IProductService {
                     .orElseThrow(() -> new NotFoundException("Không có sản phẩm mới!"));
             products = page.getContent();
         } else {
-            products = productRepository.findByCategoryShopShopIdAndStatusOrderByCreateAtDesc(shopId, Status.ACTIVE)
+            products = productRepository.findByShopShopIdAndStatusOrderByCreateAtDesc(shopId, Status.ACTIVE)
                     .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm mới!"));
         }
 
@@ -116,7 +116,7 @@ public class ProductServiceImpl implements IProductService {
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào có tên tương tự!"));
         } else {
             products = productRepository
-                    .findAllByNameContainingAndCategoryShopShopIdAndStatus(productName, shopId, Status.ACTIVE)
+                    .findAllByNameContainingAndShopShopIdAndStatus(productName, shopId, Status.ACTIVE)
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào có tên tương tự!"));
         }
 

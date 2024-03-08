@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.guest.ICategoryService;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public CategoriesResponse getAllCategoryParent() {
-        List<Category> categories = categoryRepository.findAllByAdminOnlyAndStatus(true, Status.ACTIVE)
+        List<Category> categories = categoryRepository.findAllByChildAndStatus(true, Status.ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục cha!"));
 
         return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục thành công!", "OK");
@@ -39,8 +40,9 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public CategoriesResponse getAllCategoryByShopId(Long shopId) {
-        List<Category> categories = categoryRepository.findAllByShopShopId(shopId);
-        return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục theo cửa hàng thành công!", "OK");
+        return null;
+//        List<Category> categories = categoryRepository.findAllByShopShopId(shopId);
+//        return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục theo cửa hàng thành công!", "OK");
     }
 
 
@@ -53,7 +55,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private void checkExistCategoryById(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
-            throw new RuntimeException("Danh mục không tồn tại!");
+            throw new NotFoundException("Danh mục không tồn tại!");
         }
     }
 

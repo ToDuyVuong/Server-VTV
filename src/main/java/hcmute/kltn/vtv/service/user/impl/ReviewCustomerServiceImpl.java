@@ -85,7 +85,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
                 .orElseThrow(() -> new BadRequestException("Đánh giá không tồn tại"));
 
         if (isShop) {
-            if (!review.getProduct().getCategory().getShop().getCustomer().getUsername().equals(username)) {
+            if (!review.getProduct().getShop().getCustomer().getUsername().equals(username)) {
                 throw new BadRequestException(
                         "Bạn không phải chủ cửa hàng. Bạn không có quyền trả lời đánh giá này.");
             }

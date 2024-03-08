@@ -17,39 +17,37 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    int countByCategoryCategoryId(Long shopId);
 
-    int countAllByCategoryShopCustomerUsername(String username);
-
-    Optional<Page<Product>> findAllByCategoryShopCustomerUsernameAndStatus(String username, Status status,
+    Optional<Page<Product>> findAllByShopShopIdAndStatus(Long shopId, Status status,
                                                                            Pageable pageable);
 
-    int countByStatus(Status status);
 
     boolean existsByBrandBrandId(Long brandId);
 
-    boolean existsByNameAndCategoryShopShopIdAndStatus(String name, Long shopId, Status status);
+    boolean existsByNameAndStatus(String name, Status status);
 
-    Optional<List<Product>> findAllByCategoryShopShopIdAndStatus(Long shopId, Status status);
+    boolean existsByProductIdAndShopShopId(Long productId, Long shopId);
+    
+    Optional<List<Product>> findAllByShopShopIdAndStatus(Long shopId, Status status);
 
-    Optional<List<Product>> findAllByCategoryCategoryIdAndCategoryShopShopIdAndStatus(Long categoryId, Long shopId,
+    Optional<List<Product>> findAllByCategoryCategoryIdAndShopShopIdAndStatus(Long categoryId, Long shopId,
                                                                                       Status status);
 
-    Optional<List<Product>> findAllByNameContainingAndCategoryShopShopIdAndStatus(String name, Long shopId,
+    Optional<List<Product>> findAllByNameContainingAndShopShopIdAndStatus(String name, Long shopId,
                                                                                   Status status);
 
     Optional<List<Product>> findAllByNameContainingAndStatus(String name, Status status);
 
 
-    Optional<List<Product>> findByCategoryShopShopIdAndStatusOrderBySoldDescNameAsc(Long shopId, Status status);
+    Optional<List<Product>> findByShopShopIdAndStatusOrderBySoldDescNameAsc(Long shopId, Status status);
 
     Optional<List<Product>> findByStatusOrderBySoldDescNameAsc(Status status);
 
-    Optional<List<Product>> findByCategoryShopShopIdAndStatusOrderByCreateAtDesc(Long shopId, Status status);
+    Optional<List<Product>> findByShopShopIdAndStatusOrderByCreateAtDesc(Long shopId, Status status);
 
 
     @Query("SELECT p FROM Product p JOIN p.productVariants v " +
-            "WHERE p.category.shop.shopId = :shopId " +
+            "WHERE p.shop.shopId = :shopId " +
             "AND p.status = :status " +
             "AND v.status = :status " +
             "AND v.price >= :minPrice " +
@@ -59,11 +57,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                              @Param("minPrice") Long minPrice,
                                              @Param("maxPrice") Long maxPrice);
 
-    Optional<List<Product>> findByCategoryParentCategoryIdAndStatus(Long categoryParentId, Status status);
 
-    Optional<List<Product>> findByCategoryCategoryIdAndStatus(Long categoryId, Status status);
-
-    Optional<List<Product>> findByCategoryShopShopIdAndStatus(Long shopId, Status status);
+    Optional<List<Product>> findByShopShopIdAndStatus(Long shopId, Status status);
 
     @Query("SELECT p FROM Product p JOIN p.productVariants v " +
             "WHERE p.status = :status " +
@@ -79,7 +74,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "ORDER BY p.createAt DESC")
     Optional<Page<Product>> findNewestProducts(@Param("status") Status status, Pageable pageable);
 
-    int countByCategoryCategoryIdAndStatus(Long categoryId, Status status);
 
 
     Optional<Page<Product>> findAllByCategoryCategoryIdAndStatusOrderByCreateAt(Long categoryId, Status status,
@@ -90,13 +84,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                                         PageRequest pageRequest);
 
 
-    Optional<Page<Product>> findAllByCategoryShopShopIdAndStatusOrderByCreateAt(Long shopId, Status status,
+    Optional<Page<Product>> findAllByShopShopIdAndStatusOrderByCreateAt(Long shopId, Status status,
                                                                                 Pageable pageable);
 
-    Optional<Page<Product>> findAllByCategoryShopShopIdAndStatusOrderBySoldDescNameAsc(Long shopId, Status status,
+    Optional<Page<Product>> findAllByShopShopIdAndStatusOrderBySoldDescNameAsc(Long shopId, Status status,
                                                                                        Pageable pageable);
 
-    Optional<Page<Product>> findAllByCategoryShopShopIdAndStatusOrderByCreateAtDesc(Long shopId, Status status,
+    Optional<Page<Product>> findAllByShopShopIdAndStatusOrderByCreateAtDesc(Long shopId, Status status,
                                                                                     Pageable pageable);
 
 

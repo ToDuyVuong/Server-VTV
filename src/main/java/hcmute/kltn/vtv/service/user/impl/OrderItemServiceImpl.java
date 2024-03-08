@@ -3,6 +3,7 @@ package hcmute.kltn.vtv.service.user.impl;
 import hcmute.kltn.vtv.model.entity.user.Cart;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
+import hcmute.kltn.vtv.model.extra.CartStatus;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
 import hcmute.kltn.vtv.model.entity.vtv.*;
@@ -53,8 +54,8 @@ public class OrderItemServiceImpl implements IOrderItemService {
         response.setProductId(orderItem.getCart().getProductVariant().getProduct().getProductId());
         response.setProductName(orderItem.getCart().getProductVariant().getProduct().getName());
         response.setProductImage(orderItem.getCart().getProductVariant().getProduct().getImage());
-        response.setShopId(orderItem.getCart().getProductVariant().getProduct().getCategory().getShop().getShopId());
-        response.setShopName(orderItem.getCart().getProductVariant().getProduct().getCategory().getShop().getName());
+        response.setShopId(orderItem.getCart().getProductVariant().getProduct().getShop().getShopId());
+        response.setShopName(orderItem.getCart().getProductVariant().getProduct().getShop().getName());
         response.setCode(200);
         response.setMessage("Lấy thông tin chi tiết về sản phẩm trong đơn hàng thành công!");
         response.setStatus("OK");

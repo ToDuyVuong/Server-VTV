@@ -251,8 +251,8 @@ public class OrderServiceImpl implements IOrderService {
         Long shippingFee = shippingStrategy.calculateShippingCost(totalPrice);
 
         Long totalPayment = totalPrice + shippingFee - discount;
-        Long shopId = orderItems.get(0).getCart().getProductVariant().getProduct().getCategory().getShop().getShopId();
-        String shopName = orderItems.get(0).getCart().getProductVariant().getProduct().getCategory().getShop()
+        Long shopId = orderItems.get(0).getCart().getProductVariant().getProduct().getShop().getShopId();
+        String shopName = orderItems.get(0).getCart().getProductVariant().getProduct().getShop()
                 .getName();
 
         Order order = new Order();

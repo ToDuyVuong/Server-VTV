@@ -14,7 +14,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -26,6 +25,7 @@ public class Product {
     private Long productId;
 
 
+    @Column(length = 120)
     private String name;
 
     private String image;
@@ -56,7 +56,12 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private List<ProductVariant> productVariants;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private List<Review> reviews;
+
 
 }

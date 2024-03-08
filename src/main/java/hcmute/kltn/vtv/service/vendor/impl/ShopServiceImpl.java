@@ -179,6 +179,9 @@ public class ShopServiceImpl implements IShopService {
                 .orElseThrow(() -> new BadRequestException("Tài khoản chưa đăng ký cửa hàng!"));
     }
 
+
+
+
     private void checkEmailAndPhoneAndUsernameInShop(String email, String phone, String username) {
         Shop shop = shopRepository.findByCustomer_Username(username);
 
