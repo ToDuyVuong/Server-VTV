@@ -81,7 +81,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
     @Override
-    public PageOrderResponse getPageOrderByStatus(String username, Status status, int page, int size) {
+    public PageOrderResponse getPageOrderByStatus(String username, OrderStatus status, int page, int size) {
         Shop shop = shopService.getShopByUsername(username);
 
         int totalOrder = orderRepository.countAllByShopIdAndStatus(shop.getShopId(), status);
@@ -123,7 +123,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
     @Override
-    public ListOrderResponse getOrdersByStatus(String username, Status status) {
+    public ListOrderResponse getOrdersByStatus(String username, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
 
         List<Order> orders = orderRepository.findAllByShopIdAndStatus(shop.getShopId(), status)
@@ -148,7 +148,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
     @Override
-    public ListOrderResponse getOrdersOnSameDayByStatus(String username, Date orderDate, Status status) {
+    public ListOrderResponse getOrdersOnSameDayByStatus(String username, Date orderDate, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
 
         Date startOfDay = startOfDay(orderDate);
@@ -178,7 +178,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
     @Override
     public ListOrderResponse getOrdersBetweenDateByStatus(String username, Date startOrderDate, Date endOrderDate,
-            Status status) {
+                                                          OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
 
         Date startOfDay = startOfDay(startOrderDate);
@@ -208,7 +208,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
     @Override
-    public OrderResponse updateStatusOrder(String username, Long orderId, Status status) {
+    public OrderResponse updateStatusOrder(String username, Long orderId, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
 
         Order order = orderRepository.findById(orderId)
@@ -246,7 +246,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
     }
 
-    private String messageUpdateStatusOrder(Status status) {
+    private String messageUpdateStatusOrder(OrderStatus status) {
         switch (status) {
             case CANCEL:
                 return "Hủy đơn hàng thành công!";
@@ -261,18 +261,18 @@ public class OrderShopServiceImpl implements IOrderShopService {
         }
     }
 
-    private void checkStatus(Order order, Status status) {
+    private void checkStatus(Order order, OrderStatus status) {
 
-        if (order.getStatus().equals(Status.CANCEL)) {
+        if (order.getStatus().equals(OrderStatus.CANCEL)) {
             throw new BadRequestException("Đơn hàng đã bị hủy!");
         }
-        if (order.getStatus().equals(Status.COMPLETED)) {
+        if (order.getStatus().equals(OrderStatus.COMPLETED)) {
             throw new BadRequestException("Đơn hàng đã được giao!");
         }
-        if (order.getStatus().equals(Status.RETURNED)) {
+        if (order.getStatus().equals(OrderStatus.RETURNED)) {
             throw new BadRequestException("Đơn hàng đã được trả!");
         }
-        if (order.getStatus().equals(Status.REFUNDED)) {
+        if (order.getStatus().equals(OrderStatus.REFUNDED)) {
             throw new BadRequestException("Đơn hàng đã được hoàn tiền!");
         }
 

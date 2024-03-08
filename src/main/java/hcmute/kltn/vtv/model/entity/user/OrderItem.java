@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.model.entity.user;
 
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +16,8 @@ public class OrderItem {
     @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderItemId;
+
+    private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

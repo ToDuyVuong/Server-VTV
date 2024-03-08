@@ -1,6 +1,8 @@
 package hcmute.kltn.vtv.service.user.impl;
 
 import hcmute.kltn.vtv.model.entity.user.*;
+import hcmute.kltn.vtv.model.extra.CartStatus;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangHoaTocShippingStrategy;
 import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangNhanhShippingStrategy;
 import hcmute.kltn.vtv.service.vtv.shippingstrategy.GiaoHangTietKiemShippingStrategy;
@@ -61,10 +63,10 @@ public class OrderServiceImpl implements IOrderService {
         // Sau này nếu có nhiều hình thước thanh toán sẻ sử lý ở đây.
         switch (order.getPaymentMethod()) {
             case "COD":
-                order.setStatus(Status.PENDING);
+                order.setStatus(OrderStatus.PENDING);
                 break;
             default:
-                order.setStatus(Status.PENDING);
+                order.setStatus(OrderStatus.PENDING);
                 break;
         }
 
@@ -111,7 +113,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public ListOrderResponse getOrdersByStatus(String username, Status status) {
+    public ListOrderResponse getOrdersByStatus(String username, OrderStatus status) {
         List<Order> orders = orderRepository.findAllByCustomerUsernameAndStatus(username, status)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng!"));
 
@@ -133,13 +135,13 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     @Transactional
     public OrderResponse cancelOrder(String username, Long orderId) {
-        Order order = orderRepository.findByOrderIdAndStatus(orderId, Status.PENDING)
+        Order order = orderRepository.findByOrderIdAndStatus(orderId, OrderStatus.PENDING)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng!"));
         if (order == null || !order.getCustomer().getUsername().equals(username)) {
             throw new BadRequestException("Không tìm thấy đơn hàng!");
         }
 
-        order.setStatus(Status.CANCEL);
+        order.setStatus(OrderStatus.CANCEL);
         order.setUpdateAt(LocalDateTime.now());
         try {
             Order save = orderRepository.save(order);
@@ -160,7 +162,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public String messageByOrderStatus(Status status) {
+    public String messageByOrderStatus(OrderStatus status) {
         String message;
         switch (status) {
             case PENDING:
@@ -178,7 +180,7 @@ public class OrderServiceImpl implements IOrderService {
             case CANCEL:
                 message = "Lấy danh sách đơn hàng đã hủy thành công.";
                 break;
-            case CART:
+            case WAITING:
                 message = "Lấy danh sách giỏ hàng thành công.";
                 break;
             default:
@@ -259,7 +261,7 @@ public class OrderServiceImpl implements IOrderService {
         order.setCustomer(customer);
         order.setOrderItems(orderItems);
         order.setAddress(address);
-        order.setStatus(Status.CART);
+        order.setStatus(OrderStatus.WAITING);
         order.setTotalPrice(totalPrice);
         order.setVoucherOrders(null);
         order.setPaymentMethod("COD");

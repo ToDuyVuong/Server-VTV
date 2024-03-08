@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.model.dto.user;
 
 import hcmute.kltn.vtv.model.entity.user.Order;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,7 +43,7 @@ public class OrderDTO {
 
     private String wardCode;
 
-    private Status status;
+    private OrderStatus status;
 
     private AddressDTO addressDTO;
 

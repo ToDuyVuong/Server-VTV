@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.model.entity.user;
 
 import hcmute.kltn.vtv.model.entity.location.Ward;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,7 +24,7 @@ public class Order {
     private Long orderId;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private OrderStatus status;
 
     private Date orderDate;
 

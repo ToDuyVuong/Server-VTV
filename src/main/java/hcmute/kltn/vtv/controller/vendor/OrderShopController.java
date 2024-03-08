@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.controller.vendor;
 
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.PageOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
@@ -45,7 +46,7 @@ public class OrderShopController {
 
     @GetMapping("/list/page/status/{status}")
     public ResponseEntity<PageOrderResponse> getPageOrderByStatus(HttpServletRequest httpServletRequest,
-            @PathVariable Status status,
+            @PathVariable OrderStatus status,
             @RequestParam int page,
             @RequestParam int size) {
         String username = (String) httpServletRequest.getAttribute("username");
@@ -55,7 +56,7 @@ public class OrderShopController {
 
     @GetMapping("/list/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersByStatus(HttpServletRequest httpServletRequest,
-            @PathVariable Status status) {
+            @PathVariable OrderStatus status) {
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(orderShopService.getOrdersByStatus(username, status));
     }
@@ -103,7 +104,7 @@ public class OrderShopController {
     @GetMapping("/list/on-same-day/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersOnSameDateByStatus(HttpServletRequest httpServletRequest,
             @RequestParam String dateString,
-            @PathVariable Status status) {
+            @PathVariable OrderStatus status) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             Date date = dateFormat.parse(dateString);
@@ -119,7 +120,7 @@ public class OrderShopController {
     public ResponseEntity<ListOrderResponse> getOrdersBetweenDateByStatus(HttpServletRequest httpServletRequest,
             @RequestParam String startDateString,
             @RequestParam String endDateString,
-            @PathVariable Status status) {
+            @PathVariable OrderStatus status) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             Date startDate = dateFormat.parse(startDateString);
@@ -153,7 +154,7 @@ public class OrderShopController {
     @PatchMapping("/update/status/{orderId}")
     public ResponseEntity<OrderResponse> updateStatusOrder(HttpServletRequest httpServletRequest,
             @PathVariable Long orderId,
-            @RequestParam Status status) {
+            @RequestParam OrderStatus status) {
         if (orderId == null) {
             throw new NotFoundException("Mã đơn hàng không được để trống!");
         }

@@ -54,7 +54,7 @@ public class OrderItemShopServiceImpl implements IOrderItemShopService {
 
     @Transactional
     @Override
-    public List<OrderItem> updateStatusOrderItemByShop(Order order, Status status) {
+    public List<OrderItem> updateStatusOrderItemByShop(Order order, OrderStatus status) {
         List<OrderItem> orderItems = new ArrayList<>();
 //        for (OrderItem orderItem : order.getOrderItems()) {
 //            Cart cart = orderItem.getCart();

@@ -4,6 +4,7 @@ import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.service.user.IOrderService;
 import hcmute.kltn.vtv.service.user.impl.OrderItemServiceImpl;
@@ -67,7 +68,7 @@ public class OrderController {
     }
 
     @GetMapping("/list/status/{status}")
-    public ResponseEntity<ListOrderResponse> getOrdersByStatus(@PathVariable Status status,
+    public ResponseEntity<ListOrderResponse> getOrdersByStatus(@PathVariable OrderStatus status,
             HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.getOrdersByStatus(username, status));

@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.repository.user;
 
 import hcmute.kltn.vtv.model.entity.user.Order;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,30 +24,30 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<List<Order>> findAllByCustomerUsername(String username);
 
-    Optional<List<Order>> findAllByCustomerUsernameAndStatus(String username, Status status);
+    Optional<List<Order>> findAllByCustomerUsernameAndStatus(String username, OrderStatus status);
 
-    Optional<Order> findByOrderIdAndStatus(Long orderId, Status status);
+    Optional<Order> findByOrderIdAndStatus(Long orderId, OrderStatus status);
 
     Optional<List<Order>> findAllByShopId(Long shopId);
 
-    Optional<List<Order>> findAllByShopIdAndStatus(Long shopId, Status status);
+    Optional<List<Order>> findAllByShopIdAndStatus(Long shopId, OrderStatus status);
 
     Optional<List<Order>> findAllByShopIdAndOrderDateBetween(Long shopId, Date startOrderDate, Date endOrderDate);
 
     Optional<List<Order>> findAllByShopIdAndOrderDateBetweenAndStatus(Long shopId, Date startOrderDate,
-            Date endOrderDate, Status status);
+            Date endOrderDate, OrderStatus status);
 
-    int countAllByShopIdAndStatusAndOrderDateBetween(Long shopId, Status status, Date startDate, Date endDate);
+    int countAllByShopIdAndStatusAndOrderDateBetween(Long shopId, OrderStatus status, Date startDate, Date endDate);
 
-    Optional<List<Order>> findAllByShopIdAndStatusAndOrderDateBetween(Long shopId, Status status, Date startDate,
+    Optional<List<Order>> findAllByShopIdAndStatusAndOrderDateBetween(Long shopId, OrderStatus status, Date startDate,
             Date endDate);
 
     Optional<Page<Order>> findAllByShopIdOrderByCreateAtDesc(Long shopId, PageRequest pageRequest);
 
-    Optional<Page<Order>> findAllByShopIdAndStatusOrderByCreateAtDesc(Long shopId, Status status,
+    Optional<Page<Order>> findAllByShopIdAndStatusOrderByCreateAtDesc(Long shopId, OrderStatus status,
             PageRequest pageRequest);
 
-    int countAllByShopIdAndStatus(Long shopId, Status status);
+    int countAllByShopIdAndStatus(Long shopId, OrderStatus status);
 
     int countAllByShopId(Long shopId);
 
