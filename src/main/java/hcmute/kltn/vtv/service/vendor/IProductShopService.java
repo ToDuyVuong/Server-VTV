@@ -20,7 +20,6 @@ public interface IProductShopService {
 
     ListProductPageResponse getListProductByUsernamePage(String username, int page, int size);
 
-    void checkRequestPageParams(int page, int size);
 
     ListProductResponse getListProductShopByCategoryId(Long categoryId, String username);
 

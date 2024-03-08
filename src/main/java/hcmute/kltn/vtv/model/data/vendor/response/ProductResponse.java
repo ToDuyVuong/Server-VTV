@@ -12,18 +12,22 @@ import lombok.*;
 @AllArgsConstructor
 public class ProductResponse extends ResponseAbstract {
 
-    private String categoryName;
+    private Long categoryParentId;
+    private String categoryParentName;
+    private Long categoryShopId;
+    private String categoryShopName;
     private String shopName;
-    private float rating;
     private ProductDTO productDTO;
 
 
-    public static ProductResponse productResponse(Product product, String message, String status, float rating) {
+    public static ProductResponse productResponse(Product product, String message, String status) {
         ProductResponse response = new ProductResponse();
         response.setProductDTO(ProductDTO.convertEntityToDTO(product));
-        response.setCategoryName(product.getCategory().getName());
+        response.setCategoryParentId(product.getCategory().getParent().getCategoryId());
+        response.setCategoryParentName(product.getCategory().getParent().getName());
+        response.setCategoryShopId(product.getCategory().getCategoryId());
+        response.setCategoryShopName(product.getCategory().getName());
         response.setShopName(product.getCategory().getShop().getName());
-        response.setRating(rating);
         response.setMessage(message);
         response.setStatus(status);
         response.setCode(200);

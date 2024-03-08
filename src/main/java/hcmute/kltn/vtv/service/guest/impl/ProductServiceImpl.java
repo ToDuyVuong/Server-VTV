@@ -36,9 +36,8 @@ public class ProductServiceImpl implements IProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
 
-        float rating = reviewService.countAverageRatingByProductId(productId);
 
-        return ProductResponse.productResponse(product, "Lấy thông tin sản phẩm thành công!", "OK", rating);
+        return ProductResponse.productResponse(product, "Lấy thông tin sản phẩm thành công!", "OK");
     }
 
 

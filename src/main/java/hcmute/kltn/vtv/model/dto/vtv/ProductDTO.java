@@ -1,7 +1,9 @@
 package hcmute.kltn.vtv.model.dto.vtv;
 
+import hcmute.kltn.vtv.model.entity.user.Review;
 import hcmute.kltn.vtv.model.entity.vtv.Product;
 import hcmute.kltn.vtv.model.extra.Status;
+import io.grpc.internal.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 
 @Data
 @ToString
@@ -34,9 +37,11 @@ public class ProductDTO {
 
     private Long brandId;
 
-    private Long maxPrice;  // New field to store the maximum price
+    private Long maxPrice;
 
-    private Long minPrice;  // New field to store the minimum price
+    private Long minPrice;
+
+    private String rating;
 
     private List<ProductVariantDTO> productVariantDTOs;
 
@@ -65,6 +70,7 @@ public class ProductDTO {
 
         productDTO.setMinPrice(calculateMinPrices(productDTO.getProductVariantDTOs()));
         productDTO.setMaxPrice(calculateMaxPrices(productDTO.getProductVariantDTOs()));
+        productDTO.setRating(calculateAverageRating(product.getReviews()));
 
         return productDTO;
     }
@@ -87,6 +93,20 @@ public class ProductDTO {
             }
         }
         return maxPrice;
+    }
+
+
+    private static String calculateAverageRating(List<Review> reviews) {
+        if (reviews == null || reviews.isEmpty()) {
+            return "0.0";
+        }
+
+        OptionalDouble averageRating = reviews.stream()
+                .mapToDouble(Review::getRating)
+                .average();
+
+        // Format the String to have one decimal place
+        return String.format("%.1f", averageRating.orElse(0.0));
     }
 
 

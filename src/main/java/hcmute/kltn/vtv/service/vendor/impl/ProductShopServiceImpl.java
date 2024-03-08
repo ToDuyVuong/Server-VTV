@@ -4,6 +4,7 @@ import hcmute.kltn.vtv.repository.vtv.AttributeRepository;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
 import hcmute.kltn.vtv.repository.vtv.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.ProductVariantRepository;
+import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.request.ProductRequest;
@@ -50,9 +51,11 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Autowired
     private ProductVariantRepository productVariantRepository;
     @Autowired
-    private IProductVariantShopService productVariantService;
+    private IProductVariantShopService productVariantShopService;
     @Autowired
     private final IReviewService reviewService;
+    @Autowired
+    private IProductVariantService productVariantService;
     @Autowired
     ModelMapper modelMapper;
 
@@ -67,7 +70,7 @@ public class ProductShopServiceImpl implements IProductShopService {
             throw new BadRequestException("Sản phẩm có tên đã tồn tại trong cửa hàng!");
         }
 
-        List<ProductVariant> productVariants = productVariantService.addNewListProductVariant(
+        List<ProductVariant> productVariants = productVariantShopService.addNewListProductVariant(
                 request.getProductVariantRequests(),
                 category.getShop().getShopId());
 
@@ -100,22 +103,15 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Override
     public ProductResponse getProductDetail(Long productId, String username) {
         Product product = getProductByIdOnShop(productId, username);
-        ProductDTO productDTO;
+
         if (product.getStatus() == Status.DELETED) {
-            productDTO = getProductDeleteToDTO(product);
-        } else {
-            productDTO = getProductToDTO(product);
+            List<ProductVariant> productVariants = productVariantService
+                    .filterProductVariantsByStatus(product.getProductVariants(), Status.ACTIVE);
+            product.setProductVariants(productVariants);
         }
 
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setProductDTO(productDTO);
-        productResponse.setCategoryName(product.getCategory().getName());
-        productResponse.setRating(reviewService.countAverageRatingByProductId(productId));
-        productResponse.setShopName(product.getCategory().getShop().getName());
-        productResponse.setStatus("ok");
-        productResponse.setCode(200);
-        productResponse.setMessage("Lấy thông tin chi tiết sản phẩm thành công.");
-        return productResponse;
+
+        return ProductResponse.productResponse(product, "Lấy thông tin sản phẩm thành công!", "OK");
     }
 
     @Override
@@ -146,7 +142,7 @@ public class ProductShopServiceImpl implements IProductShopService {
     }
 
     public ListProductPageResponse listProductPageResponse(List<Product> products, int page,
-            int size, int totalPage, String message) {
+                                                           int size, int totalPage, String message) {
         ListProductPageResponse response = new ListProductPageResponse();
         response.setProductDTOs(ProductDTO.convertToListDTO(products));
         response.setCount(products.size());
@@ -159,18 +155,6 @@ public class ProductShopServiceImpl implements IProductShopService {
         return response;
     }
 
-    @Override
-    public void checkRequestPageParams(int page, int size) {
-        if (page < 0) {
-            throw new NotFoundException("Trang không được nhỏ hơn 0!");
-        }
-        if (size < 0) {
-            throw new NotFoundException("Kích thước trang không được nhỏ hơn 0!");
-        }
-        if (size > 200) {
-            throw new NotFoundException("Kích thước trang không được lớn hơn 200!");
-        }
-    }
 
     @Override
     public ListProductResponse getListProductShopByCategoryId(Long categoryId, String username) {
@@ -254,7 +238,7 @@ public class ProductShopServiceImpl implements IProductShopService {
             throw new BadRequestException("Sản phẩm cập nhật đã có tên đã tồn tại trong cửa hàng!");
         }
 
-        List<ProductVariant> productVariants = productVariantService.getListProductVariant(
+        List<ProductVariant> productVariants = productVariantShopService.getListProductVariant(
                 productRequest.getProductVariantRequests(),
                 category.getShop().getShopId(), product.getProductId());
 
@@ -443,6 +427,8 @@ public class ProductShopServiceImpl implements IProductShopService {
         Product product = productRepository
                 .findById(productId)
                 .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
+
+        // su dung ham checkExistProduct
 
         if (product.getCategory().getShop() == null ||
                 !product.getCategory().getShop().getCustomer().getUsername().equals(username)) {

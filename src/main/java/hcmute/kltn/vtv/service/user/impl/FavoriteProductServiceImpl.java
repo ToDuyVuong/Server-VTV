@@ -61,10 +61,9 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
     public ProductResponse getProductByFavoriteProductId(Long favoriteProductId, String username) {
         FavoriteProduct favoriteProduct = getFavoriteProductById(favoriteProductId);
 
-        float rating = reviewService.countAverageRatingByProductId(favoriteProduct.getProduct().getProductId());
 
         return  ProductResponse.productResponse(favoriteProduct.getProduct(),
-                "Lấy thông tin sản phẩm yêu thích thành công.", "OK", rating);
+                "Lấy thông tin sản phẩm yêu thích thành công.", "OK");
     }
 
     @Override

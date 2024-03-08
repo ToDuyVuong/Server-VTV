@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.controller.vendor;
 
+import hcmute.kltn.vtv.service.guest.IPageService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.request.ProductRequest;
@@ -21,40 +22,32 @@ public class ProductShopController {
 
     @Autowired
     private IProductShopService productService;
+    @Autowired
+    private final IPageService pageService;
 
     @PostMapping("/add")
     public ResponseEntity<ProductResponse> addNewProduct(@RequestBody ProductRequest request,
-            HttpServletRequest httpServletRequest) {
+                                                         HttpServletRequest httpServletRequest) {
         String username = (String) httpServletRequest.getAttribute("username");
         request.setUsername(username);
         request.validate();
         return ResponseEntity.ok(productService.addNewProduct(request));
     }
 
-    @PostMapping("/add2")
-    public ResponseEntity<ProductResponse> addNewProduct2(@RequestBody ProductRequest request,
-            HttpServletRequest httpServletRequest) {
-        String username = (String) httpServletRequest.getAttribute("username");
-        request.setUsername(username);
-        request.validate();
-        return ResponseEntity.ok(productService.addNewProduct(request));
-    }
 
     @GetMapping("/detail/{productId}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long productId,
-            HttpServletRequest httpServletRequest) {
-        if (productId == null) {
-            throw new NotFoundException("Mã sản phẩm không được để trống!");
-        }
+                                                            HttpServletRequest httpServletRequest) {
+
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(productService.getProductDetail(productId, username));
     }
 
     @GetMapping("/page")
     public ResponseEntity<ListProductPageResponse> getPageProductByUsername(@RequestParam int page,
-            @RequestParam int size,
-            HttpServletRequest httpServletRequest) {
-        productService.checkRequestPageParams(page, size);
+                                                                            @RequestParam int size,
+                                                                            HttpServletRequest httpServletRequest) {
+        pageService.checkRequestProductPageParams(page, size);
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(productService.getListProductByUsernamePage(username, page, size));
     }
@@ -67,17 +60,15 @@ public class ProductShopController {
 
     @GetMapping("/list/category/{categoryId}")
     public ResponseEntity<ListProductResponse> getListProductShopByCategoryId(@PathVariable Long categoryId,
-            HttpServletRequest httpServletRequest) {
-        if (categoryId == null) {
-            throw new NotFoundException("Mã danh mục không được để trống!");
-        }
+                                                                              HttpServletRequest httpServletRequest) {
+
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(productService.getListProductShopByCategoryId(categoryId, username));
     }
 
     @GetMapping("/search")
     public ResponseEntity<ListProductResponse> searchProductsByName(@RequestParam String productName,
-            HttpServletRequest httpServletRequest) {
+                                                                    HttpServletRequest httpServletRequest) {
         if (productName == null) {
             throw new NotFoundException("Tên sản phẩm không được để trống!");
         }
@@ -85,38 +76,27 @@ public class ProductShopController {
         return ResponseEntity.ok(productService.searchProductsByName(productName, username));
     }
 
-    @GetMapping("/best-sellers")
-    public ResponseEntity<ListProductResponse> getBestSellingProducts(@RequestParam Long limit,
-            HttpServletRequest httpServletRequest) {
-        int maxLimit = Math.toIntExact(limit);
-        if (maxLimit <= 0) {
+    @GetMapping("/best-selling")
+    public ResponseEntity<ListProductResponse> getBestSellingProducts(@RequestParam int limit,
+                                                                      HttpServletRequest httpServletRequest) {
+        if (limit <= 0) {
             throw new BadRequestException("Số lượng sản phẩm bán chạy nhất phải lớn hơn 0!");
         }
         String username = (String) httpServletRequest.getAttribute("username");
-        return ResponseEntity.ok(productService.getBestSellingProducts(maxLimit, username));
+        return ResponseEntity.ok(productService.getBestSellingProducts(limit, username));
     }
 
     @GetMapping("/price-range")
     public ResponseEntity<ListProductResponse> getListProductByPriceRange(@RequestParam Long minPrice,
-            @RequestParam Long maxPrice,
-            HttpServletRequest httpServletRequest) {
-        checkPrice(minPrice, maxPrice);
+                                                                          @RequestParam Long maxPrice,
+                                                                          HttpServletRequest httpServletRequest) {
+
+        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
 
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(productService.getListProductByPriceRange(username, minPrice, maxPrice));
     }
 
-    public static void checkPrice(@RequestParam Long minPrice, @RequestParam Long maxPrice) {
-        if (minPrice == null || maxPrice == null) {
-            throw new NotFoundException("Giá sản phẩm không được để trống!");
-        }
-        if (minPrice <= 0 || maxPrice <= 0) {
-            throw new BadRequestException("Giá sản phẩm không được nhỏ hơn hoặc bằng 0!");
-        }
-        if (minPrice >= maxPrice) {
-            throw new BadRequestException("Giá sản phẩm tối thiểu phải nhỏ hơn hoặc bằng giá sản phẩm tối đa!");
-        }
-    }
 
     @GetMapping("/list-new")
     public ResponseEntity<ListProductResponse> getListNewProduct(HttpServletRequest httpServletRequest) {
@@ -126,11 +106,9 @@ public class ProductShopController {
 
     @PutMapping("/update/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,
-            @RequestBody ProductRequest request,
-            HttpServletRequest httpServletRequest) {
-        if (productId == null) {
-            throw new NotFoundException("Mã sản phẩm không được để trống!");
-        }
+                                                         @RequestBody ProductRequest request,
+                                                         HttpServletRequest httpServletRequest) {
+
         String username = (String) httpServletRequest.getAttribute("username");
         request.setUsername(username);
         request.setProductId(productId);
@@ -140,11 +118,9 @@ public class ProductShopController {
 
     @PatchMapping("/update/status/{productId}")
     public ResponseEntity<ProductResponse> updateStatusProduct(@PathVariable Long productId,
-            @RequestParam Status status,
-            HttpServletRequest httpServletRequest) {
-        if (productId == null) {
-            throw new NotFoundException("Mã sản phẩm không được để trống!");
-        }
+                                                               @RequestParam Status status,
+                                                               HttpServletRequest httpServletRequest) {
+
         if (status == null) {
             throw new NotFoundException("Trạng thái sản phẩm không được để trống!");
         }
@@ -161,10 +137,8 @@ public class ProductShopController {
 
     @PutMapping("/restore/{productId}")
     public ResponseEntity<ProductResponse> restoreProductById(@PathVariable Long productId,
-            HttpServletRequest httpServletRequest) {
-        if (productId == null) {
-            throw new NotFoundException("Mã sản phẩm không được để trống!");
-        }
+                                                              HttpServletRequest httpServletRequest) {
+
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(productService.restoreProductById(productId, username));
     }

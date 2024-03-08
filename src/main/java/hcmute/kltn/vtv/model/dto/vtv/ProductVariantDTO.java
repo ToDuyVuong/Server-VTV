@@ -36,6 +36,8 @@ public class ProductVariantDTO {
 
     private String productImage;
 
+    private String discountPercent;
+
     private List<AttributeDTO> attributeDTOs;
 
     public static ProductVariantDTO convertEntityToDTO(ProductVariant productVariant) {
@@ -51,6 +53,7 @@ public class ProductVariantDTO {
         productVariantDTO.setProductId(productVariant.getProduct().getProductId());
         productVariantDTO.setProductName(productVariant.getProduct().getName());
         productVariantDTO.setProductImage(productVariant.getProduct().getImage());
+        productVariantDTO.setDiscountPercent(calculateDiscountPercentage(productVariant.getOriginalPrice(), productVariant.getPrice()));
 
         return productVariantDTO;
     }
@@ -63,5 +66,24 @@ public class ProductVariantDTO {
         }
         return productVariantDTOs;
     }
+
+
+    private static String calculateDiscountPercentage(Long originalPrice, Long currentPrice) {
+        if (originalPrice == null || currentPrice == null || originalPrice <= 0) {
+            return "0%";
+        }
+
+        double percentage = ((originalPrice - currentPrice) / (double) originalPrice) * 100;
+
+        // Format the String based on the sign of the percentage
+        if (percentage > 0) {
+            return String.format("-%.0f%%", percentage);
+        } else if (percentage < 0) {
+            return String.format("%.0f%%", percentage);
+        } else {
+            return "0%";
+        }
+    }
+
 
 }

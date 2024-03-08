@@ -4,12 +4,13 @@ import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.ProductVariantRepository;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
-import hcmute.kltn.vtv.service.vendor.IAttributeShopService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +42,13 @@ public class ProductVariantServiceImpl implements IProductVariantService {
         }
 
         return productVariant;
+    }
+
+
+    @Override
+    public List<ProductVariant> filterProductVariantsByStatus(List<ProductVariant> productVariants, Status status) {
+        return productVariants.stream()
+                .filter(productVariant -> productVariant.getStatus() == status)
+                .toList();
     }
 }
