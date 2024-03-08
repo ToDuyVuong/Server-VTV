@@ -31,8 +31,8 @@ public class Notification {
 
     private String type;
 
-    @Column( columnDefinition = "boolean default false")
-    private boolean read;
+    //    @Column( columnDefinition = "boolean default false")
+    private boolean seen;
 
 //    @Column(columnDefinition = "boolean default false")
 //    private boolean deleted;

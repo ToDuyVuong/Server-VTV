@@ -74,7 +74,7 @@ public class NotificationServiceImpl implements INotificationService {
         Notification notification = getNotificationByIdAndRecipient(notificationId, username);
 
         try {
-            notification.setRead(true);
+            notification.setSeen(true);
             notificationRepository.save(notification);
 
             return notificationResponse(getNotifications(username, 1, 20), "Đọc thông báo thành công.");
@@ -116,7 +116,7 @@ public class NotificationServiceImpl implements INotificationService {
         notification.setRecipient(request.getRecipient());
         notification.setSender(request.getSender());
         notification.setType(request.getType());
-        notification.setRead(false);
+        notification.setSeen(false);
         notification.setCreateAt(LocalDateTime.now());
 
         return notification;
@@ -127,12 +127,12 @@ public class NotificationServiceImpl implements INotificationService {
         NotificationResponse response = new NotificationResponse();
         response.setNotificationDTOs(NotificationDTO.convertEntitiesToListDTOs(notifications.getContent()));
         response.setTotalPage(notifications.getTotalPages());
-        response.setCount((int) notifications.getNumberOfElements());
+        response.setCount(notifications.getNumberOfElements());
         response.setPage(notifications.getNumber() + 1);
         response.setSize(notifications.getSize());
         response.setStatus("OK");
         response.setCode(200);
-        response.setMessage("message");
+        response.setMessage(message);
 
         return response;
     }

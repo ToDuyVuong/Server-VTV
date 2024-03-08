@@ -30,7 +30,8 @@ public class NotificationDTO {
 
     private String type;
 
-    private boolean isRead;
+    private boolean seen;
+
 
 //    private boolean isDeleted;
 
@@ -45,7 +46,7 @@ public class NotificationDTO {
         notificationDTO.setRecipient(notification.getRecipient());
         notificationDTO.setSender(notification.getSender());
         notificationDTO.setType(notification.getType());
-        notificationDTO.setRead(notification.isRead());
+        notificationDTO.setSeen(notification.isSeen());
 //        notificationDTO.setDeleted(notification.isDeleted());
         notificationDTO.setCreateAt(notification.getCreateAt());
 
