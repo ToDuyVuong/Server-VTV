@@ -52,12 +52,10 @@
     - Chọn trạng thái cửa hàng.
 
 
-- Quản lý danh mục từ quyền admin:
-    - Thêm danh mục bằng quyền admin.
-    - Xem danh sách danh mục.
-    - Xem chi tiết danh mục.
+- Quản lý danh mục từ quyền manager:
+    - Thêm danh mục.
     - Cập nhật thông tin danh mục.
-    - Chọn trạng thái danh mục.
+    - Xóa danh mục.
 
 
 - Quản lý thương hiệu sản phẩm từ quyền admin:
