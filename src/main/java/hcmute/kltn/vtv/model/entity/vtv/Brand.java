@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,6 +30,10 @@ public class Brand {
 
     private String origin;
 
+    private String createdBy;
+
+    private String updatedBy;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -36,18 +41,15 @@ public class Brand {
 
     private LocalDateTime updateAt;
 
-    private boolean adminOnly;
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "customer_id")
-    // private Customer customer;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "brand_category",
+            joinColumns = @JoinColumn(name = "brand_id", nullable = true),
+            inverseJoinColumns = @JoinColumn(name = "category_id", nullable = true))
+    private List<Category> categories;
 
-    // @OneToMany(mappedBy = "brand")
-    // @JsonIgnore
-    // private List<Product> products;
+
 
 }

@@ -52,11 +52,9 @@ public class BrandAdminServiceImpl implements IBrandAdminService {
         }
 
         brand = modelMapper.map(request, Brand.class);
-        brand.setAdminOnly(true);
         brand.setCreateAt(LocalDateTime.now());
         brand.setUpdateAt(LocalDateTime.now());
         brand.setStatus(Status.ACTIVE);
-        brand.setCustomer(customer);
 
         try {
             Brand saveBrand = brandRepository.save(brand);
@@ -94,20 +92,20 @@ public class BrandAdminServiceImpl implements IBrandAdminService {
     @Override
     public AllBrandAdminResponse getAllBrandAdmin() {
 
-        List<Brand> brands = brandRepository.findAllByAdminOnly(true);
-        if (brands == null || brands.isEmpty()) {
-            throw new BadRequestException("Không có thương hiệu nào!");
-        }
-
-        List<BrandDTO> brandDTOs = BrandDTO.convertToListDTO(brands);
-        brandDTOs.sort(Comparator.comparing(BrandDTO::getName));
-
-        AllBrandAdminResponse response = new AllBrandAdminResponse();
-        response.setBrandDTOs(brandDTOs);
-        response.setCode(200);
-        response.setStatus("ok");
-        response.setMessage("Lấy danh sách thương hiệu thành công.");
-        return response;
+//        List<Brand> brands = brandRepository.findAllByAdminOnly(true);
+//        if (brands == null || brands.isEmpty()) {
+//            throw new BadRequestException("Không có thương hiệu nào!");
+//        }
+//
+//        List<BrandDTO> brandDTOs = BrandDTO.convertEntitiesToDTOs(brands);
+//        brandDTOs.sort(Comparator.comparing(BrandDTO::getName));
+//
+//        AllBrandAdminResponse response = new AllBrandAdminResponse();
+//        response.setBrandDTOs(brandDTOs);
+//        response.setCode(200);
+//        response.setStatus("ok");
+//        response.setMessage("Lấy danh sách thương hiệu thành công.");
+        return null;
     }
 
     @Override
@@ -116,7 +114,7 @@ public class BrandAdminServiceImpl implements IBrandAdminService {
 
         Brand brand = brandRepository.findById(request.getBrandId())
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy thương hiệu!"));
-        if (!brand.getCustomer().getUsername().equals(request.getUsername())) {
+        if (!"brand.getCustomer().getUsername()".equals(request.getUsername())) {
             throw new UnauthorizedAccessException("Bạn không có quyền sửa thương hiệu này!");
         }
 
@@ -156,7 +154,7 @@ public class BrandAdminServiceImpl implements IBrandAdminService {
 
         Brand brand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy thương hiệu!"));
-        if (!brand.getCustomer().getUsername().equals(username)) {
+        if (!"brand.getCustomer().getUsername()".equals(username)) {
             throw new UnauthorizedAccessException("Bạn không có quyền sửa thương hiệu này!");
         }
         if (brand.getStatus() == Status.DELETED) {

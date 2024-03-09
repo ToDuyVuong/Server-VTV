@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.model.data.manager.request.CategoryRequest;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
+import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import hcmute.kltn.vtv.service.manager.IManagerProductService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
@@ -25,6 +26,8 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     private final CategoryRepository categoryRepository;
     @Autowired
     private final IManagerProductService managerProductService;
+    @Autowired
+    private final IManagerBrandService managerBrandService;
 
 
     @Override
@@ -50,7 +53,6 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     public CategoryResponse updateCategoryByManager(CategoryRequest request, Long categoryId, String username) {
         checkExistCategoryById(categoryId);
         checkExistCategoryByCategoryIdAndName(categoryId, request.getName());
-
         if (request.isChild()) {
             validateCategoryDepth(request.getParentId());
         }
@@ -69,15 +71,26 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     @Transactional
     public ResponseClass deleteCategoryNoUsingByManager(Long categoryId) {
         checkExistCategoryById(categoryId);
-        if (managerProductService.checkExistProductUseCategory(categoryId)) {
-            throw new BadRequestException("Danh mục đang chứa sản phẩm, không thể xóa!");
-        }
+        checkUsingCategory(categoryId);
+
         try {
             categoryRepository.deleteById(categoryId);
 
             return ResponseClass.responseClass("Xóa danh mục thành công!", "Success", 200);
         }catch (Exception e) {
             throw new InternalServerErrorException("Xóa danh mục thất bại!");
+        }
+    }
+
+
+    private void checkUsingCategory(Long categoryId) {
+
+        if (managerBrandService.existsBrandUsingCategoryIdInCategories(categoryId)) {
+            throw new BadRequestException("Danh mục đang chứa thương hiệu, không thể xóa!");
+        }
+
+        if (managerProductService.checkExistProductUseCategory(categoryId)) {
+            throw new BadRequestException("Danh mục đang chứa sản phẩm, không thể xóa!");
         }
     }
 

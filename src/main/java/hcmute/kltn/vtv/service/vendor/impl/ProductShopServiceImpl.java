@@ -38,8 +38,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductShopServiceImpl implements IProductShopService {
 
-    @Autowired
-    private AttributeRepository attributeRepository;
+
     @Autowired
     private IShopService shopService;
     @Autowired
@@ -52,8 +51,7 @@ public class ProductShopServiceImpl implements IProductShopService {
     private ProductVariantRepository productVariantRepository;
     @Autowired
     private IProductVariantShopService productVariantShopService;
-    @Autowired
-    private final IReviewService reviewService;
+
     @Autowired
     private IProductVariantService productVariantService;
     @Autowired
@@ -63,6 +61,7 @@ public class ProductShopServiceImpl implements IProductShopService {
     @Transactional
     public ProductResponse addNewProduct(ProductRequest request) {
         Category category = categoryService.getCategoryById(request.getCategoryId());
+        categoryService.checkExistCategoryHasChild(category.getCategoryId());
         Brand brand = checkBrand(request.getBrandId());
         Long shopId = shopService.getShopByUsername(request.getUsername()).getShopId();
 

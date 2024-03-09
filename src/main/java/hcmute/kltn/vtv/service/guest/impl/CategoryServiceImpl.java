@@ -47,10 +47,18 @@ public class CategoryServiceImpl implements ICategoryService {
 
 
     @Override
+    public void checkExistCategoryHasChild(Long categoryId) {
+        if (categoryRepository.existsByParentCategoryIdAndStatus(categoryId, Status.ACTIVE)) {
+            throw new NotFoundException("Danh mục này có danh mục con không thể thực hiện thao tác này!");
+        }
+    }
+
+
+    @Override
     public Category getCategoryById(Long categoryId) {
         checkExistCategoryById(categoryId);
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục!"));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục!"));
     }
 
     private void checkExistCategoryById(Long categoryId) {

@@ -10,5 +10,7 @@ public interface ICategoryService {
 
     CategoriesResponse getAllCategoryByShopId(Long shopId);
 
+    void checkExistCategoryHasChild(Long categoryId);
+
     Category getCategoryById(Long categoryId);
 }

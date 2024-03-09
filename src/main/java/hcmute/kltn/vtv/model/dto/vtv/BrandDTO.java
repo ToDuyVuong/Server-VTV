@@ -51,12 +51,24 @@ public class BrandDTO {
         }
     }
 
-    public static List<BrandDTO> convertToListDTO(List<Brand> brands) {
+
+    public static BrandDTO convertEntityToDTO(Brand brand) {
+        BrandDTO brandDTO = new BrandDTO();
+        brandDTO.setBrandId(brand.getBrandId());
+        brandDTO.setName(brand.getName());
+        brandDTO.setImage(brand.getImage());
+        brandDTO.setDescription(brand.getDescription());
+        brandDTO.setInformation(brand.getInformation());
+        brandDTO.setOrigin(brand.getOrigin());
+        brandDTO.setStatus(brand.getStatus());
+
+        return brandDTO;
+    }
+
+    public static List<BrandDTO> convertEntitiesToDTOs(List<Brand> brands) {
         List<BrandDTO> brandDTOS = new ArrayList<>();
         for (Brand brand : brands) {
-            ModelMapper modelMapper = new ModelMapper();
-            BrandDTO brandDTO = modelMapper.map(brand, BrandDTO.class);
-            brandDTOS.add(brandDTO);
+            brandDTOS.add(convertEntityToDTO(brand));
         }
         return brandDTOS;
     }
