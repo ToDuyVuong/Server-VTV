@@ -14,6 +14,8 @@ public interface IManagerProductService {
 
     ListManagerProductResponse getListManagerProduct(int page, int size);
 
+    boolean checkExistProductUseCategory(Long categoryId);
+
     ListManagerProductResponse getListManagerProductByProductName(int page, int size, String productName);
 
     void checkRequestPageParams(int page, int size);

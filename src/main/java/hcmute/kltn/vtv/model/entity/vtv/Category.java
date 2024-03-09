@@ -44,16 +44,16 @@ public class Category {
 
 
 
-    @PrePersist
-    protected void onCreate() {
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updateAt = LocalDateTime.now();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        createAt = LocalDateTime.now();
+//        updateAt = LocalDateTime.now();
+//    }
+//
+//    @PreUpdate
+//    protected void onUpdate() {
+//        updateAt = LocalDateTime.now();
+//    }
 
 
 

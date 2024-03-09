@@ -1,11 +1,13 @@
 package hcmute.kltn.vtv.service.manager.impl;
 
 import hcmute.kltn.vtv.model.data.guest.CategoryResponse;
+import hcmute.kltn.vtv.model.data.guest.ResponseClass;
 import hcmute.kltn.vtv.model.data.manager.request.CategoryRequest;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
+import hcmute.kltn.vtv.service.manager.IManagerProductService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
@@ -13,33 +15,86 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ManagerCategoryServiceImpl implements IManagerCategoryService {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+    @Autowired
+    private final IManagerProductService managerProductService;
 
 
     @Override
     @Transactional
     public CategoryResponse addNewCategoryByManager(CategoryRequest request, String username) {
-
         checkExistCategoryByName(request.getName());
         if (request.isChild()) {
             validateCategoryDepth(request.getParentId());
         }
         Category category = createCategoryByCategoryRequest(request, username);
-
         try {
-            Category categorySave = categoryRepository.save(category);
-            return CategoryResponse.categoryResponse(categorySave, "Thêm danh mục thành công!", "Success");
+            categoryRepository.save(category);
+
+            return CategoryResponse.categoryResponse(category, "Thêm danh mục thành công!", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Thêm danh mục thất bại!");
         }
-
-
     }
+
+
+    @Override
+    @Transactional
+    public CategoryResponse updateCategoryByManager(CategoryRequest request, Long categoryId, String username) {
+        checkExistCategoryById(categoryId);
+        checkExistCategoryByCategoryIdAndName(categoryId, request.getName());
+
+        if (request.isChild()) {
+            validateCategoryDepth(request.getParentId());
+        }
+        Category category = updateCategoryByCategoryRequest(request, categoryId, username);
+        try {
+            categoryRepository.save(category);
+
+            return CategoryResponse.categoryResponse(category, "Cập nhật danh mục thành công!", "Success");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Cập nhật danh mục thất bại!");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public ResponseClass deleteCategoryNoUsingByManager(Long categoryId) {
+        checkExistCategoryById(categoryId);
+        if (managerProductService.checkExistProductUseCategory(categoryId)) {
+            throw new BadRequestException("Danh mục đang chứa sản phẩm, không thể xóa!");
+        }
+        try {
+            categoryRepository.deleteById(categoryId);
+
+            return ResponseClass.responseClass("Xóa danh mục thành công!", "Success", 200);
+        }catch (Exception e) {
+            throw new InternalServerErrorException("Xóa danh mục thất bại!");
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     private Category createCategoryByCategoryRequest(CategoryRequest request, String username) {
@@ -51,10 +106,29 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         category.setStatus(Status.ACTIVE);
         category.setCreatedBy(username);
         category.setUpdatedBy(username);
-
         if (request.isChild()) {
             category.setParent(getCategoryById(request.getParentId()));
         }
+        category.setCreateAt(LocalDateTime.now());
+        category.setUpdateAt(LocalDateTime.now());
+
+        return category;
+    }
+
+
+
+    private Category updateCategoryByCategoryRequest(CategoryRequest request, Long categoryId, String username) {
+        Category category = getCategoryById(categoryId);
+        category.setName(request.getName());
+        category.setDescription(request.getDescription());
+        category.setImage(request.getImage());
+        category.setChild(request.isChild());
+        category.setUpdatedBy(username);
+        category.setParent(null);
+        if (request.isChild()) {
+            category.setParent(getCategoryById(request.getParentId()));
+        }
+        category.setUpdateAt(LocalDateTime.now());
 
         return category;
     }
@@ -66,6 +140,7 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
 
         validateCategoryDepthRecursive(categoryId, depth);
     }
+
 
     private void validateCategoryDepthRecursive(Long categoryId, int depth) {
         if (checkExistCategoryByIdAndChild(categoryId)) {
@@ -91,6 +166,7 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         return categoryRepository.existsByCategoryIdAndChild(categoryId, true);
     }
 
+
     private Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy danh mục theo id!"));
@@ -102,22 +178,14 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
             throw new BadRequestException("Tên danh mục đã tồn tại!");
         }
     }
-//    private int checkCountParentCategory(Long categoryId) {
-//
-//        checkExistCategoryById(categoryId);
-//        int count = 0;
-//        if (checkExistCategoryByIdAndChild(categoryId)) {
-//            count++;
-//            Long parentId = getCategoryById(categoryId).getParent().getCategoryId();
-//            checkCountParentCategory(parentId);
-//        }
-//        if (count > 4) {
-//            throw new BadRequestException("Danh mục cha không được lớn hơn 4!");
-//        }
-//
-//        return count;
-//
 
-//    }
+
+    private void checkExistCategoryByCategoryIdAndName(Long categoryId, String name) {
+        if (!categoryRepository.existsByCategoryIdAndName(categoryId, name)
+                && categoryRepository.existsByNameAndStatus(name, Status.ACTIVE)) {
+            throw new BadRequestException("Tên danh mục đã tồn tại!");
+        }
+    }
+
 
 }

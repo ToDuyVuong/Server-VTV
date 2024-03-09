@@ -122,6 +122,17 @@ public class ManagerProductServiceImpl implements IManagerProductService {
         return listManagerProductResponse(managerProducts.getContent(), page, totalPage, size, message);
     }
 
+
+    @Override
+    public boolean checkExistProductUseCategory(Long categoryId) {
+        return productRepository.existsByAndCategoryCategoryId(categoryId);
+    }
+
+
+
+
+
+
     @Override
     public ListManagerProductResponse getListManagerProductByProductName(int page, int size, String productName) {
         int totalManagerProduct = managerProductRepository.countAllByLockAndProductNameContains(true, productName);
@@ -236,5 +247,8 @@ public class ManagerProductServiceImpl implements IManagerProductService {
 
         return product;
     }
+
+
+
 
 }
