@@ -26,6 +26,10 @@ public class Category {
 
     private boolean child;
 
+    private String createdBy;
+
+    private String updatedBy;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
