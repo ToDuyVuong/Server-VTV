@@ -3,7 +3,7 @@ package hcmute.kltn.vtv.controller.user;
 
 import hcmute.kltn.vtv.model.data.user.response.NotificationResponse;
 import hcmute.kltn.vtv.service.guest.IPageService;
-import hcmute.kltn.vtv.service.user.INotificationService;
+import hcmute.kltn.vtv.service.vtv.INotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

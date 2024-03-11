@@ -13,4 +13,6 @@ public interface ICategoryService {
     void checkExistCategoryHasChild(Long categoryId);
 
     Category getCategoryById(Long categoryId);
+
+    void checkExistCategoryById(Long categoryId);
 }

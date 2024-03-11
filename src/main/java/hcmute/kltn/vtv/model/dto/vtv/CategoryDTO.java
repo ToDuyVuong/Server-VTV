@@ -53,4 +53,14 @@ public class CategoryDTO {
         return categoryDTOs;
     }
 
+
+    public static List<Long> convertEntitiesToIds(List<Category> categories) {
+        List<Long> categoryIds = new ArrayList<>();
+        for (Category category : categories) {
+            categoryIds.add(category.getCategoryId());
+        }
+        return categoryIds;
+    }
+
+
 }

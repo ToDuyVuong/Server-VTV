@@ -42,6 +42,7 @@ public class SecurityConfig {
 
             "/api/payment/**",
             "/api/category/**",
+            "/api/brand/**",
 
             "/api/chat/room/**",
             "/api/chat/message/**",

@@ -1,4 +1,4 @@
-package hcmute.kltn.vtv.service.user;
+package hcmute.kltn.vtv.service.vtv;
 
 import hcmute.kltn.vtv.model.entity.user.Notification;
 

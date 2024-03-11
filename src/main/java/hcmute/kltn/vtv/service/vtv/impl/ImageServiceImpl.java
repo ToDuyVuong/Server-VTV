@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.service.vtv.IImageService;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class ImageServiceImpl implements IImageService {
 
 
     @Override
+    @Transactional
     public String uploadImageToFirebase(MultipartFile multipartFile) {
         try {
             String fileName = createFileName(multipartFile);
@@ -43,21 +45,20 @@ public class ImageServiceImpl implements IImageService {
 
 
     @Override
-    public boolean deleteImageFromFirebase(String imageUrl) {
+    @Transactional
+    public void deleteImageFromFirebase(String imageUrl) {
         try {
             String fileName = getFileNameFromUrl(imageUrl);
-
-            return deleteFile(fileName);
+            deleteFile(fileName);
         } catch (Exception e) {
             throw new InternalServerErrorException("Lỗi khi xóa ảnh!");
         }
     }
 
-    private boolean deleteFile(String fileName) {
+    private void deleteFile(String fileName) {
         try {
             Storage storage = storageClient.getStorage();
             storage.delete(storageClient.getName(), fileName);
-            return true;
         } catch (Exception e) {
             throw new InternalServerErrorException("Lỗi khi xóa file!");
         }

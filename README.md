@@ -353,8 +353,15 @@
   - Xem danh sách danh mục cha.
 
 
+- Quản lý thương hiệu bằng quyền manager:
+  - Thêm thương hiệu.
+  - Cập nhật thông tin thương hiệu.
+  - Xóa thương hiệu.
 
 
+- Quản lý thương hiệu bằng quyền guest:
+  - Xem chi tiết thương hiệu.
+  - Xem danh sách thương hiệu theo mã danh mục.
 
 
 

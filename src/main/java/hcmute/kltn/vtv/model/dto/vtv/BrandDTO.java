@@ -28,28 +28,9 @@ public class BrandDTO {
 
     private String origin;
 
-    private Status status;
+    private boolean allCategories;
 
-    public void validate() {
-        if (name == null || name.isEmpty()) {
-            throw new BadRequestException("Tên thương hiệu không được để trống.");
-        }
-        if (description == null || description.isEmpty()) {
-            throw new BadRequestException("Mô tả không được để trống.");
-        }
-        if (information == null || information.isEmpty()) {
-            throw new BadRequestException("Thông tin không được để trống.");
-        }
-        if (origin == null || origin.isEmpty()) {
-            throw new BadRequestException("Xuất xứ không được để trống.");
-        }
-        if (image == null || image.isEmpty()) {
-            throw new BadRequestException("Hình ảnh không được để trống.");
-        }
-        if (status == null) {
-            throw new BadRequestException("Trạng thái không được để trống.");
-        }
-    }
+    private List<Long> categories;
 
 
     public static BrandDTO convertEntityToDTO(Brand brand) {
@@ -60,7 +41,10 @@ public class BrandDTO {
         brandDTO.setDescription(brand.getDescription());
         brandDTO.setInformation(brand.getInformation());
         brandDTO.setOrigin(brand.getOrigin());
-        brandDTO.setStatus(brand.getStatus());
+        brandDTO.setAllCategories(brand.isAllCategories());
+        brandDTO.setCategories(brandDTO.isAllCategories() ?
+                new ArrayList<>() : CategoryDTO.convertEntitiesToIds(brand.getCategories()));
+
 
         return brandDTO;
     }
@@ -70,6 +54,7 @@ public class BrandDTO {
         for (Brand brand : brands) {
             brandDTOS.add(convertEntityToDTO(brand));
         }
+        brandDTOS.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
         return brandDTOS;
     }
 }

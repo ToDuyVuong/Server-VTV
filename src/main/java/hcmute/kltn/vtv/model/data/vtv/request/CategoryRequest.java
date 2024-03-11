@@ -1,4 +1,4 @@
-package hcmute.kltn.vtv.model.data.manager.request;
+package hcmute.kltn.vtv.model.data.vtv.request;
 
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.Data;

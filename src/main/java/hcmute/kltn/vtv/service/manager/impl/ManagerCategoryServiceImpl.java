@@ -2,21 +2,24 @@ package hcmute.kltn.vtv.service.manager.impl;
 
 import hcmute.kltn.vtv.model.data.guest.CategoryResponse;
 import hcmute.kltn.vtv.model.data.guest.ResponseClass;
-import hcmute.kltn.vtv.model.data.manager.request.CategoryRequest;
+import hcmute.kltn.vtv.model.data.vtv.request.CategoryRequest;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.repository.vtv.BrandRepository;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import hcmute.kltn.vtv.service.manager.IManagerProductService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,11 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     @Autowired
     private final IManagerProductService managerProductService;
     @Autowired
-    private final IManagerBrandService managerBrandService;
+    private final BrandRepository brandRepository;
+
+
+
+
 
 
     @Override
@@ -83,9 +90,18 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     }
 
 
+
+    @Override
+    public List<Category> getCategoriesByIds(List<Long> categoryIds) {
+        return categoryRepository.findAllByCategoryIdInAndStatus(categoryIds, Status.ACTIVE)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục!"));
+    }
+
+
+
     private void checkUsingCategory(Long categoryId) {
 
-        if (managerBrandService.existsBrandUsingCategoryIdInCategories(categoryId)) {
+        if (brandRepository.existsBrandUsingCategoryIdInCategories(categoryId)) {
             throw new BadRequestException("Danh mục đang chứa thương hiệu, không thể xóa!");
         }
 

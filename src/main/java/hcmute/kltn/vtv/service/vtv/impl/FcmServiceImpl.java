@@ -1,10 +1,10 @@
-package hcmute.kltn.vtv.service.user.impl;
+package hcmute.kltn.vtv.service.vtv.impl;
 
 import com.google.firebase.messaging.*;
 import hcmute.kltn.vtv.model.entity.user.Notification;
 import hcmute.kltn.vtv.model.entity.user.FcmToken;
 import hcmute.kltn.vtv.repository.user.FcmTokenRepository;
-import hcmute.kltn.vtv.service.user.IFcmService;
+import hcmute.kltn.vtv.service.vtv.IFcmService;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;

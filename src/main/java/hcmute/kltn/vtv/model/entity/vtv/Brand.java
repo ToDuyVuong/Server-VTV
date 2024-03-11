@@ -34,6 +34,9 @@ public class Brand {
 
     private String updatedBy;
 
+    // access all categories
+    private boolean allCategories;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 

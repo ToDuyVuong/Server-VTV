@@ -2,7 +2,7 @@ package hcmute.kltn.vtv.controller.manager;
 
 import hcmute.kltn.vtv.model.data.guest.CategoryResponse;
 import hcmute.kltn.vtv.model.data.guest.ResponseClass;
-import hcmute.kltn.vtv.model.data.manager.request.CategoryRequest;
+import hcmute.kltn.vtv.model.data.vtv.request.CategoryRequest;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

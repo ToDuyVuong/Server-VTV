@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.repository.vtv;
 
 import hcmute.kltn.vtv.model.entity.vtv.Brand;
+import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +14,15 @@ import java.util.Optional;
 public interface BrandRepository extends JpaRepository<Brand, Long> {
 
     Brand findByName(String name);
+
+    boolean existsByName(String name);
+
+    boolean existsByBrandIdAndName(Long brandId, String name);
+
+    Optional<List<Brand>> findAllByCategoriesEmptyAndStatus(Status status);
+
+
+    Optional<List<Brand>> findAllByCategories_CategoryIdAndStatusOrCategoriesEmpty(Long categoryId, Status status);
 
 
 
