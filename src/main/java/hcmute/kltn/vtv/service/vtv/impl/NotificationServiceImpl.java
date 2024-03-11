@@ -1,4 +1,4 @@
-package hcmute.kltn.vtv.service.user.impl;
+package hcmute.kltn.vtv.service.vtv.impl;
 
 
 import hcmute.kltn.vtv.model.data.user.request.NotificationRequest;
@@ -6,8 +6,8 @@ import hcmute.kltn.vtv.model.data.user.response.NotificationResponse;
 import hcmute.kltn.vtv.model.dto.user.NotificationDTO;
 import hcmute.kltn.vtv.model.entity.user.Notification;
 import hcmute.kltn.vtv.repository.user.NotificationRepository;
-import hcmute.kltn.vtv.service.user.IFcmService;
-import hcmute.kltn.vtv.service.user.INotificationService;
+import hcmute.kltn.vtv.service.vtv.IFcmService;
+import hcmute.kltn.vtv.service.vtv.INotificationService;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
