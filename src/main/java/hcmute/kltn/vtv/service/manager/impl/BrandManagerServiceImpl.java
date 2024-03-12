@@ -66,7 +66,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
 
         try {
             brandRepository.save(brand);
-            if (oldImage != null && (brandRequest.isChangeImage() || brandRequest.isDeleteImage())) {
+            if (brandRequest.isChangeImage() ) {
                 imageService.deleteImageFromFirebase(oldImage);
             }
 

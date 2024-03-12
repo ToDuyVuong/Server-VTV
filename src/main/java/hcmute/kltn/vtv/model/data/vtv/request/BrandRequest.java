@@ -20,8 +20,6 @@ public class BrandRequest {
 
     private boolean changeImage;
 
-    private boolean deleteImage;
-
     private String description;
 
     private String information;
@@ -55,9 +53,6 @@ public class BrandRequest {
             throw new BadRequestException("Danh sách danh mục không được để trống!");
         }
 
-        if (this.changeImage && this.deleteImage) {
-            throw new BadRequestException("Không thể thay đổi và xóa hình ảnh cùng lúc!");
-        }
 
         if (this.changeImage && (this.image == null || this.image.isEmpty())) {
             throw new BadRequestException("Không thể thay đổi hình ảnh khi không có hình ảnh mới!");

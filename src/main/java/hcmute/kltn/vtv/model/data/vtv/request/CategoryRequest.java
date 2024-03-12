@@ -4,6 +4,7 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @ToString
@@ -11,9 +12,15 @@ import lombok.ToString;
 public class CategoryRequest {
 
     private String name;
+
     private String description;
-    private String image;
+
+    private MultipartFile image;
+
+    private boolean changeImage;
+
     private boolean child;
+
     private Long parentId;
 
     public void validate() {
@@ -34,12 +41,24 @@ public class CategoryRequest {
         }
 
 
+        if (this.changeImage && (this.image == null || this.image.isEmpty())) {
+            throw new BadRequestException("Không thể thay đổi hình ảnh khi không có hình ảnh mới!");
+        }
+
+        if (this.changeImage && !isImage(this.image)) {
+            throw new BadRequestException("Hình ảnh không hợp lệ! Vui lòng chọn hình ảnh khác!");
+        }
+
+
         trim();
     }
 
     public void trim() {
         this.name = this.name.trim();
         this.description = this.description.trim();
-        this.image = this.image.trim();
+    }
+
+    private boolean isImage(MultipartFile file) {
+        return file != null && file.getContentType() != null && file.getContentType().startsWith("image");
     }
 }

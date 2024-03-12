@@ -21,7 +21,7 @@ public class ManagerCategoryController {
 
     @PostMapping("/add")
     public ResponseEntity<CategoryResponse> addNewCategoryByManager(
-            @RequestBody CategoryRequest request, HttpServletRequest servletRequest) {
+            @ModelAttribute CategoryRequest request, HttpServletRequest servletRequest) {
 
         String username = (String) servletRequest.getAttribute("username");
         request.validate();
@@ -32,7 +32,7 @@ public class ManagerCategoryController {
 
     @PostMapping("/update/{categoryId}")
     public ResponseEntity<CategoryResponse> updateCategoryByManager(
-            @RequestBody CategoryRequest request,
+            @ModelAttribute CategoryRequest request,
             @PathVariable("categoryId") Long categoryId,
             HttpServletRequest servletRequest) {
 
@@ -48,7 +48,6 @@ public class ManagerCategoryController {
             @PathVariable("categoryId") Long categoryId) {
 
         return ResponseEntity.ok(managerCategoryService.deleteCategoryNoUsingByManager(categoryId));
-
     }
 
 

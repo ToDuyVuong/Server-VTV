@@ -10,6 +10,7 @@ import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import hcmute.kltn.vtv.service.manager.IManagerProductService;
+import hcmute.kltn.vtv.service.vtv.IImageService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
@@ -31,10 +32,8 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     private final IManagerProductService managerProductService;
     @Autowired
     private final BrandRepository brandRepository;
-
-
-
-
+    @Autowired
+    private final IImageService imageService;
 
 
     @Override
@@ -63,12 +62,21 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         if (request.isChild()) {
             validateCategoryDepth(request.getParentId());
         }
-        Category category = updateCategoryByCategoryRequest(request, categoryId, username);
+
+        Category category = getCategoryById(categoryId);
+        String oldImage = category.getImage();
+        updateCategoryByCategoryRequest(category, request, username);
         try {
             categoryRepository.save(category);
+            if (request.isChangeImage()) {
+                imageService.deleteImageFromFirebase(oldImage);
+            }
 
             return CategoryResponse.categoryResponse(category, "Cập nhật danh mục thành công!", "Success");
         } catch (Exception e) {
+            if (request.isChangeImage()) {
+                imageService.deleteImageFromFirebase(category.getImage());
+            }
             throw new InternalServerErrorException("Cập nhật danh mục thất bại!");
         }
     }
@@ -79,16 +87,16 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     public ResponseClass deleteCategoryNoUsingByManager(Long categoryId) {
         checkExistCategoryById(categoryId);
         checkUsingCategory(categoryId);
-
+        String oldImage = getCategoryById(categoryId).getImage();
         try {
             categoryRepository.deleteById(categoryId);
+            imageService.deleteImageFromFirebase(oldImage);
 
             return ResponseClass.responseClass("Xóa danh mục thành công!", "Success");
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new InternalServerErrorException("Xóa danh mục thất bại!");
         }
     }
-
 
 
     @Override
@@ -96,7 +104,6 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         return categoryRepository.findAllByCategoryIdInAndStatus(categoryIds, Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục!"));
     }
-
 
 
     private void checkUsingCategory(Long categoryId) {
@@ -111,26 +118,11 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private Category createCategoryByCategoryRequest(CategoryRequest request, String username) {
         Category category = new Category();
         category.setName(request.getName());
         category.setDescription(request.getDescription());
-        category.setImage(request.getImage());
+        category.setImage(imageService.uploadImageToFirebase(request.getImage()));
         category.setChild(request.isChild());
         category.setStatus(Status.ACTIVE);
         category.setCreatedBy(username);
@@ -145,12 +137,10 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     }
 
 
-
-    private Category updateCategoryByCategoryRequest(CategoryRequest request, Long categoryId, String username) {
-        Category category = getCategoryById(categoryId);
+    private void updateCategoryByCategoryRequest(Category category, CategoryRequest request, String username) {
         category.setName(request.getName());
         category.setDescription(request.getDescription());
-        category.setImage(request.getImage());
+        category.setImage(request.isChangeImage() ? imageService.uploadImageToFirebase(request.getImage()) : category.getImage());
         category.setChild(request.isChild());
         category.setUpdatedBy(username);
         category.setParent(null);
@@ -158,8 +148,6 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
             category.setParent(getCategoryById(request.getParentId()));
         }
         category.setUpdateAt(LocalDateTime.now());
-
-        return category;
     }
 
 
