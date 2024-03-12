@@ -1,9 +1,8 @@
-package hcmute.kltn.vtv.model.dto.vtv;
+package hcmute.kltn.vtv.model.dto.vendor;
 
 import hcmute.kltn.vtv.model.entity.user.Review;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.extra.Status;
-import io.grpc.internal.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

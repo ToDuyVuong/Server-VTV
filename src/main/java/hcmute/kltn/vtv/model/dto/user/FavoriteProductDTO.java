@@ -1,10 +1,10 @@
 package hcmute.kltn.vtv.model.dto.user;
 
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ProductVariantDTO;
+import hcmute.kltn.vtv.model.dto.vendor.ProductDTO;
+import hcmute.kltn.vtv.model.dto.vendor.ProductVariantDTO;
 import hcmute.kltn.vtv.model.entity.user.FavoriteProduct;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
-import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
 import lombok.*;
 import org.modelmapper.ModelMapper;

@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.model.entity.user;
 
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

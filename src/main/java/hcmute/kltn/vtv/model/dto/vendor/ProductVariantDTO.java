@@ -1,6 +1,6 @@
-package hcmute.kltn.vtv.model.dto.vtv;
+package hcmute.kltn.vtv.model.dto.vendor;
 
-import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;

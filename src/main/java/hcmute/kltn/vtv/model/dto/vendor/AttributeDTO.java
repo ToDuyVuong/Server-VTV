@@ -1,6 +1,6 @@
-package hcmute.kltn.vtv.model.dto.vtv;
+package hcmute.kltn.vtv.model.dto.vendor;
 
-import hcmute.kltn.vtv.model.entity.vtv.Attribute;
+import hcmute.kltn.vtv.model.entity.vendor.Attribute;
 import lombok.*;
 
 import java.util.ArrayList;

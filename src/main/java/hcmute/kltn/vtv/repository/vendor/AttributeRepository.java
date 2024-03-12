@@ -1,6 +1,6 @@
-package hcmute.kltn.vtv.repository.vtv;
+package hcmute.kltn.vtv.repository.vendor;
 
-import hcmute.kltn.vtv.model.entity.vtv.Attribute;
+import hcmute.kltn.vtv.model.entity.vendor.Attribute;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

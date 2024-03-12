@@ -1,4 +1,4 @@
-package hcmute.kltn.vtv.model.entity.vtv;
+package hcmute.kltn.vtv.model.entity.vendor;
 
 import hcmute.kltn.vtv.model.extra.Status;
 import jakarta.persistence.*;

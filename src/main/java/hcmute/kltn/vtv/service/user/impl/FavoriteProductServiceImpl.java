@@ -5,27 +5,20 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.FavoriteProductResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListFavoriteProductResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
-import hcmute.kltn.vtv.model.dto.user.CustomerDTO;
-import hcmute.kltn.vtv.model.dto.user.FavoriteProductDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ProductVariantDTO;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.user.FavoriteProduct;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.repository.user.FavoriteProductRepository;
 import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.user.IFavoriteProductService;
-import hcmute.kltn.vtv.service.vendor.IProductShopService;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 
 @Service

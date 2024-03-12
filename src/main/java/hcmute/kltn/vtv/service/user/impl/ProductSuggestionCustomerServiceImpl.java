@@ -2,9 +2,9 @@ package hcmute.kltn.vtv.service.user.impl;
 
 
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.extra.Status;
-import hcmute.kltn.vtv.repository.vtv.ProductRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.user.IProductSuggestionCustomerService;
 import hcmute.kltn.vtv.service.user.ISearchHistoryService;
 import lombok.RequiredArgsConstructor;

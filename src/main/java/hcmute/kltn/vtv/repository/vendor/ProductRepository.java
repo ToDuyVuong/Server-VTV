@@ -1,7 +1,7 @@
-package hcmute.kltn.vtv.repository.vtv;
+package hcmute.kltn.vtv.repository.vendor;
 
 import hcmute.kltn.vtv.model.entity.vtv.Category;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

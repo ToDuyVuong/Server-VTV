@@ -1,26 +1,14 @@
 package hcmute.kltn.vtv.service.guest.impl;
 
-import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.guest.ShopDetailResponse;
-import hcmute.kltn.vtv.model.dto.vtv.CategoryDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ShopDTO;
-import hcmute.kltn.vtv.model.entity.vtv.Category;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
-import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.repository.user.FollowedShopRepository;
-import hcmute.kltn.vtv.repository.vtv.ProductRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.ShopRepository;
 import hcmute.kltn.vtv.service.guest.IShopDetailService;
-import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

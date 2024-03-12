@@ -1,5 +1,6 @@
-package hcmute.kltn.vtv.model.entity.vtv;
+package hcmute.kltn.vtv.model.entity.vendor;
 
+import hcmute.kltn.vtv.model.entity.vtv.Shop;
 import jakarta.persistence.*;
 import lombok.*;
 

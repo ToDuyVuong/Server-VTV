@@ -5,7 +5,7 @@ import hcmute.kltn.vtv.model.data.user.request.ReviewRequest;
 import hcmute.kltn.vtv.model.data.user.response.ReviewResponse;
 import hcmute.kltn.vtv.model.dto.user.ReviewDTO;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.user.Review;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.OrderItemRepository;

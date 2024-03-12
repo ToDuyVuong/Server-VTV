@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.service.guest;
 
-import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
 
 import java.util.List;

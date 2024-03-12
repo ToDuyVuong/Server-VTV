@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.model.entity.user;
 
-import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.CartStatus;
 import jakarta.persistence.*;
 import lombok.*;

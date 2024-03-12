@@ -1,15 +1,14 @@
 package hcmute.kltn.vtv.service.vendor.impl;
 
-import hcmute.kltn.vtv.repository.vtv.ProductVariantRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductVariantRepository;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.vendor.request.ProductVariantRequest;
-import hcmute.kltn.vtv.model.entity.vtv.Attribute;
-import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
+import hcmute.kltn.vtv.model.entity.vendor.Attribute;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.service.vendor.IAttributeShopService;
 import hcmute.kltn.vtv.service.vendor.IProductVariantShopService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

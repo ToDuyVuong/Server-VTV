@@ -3,7 +3,7 @@ package hcmute.kltn.vtv.service.vendor;
 import hcmute.kltn.vtv.model.data.vendor.request.AttributeRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.AttributeResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListAttributeResponse;
-import hcmute.kltn.vtv.model.entity.vtv.Attribute;
+import hcmute.kltn.vtv.model.entity.vendor.Attribute;
 
 import java.util.List;
 

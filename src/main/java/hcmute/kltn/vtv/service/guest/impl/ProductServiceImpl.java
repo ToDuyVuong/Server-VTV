@@ -2,9 +2,9 @@ package hcmute.kltn.vtv.service.guest.impl;
 
 import hcmute.kltn.vtv.model.data.vendor.response.ListProductResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.extra.Status;
-import hcmute.kltn.vtv.repository.vtv.ProductRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.service.guest.IReviewService;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;

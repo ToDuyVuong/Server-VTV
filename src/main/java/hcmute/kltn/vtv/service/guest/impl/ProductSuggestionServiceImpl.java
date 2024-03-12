@@ -3,10 +3,10 @@ package hcmute.kltn.vtv.service.guest.impl;
 
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
-import hcmute.kltn.vtv.repository.vtv.ProductRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.guest.IProductSuggestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

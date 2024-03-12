@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.model.data.vendor.response;
 
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
-import hcmute.kltn.vtv.model.entity.vtv.Product;
+import hcmute.kltn.vtv.model.dto.vendor.ProductDTO;
+import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.extra.ResponseAbstract;
 import lombok.*;
 

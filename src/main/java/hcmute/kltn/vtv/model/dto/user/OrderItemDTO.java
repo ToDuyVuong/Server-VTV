@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.model.dto.user;
 
-import hcmute.kltn.vtv.model.dto.vtv.ProductVariantDTO;
+import hcmute.kltn.vtv.model.dto.vendor.ProductVariantDTO;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;

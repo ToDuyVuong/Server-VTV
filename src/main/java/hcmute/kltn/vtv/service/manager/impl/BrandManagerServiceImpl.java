@@ -6,7 +6,7 @@ import hcmute.kltn.vtv.model.data.vtv.request.BrandRequest;
 import hcmute.kltn.vtv.model.entity.vtv.Brand;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
-import hcmute.kltn.vtv.repository.vtv.ProductRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import hcmute.kltn.vtv.service.vtv.IImageService;

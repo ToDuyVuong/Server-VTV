@@ -1,8 +1,8 @@
 package hcmute.kltn.vtv.service.guest.impl;
 
-import hcmute.kltn.vtv.model.entity.vtv.ProductVariant;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
-import hcmute.kltn.vtv.repository.vtv.ProductVariantRepository;
+import hcmute.kltn.vtv.repository.vendor.ProductVariantRepository;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;

@@ -7,7 +7,6 @@ import hcmute.kltn.vtv.model.data.vendor.response.StatisticsResponse;
 import hcmute.kltn.vtv.model.dto.vtv.StatisticsDTO;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.vtv.Shop;
-import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.OrderRepository;
 import hcmute.kltn.vtv.service.vendor.IRevenueService;
 import hcmute.kltn.vtv.service.vendor.IShopService;

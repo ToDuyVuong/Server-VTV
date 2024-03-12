@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.model.dto.user;
 
-import hcmute.kltn.vtv.model.dto.vtv.ProductDTO;
-import hcmute.kltn.vtv.model.dto.vtv.ProductVariantDTO;
+import hcmute.kltn.vtv.model.dto.vendor.ProductDTO;
+import hcmute.kltn.vtv.model.dto.vendor.ProductVariantDTO;
 import hcmute.kltn.vtv.model.entity.user.Cart;
 import lombok.*;
 
