@@ -2,6 +2,7 @@ package hcmute.kltn.vtv.controller.manager;
 
 
 import hcmute.kltn.vtv.model.data.guest.BrandResponse;
+import hcmute.kltn.vtv.model.data.guest.ResponseClass;
 import hcmute.kltn.vtv.model.data.vtv.request.BrandRequest;
 import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +41,14 @@ public class ManagerBrandController {
         String username = (String) request.getAttribute("username");
 
         return ResponseEntity.ok(managerBrandService.updateBrand(brandId, brandRequest, username));
+    }
+
+
+    @DeleteMapping("/delete/{brandId}")
+    public ResponseEntity<ResponseClass> deleteBrand(@PathVariable Long brandId, HttpServletRequest request) {
+        String username = (String) request.getAttribute("username");
+
+        return ResponseEntity.ok(managerBrandService.deleteBrand(brandId, username));
     }
 
 

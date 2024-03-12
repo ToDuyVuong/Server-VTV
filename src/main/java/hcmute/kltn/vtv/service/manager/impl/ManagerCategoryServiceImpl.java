@@ -83,7 +83,7 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         try {
             categoryRepository.deleteById(categoryId);
 
-            return ResponseClass.responseClass("Xóa danh mục thành công!", "Success", 200);
+            return ResponseClass.responseClass("Xóa danh mục thành công!", "Success");
         }catch (Exception e) {
             throw new InternalServerErrorException("Xóa danh mục thất bại!");
         }

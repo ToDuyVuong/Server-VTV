@@ -11,11 +11,11 @@ import lombok.*;
 
 public class ResponseClass extends ResponseAbstract {
 
-    public static ResponseClass responseClass(String message, String status, int code) {
+    public static ResponseClass responseClass(String message, String status) {
         ResponseClass responseClass = new ResponseClass();
         responseClass.setMessage(message);
         responseClass.setStatus(status);
-        responseClass.setCode(code);
+        responseClass.setCode(200);
 
         return responseClass;
     }

@@ -1,11 +1,12 @@
 package hcmute.kltn.vtv.service.manager.impl;
 
 import hcmute.kltn.vtv.model.data.guest.BrandResponse;
+import hcmute.kltn.vtv.model.data.guest.ResponseClass;
 import hcmute.kltn.vtv.model.data.vtv.request.BrandRequest;
 import hcmute.kltn.vtv.model.entity.vtv.Brand;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
-import hcmute.kltn.vtv.service.guest.IBrandService;
+import hcmute.kltn.vtv.repository.vtv.ProductRepository;
 import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import hcmute.kltn.vtv.service.vtv.IImageService;
@@ -29,7 +30,8 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
     @Autowired
     private final IManagerCategoryService categoryService;
     @Autowired
-    private final IBrandService brandService;
+    private final ProductRepository productRepository;
+
 
     @Override
     public boolean existsBrandUsingCategoryIdInCategories(Long categoryId) {
@@ -58,14 +60,13 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
     public BrandResponse updateBrand(Long brandId, BrandRequest brandRequest, String username) {
         checkExistBrandByBrandId(brandId);
         checkExistBrandByBrandIdAndName(brandId, brandRequest.getName());
-        Brand brand = brandRepository.findById(brandId)
-                .orElseThrow(() -> new BadRequestException("Không tìm thấy thương hiệu!"));
+        Brand brand = getBrandById(brandId);
         String oldImage = brand.getImage();
         updateBrandByBrandRequest(brand, brandRequest, username);
 
         try {
             brandRepository.save(brand);
-            if (brandRequest.isChangeImage()) {
+            if (oldImage != null && (brandRequest.isChangeImage() || brandRequest.isDeleteImage())) {
                 imageService.deleteImageFromFirebase(oldImage);
             }
 
@@ -73,6 +74,27 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
         } catch (Exception e) {
             imageService.deleteImageFromFirebase(brand.getImage());
             throw new BadRequestException("Cập nhật thương hiệu thất bại!");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public ResponseClass deleteBrand(Long brandId, String username) {
+        checkExistBrandByBrandId(brandId);
+        if (productRepository.existsByBrandBrandId(brandId)) {
+            throw new BadRequestException("Thương hiệu đang chứa sản phẩm, không thể xóa!");
+        }
+        Brand brand = getBrandById(brandId);
+        String oldImage = brand.getImage();
+        try {
+            brandRepository.delete(brand);
+            if (oldImage != null) {
+                imageService.deleteImageFromFirebase(oldImage);
+            }
+            return ResponseClass.responseClass("Xóa thương hiệu thành công!", "Success");
+        } catch (Exception e) {
+            throw new BadRequestException("Xóa thương hiệu thất bại!");
         }
     }
 
@@ -110,6 +132,12 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
         brand.setUpdateAt(LocalDateTime.now());
 
         return brand;
+    }
+
+
+    private Brand getBrandById(Long brandId) {
+        return brandRepository.findById(brandId)
+                .orElseThrow(() -> new BadRequestException("Không tìm thấy thương hiệu!"));
     }
 
 
