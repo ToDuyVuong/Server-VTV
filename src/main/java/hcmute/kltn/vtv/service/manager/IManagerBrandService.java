@@ -9,11 +9,11 @@ public interface IManagerBrandService {
     boolean existsBrandUsingCategoryIdInCategories(Long categoryId);
 
     @Transactional
-    BrandResponse addNewBrand(BrandRequest brandRequest, String username);
+    BrandResponse addNewBrandByManager(BrandRequest brandRequest, String username);
 
     @Transactional
-    BrandResponse updateBrand(Long brandId, BrandRequest brandRequest, String username);
+    BrandResponse updateBrandByManager(Long brandId, BrandRequest brandRequest, String username);
 
     @Transactional
-    ResponseClass deleteBrand(Long brandId, String username);
+    ResponseClass deleteBrandByManager(Long brandId, String username);
 }

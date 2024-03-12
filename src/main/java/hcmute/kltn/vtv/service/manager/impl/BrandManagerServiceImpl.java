@@ -41,7 +41,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
 
     @Override
     @Transactional
-    public BrandResponse addNewBrand(BrandRequest brandRequest, String username) {
+    public BrandResponse addNewBrandByManager(BrandRequest brandRequest, String username) {
         existsBrandByName(brandRequest.getName());
         Brand brand = createBrandByBrandRequest(brandRequest, username);
         try {
@@ -57,7 +57,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
 
     @Override
     @Transactional
-    public BrandResponse updateBrand(Long brandId, BrandRequest brandRequest, String username) {
+    public BrandResponse updateBrandByManager(Long brandId, BrandRequest brandRequest, String username) {
         checkExistBrandByBrandId(brandId);
         checkExistBrandByBrandIdAndName(brandId, brandRequest.getName());
         Brand brand = getBrandById(brandId);
@@ -80,7 +80,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
 
     @Override
     @Transactional
-    public ResponseClass deleteBrand(Long brandId, String username) {
+    public ResponseClass deleteBrandByManager(Long brandId, String username) {
         checkExistBrandByBrandId(brandId);
         if (productRepository.existsByBrandBrandId(brandId)) {
             throw new BadRequestException("Thương hiệu đang chứa sản phẩm, không thể xóa!");

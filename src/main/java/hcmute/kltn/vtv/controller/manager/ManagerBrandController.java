@@ -28,7 +28,7 @@ public class ManagerBrandController {
         brandRequest.validate();
         String username = (String) request.getAttribute("username");
 
-        return ResponseEntity.ok(managerBrandService.addNewBrand(brandRequest, username));
+        return ResponseEntity.ok(managerBrandService.addNewBrandByManager(brandRequest, username));
 
     }
 
@@ -40,7 +40,7 @@ public class ManagerBrandController {
         brandRequest.validate();
         String username = (String) request.getAttribute("username");
 
-        return ResponseEntity.ok(managerBrandService.updateBrand(brandId, brandRequest, username));
+        return ResponseEntity.ok(managerBrandService.updateBrandByManager(brandId, brandRequest, username));
     }
 
 
@@ -48,7 +48,7 @@ public class ManagerBrandController {
     public ResponseEntity<ResponseClass> deleteBrand(@PathVariable Long brandId, HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
 
-        return ResponseEntity.ok(managerBrandService.deleteBrand(brandId, username));
+        return ResponseEntity.ok(managerBrandService.deleteBrandByManager(brandId, username));
     }
 
 
