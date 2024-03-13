@@ -43,6 +43,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
     @Transactional
     public BrandResponse addNewBrandByManager(BrandRequest brandRequest, String username) {
         existsBrandByName(brandRequest.getName());
+        categoryService.checkExistsCategoriesByIds(brandRequest.getCategories());
         Brand brand = createBrandByBrandRequest(brandRequest, username);
         try {
             brandRepository.save(brand);
@@ -60,6 +61,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
     public BrandResponse updateBrandByManager(Long brandId, BrandRequest brandRequest, String username) {
         checkExistBrandByBrandId(brandId);
         checkExistBrandByBrandIdAndName(brandId, brandRequest.getName());
+        categoryService.checkExistsCategoriesByIds(brandRequest.getCategories());
         Brand brand = getBrandById(brandId);
         String oldImage = brand.getImage();
         updateBrandByBrandRequest(brand, brandRequest, username);

@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.model.dto.vtv;
 
 import hcmute.kltn.vtv.model.entity.vtv.Brand;
+import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.*;
@@ -42,8 +43,8 @@ public class BrandDTO {
         brandDTO.setInformation(brand.getInformation());
         brandDTO.setOrigin(brand.getOrigin());
         brandDTO.setAllCategories(brand.isAllCategories());
-        brandDTO.setCategories(brandDTO.isAllCategories() ?
-                new ArrayList<>() : CategoryDTO.convertEntitiesToIds(brand.getCategories()));
+        brandDTO.setCategories(brandDTO.isAllCategories() ? new ArrayList<>() :
+                brand.getCategories().stream().map(Category::getCategoryId).toList());
 
 
         return brandDTO;

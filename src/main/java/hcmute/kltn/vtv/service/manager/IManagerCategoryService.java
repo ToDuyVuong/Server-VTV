@@ -19,4 +19,6 @@ public interface IManagerCategoryService {
     ResponseClass deleteCategoryNoUsingByManager(Long categoryId);
 
     List<Category> getCategoriesByIds(List<Long> categoryIds);
+
+    void checkExistsCategoriesByIds(List<Long> categoryIds);
 }

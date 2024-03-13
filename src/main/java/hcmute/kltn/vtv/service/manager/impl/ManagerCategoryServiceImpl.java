@@ -7,7 +7,6 @@ import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
-import hcmute.kltn.vtv.service.manager.IManagerBrandService;
 import hcmute.kltn.vtv.service.manager.IManagerCategoryService;
 import hcmute.kltn.vtv.service.manager.IManagerProductService;
 import hcmute.kltn.vtv.service.vtv.IImageService;
@@ -103,6 +102,14 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
     public List<Category> getCategoriesByIds(List<Long> categoryIds) {
         return categoryRepository.findAllByCategoryIdInAndStatus(categoryIds, Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục!"));
+    }
+
+
+    @Override
+    public void checkExistsCategoriesByIds(List<Long> categoryIds) {
+        if (!categoryRepository.existsAllByCategoryIdIn(categoryIds)) {
+            throw new BadRequestException("Danh mục không tồn tại!");
+        }
     }
 
 
