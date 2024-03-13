@@ -21,6 +21,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Page<Product>> findAllByShopShopIdAndStatus(Long shopId, Status status,
                                                                            Pageable pageable);
 
+    Optional<Page<Product>> findAllByCategoryCategoryIdAndStatus(Long categoryId, Status status,
+                                                                               Pageable pageable);
     boolean existsByCategoryCategoryId(Long categoryId);
 
     boolean existsByBrandBrandId(Long brandId);
@@ -80,6 +82,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Page<Product>> findAllByCategoryCategoryIdAndStatusOrderByCreateAt(Long categoryId, Status status,
                                                                                 PageRequest pageable);
+
+
+    Optional<List<Product>> findAllByCategoryCategoryIdAndStatus(Long categoryId, Status status);
 
 
     Optional<Page<Product>> findAllByCategoryInAndStatusOrderByCreateAt(List<Category> categories, Status status,

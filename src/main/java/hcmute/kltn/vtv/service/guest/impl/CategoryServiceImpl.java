@@ -18,13 +18,13 @@ import java.util.List;
 public class CategoryServiceImpl implements ICategoryService {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
 
     @Override
     public CategoriesResponse getAllCategoryParent() {
-        List<Category> categories = categoryRepository.findAllByChildAndStatus(true, Status.ACTIVE)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục cha!"));
+        List<Category> categories = categoryRepository.findAllByChildAndStatus(false, Status.ACTIVE)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục cha!"));
 
         return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục thành công!", "OK");
     }
@@ -33,17 +33,12 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public CategoriesResponse getAllCategoryByParentId(Long categoryId) {
         List<Category> categories = categoryRepository.findAllByParentCategoryIdAndStatus(categoryId, Status.ACTIVE)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục con nào trong danh mục cha này!"));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục con nào trong danh mục cha này!"));
         return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục con theo danh mục cha thành công!", "OK");
     }
 
 
-    @Override
-    public CategoriesResponse getAllCategoryByShopId(Long shopId) {
-        return null;
-//        List<Category> categories = categoryRepository.findAllByShopShopId(shopId);
-//        return CategoriesResponse.categoriesResponse(categories, "Lấy danh mục theo cửa hàng thành công!", "OK");
-    }
+
 
 
     @Override
@@ -68,6 +63,7 @@ public class CategoryServiceImpl implements ICategoryService {
             throw new NotFoundException("Danh mục không tồn tại!");
         }
     }
+
 
 
 }

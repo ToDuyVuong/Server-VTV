@@ -42,7 +42,7 @@ public class ProductController {
                                                                                   @PathVariable Long categoryId) {
         pageService.checkRequestProductPageParams(page, size);
 
-        return ResponseEntity.ok(productPageService.getListProductPageByCategoryId(categoryId, page, size));
+        return ResponseEntity.ok(productService.getListProductPageByCategoryId(categoryId, page, size));
     }
 
     @GetMapping("/shop/{shopId}")

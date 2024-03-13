@@ -125,7 +125,7 @@ public class ManagerProductServiceImpl implements IManagerProductService {
 
     @Override
     public boolean checkExistProductUseCategory(Long categoryId) {
-        return productRepository.existsByAndCategoryCategoryId(categoryId);
+        return productRepository.existsByCategoryCategoryId(categoryId);
     }
 
 

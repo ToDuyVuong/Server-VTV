@@ -1,21 +1,25 @@
 package hcmute.kltn.vtv.service.guest.impl;
 
+import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListProductResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
 import hcmute.kltn.vtv.model.entity.vendor.Product;
+import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vendor.ProductRepository;
+import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.guest.IProductService;
-import hcmute.kltn.vtv.service.guest.IReviewService;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,7 +31,7 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IProductShopService productShopService;
     @Autowired
-    private final IReviewService reviewService;
+    private CategoryRepository categoryRepository;
 
 
     @Override
@@ -47,6 +51,57 @@ public class ProductServiceImpl implements IProductService {
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));
 
         return ListProductResponse.listProductResponse(products, "Lấy danh sách sản phẩm theo cửa hàng thành công!", "OK");
+    }
+
+
+    @Override
+    public ListProductPageResponse getListProductPageByCategoryId(Long categoryId, int page, int size) {
+        if (checkExistCategoryHasChild(categoryId)) {
+            List<Product> products = getProductsByCategoryAndDescendants(categoryId);
+            Page<Product> productPage = new PageImpl<>(products, PageRequest.of(page - 1, size), products.size());
+            return ListProductPageResponse.listProductPageResponse(productPage, size,
+                    "Lấy danh sách sản phẩm theo danh mục thành công!");
+        } else {
+            return getProductsByCategoryId(categoryId, page, size);
+        }
+    }
+
+    private ListProductPageResponse getProductsByCategoryId(Long categoryId, int page, int size) {
+        Page<Product> productPage = productRepository
+                .findAllByCategoryCategoryIdAndStatus(categoryId, Status.ACTIVE, PageRequest.of(page - 1, size))
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục này!"));
+
+        String message = "Lấy danh sách sản phẩm theo danh mục thành công!";
+
+        return ListProductPageResponse.listProductPageResponse(productPage, size, message);
+    }
+
+    private List<Product> getProductsByCategoryAndDescendants(Long categoryId) {
+        List<Category> childCategories = categoryRepository.findAllByParent_CategoryIdAndStatus(categoryId, Status.ACTIVE)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục con nào trong danh mục này!"));
+
+        List<Product> products = new ArrayList<>();
+        for (Category childCategory : childCategories) {
+            List<Product> categoryProducts;
+            if (checkExistCategoryHasChild(childCategory.getCategoryId())) {
+                // Check if the child category has more child categories before making the recursive call
+                if (!categoryId.equals(childCategory.getCategoryId())) {
+                    categoryProducts = getProductsByCategoryAndDescendants(childCategory.getCategoryId());
+                    products.addAll(categoryProducts);
+                }
+            } else {
+                categoryProducts = productRepository
+                        .findAllByCategoryCategoryIdAndStatus(childCategory.getCategoryId(), Status.ACTIVE)
+                        .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong danh mục này!"));
+                products.addAll(categoryProducts);
+            }
+        }
+
+        return products;
+    }
+
+    private boolean checkExistCategoryHasChild(Long categoryId) {
+        return categoryRepository.existsByParentCategoryIdAndStatus(categoryId, Status.ACTIVE);
     }
 
     @Override
@@ -106,25 +161,6 @@ public class ProductServiceImpl implements IProductService {
         return productShopService.getListProductResponseSort(products, message, true);
     }
 
-    @Override
-    public ListProductResponse searchProducts(Long shopId, String productName) {
-        List<Product> products;
-
-        if (shopId == null) {
-            products = productRepository
-                    .findAllByNameContainingAndStatus(productName, Status.ACTIVE)
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào có tên tương tự!"));
-        } else {
-            products = productRepository
-                    .findAllByNameContainingAndShopShopIdAndStatus(productName, shopId, Status.ACTIVE)
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào có tên tương tự!"));
-        }
-
-        String message = shopId == null ? "Tìm kiếm sản phẩm theo tên thành công!"
-                : "Tìm kiếm sản phẩm theo tên trong cửa hàng thành công!";
-
-        return productShopService.getListProductResponseSort(products, message, true);
-    }
 
     @Override
     public Product getProductById(Long productId) {
