@@ -3,6 +3,7 @@ package hcmute.kltn.vtv.controller.guest;
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.service.guest.IPageService;
 import hcmute.kltn.vtv.service.guest.IProductPageService;
+import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class ProductPageController {
     @Autowired
     private final IPageService pageService;
 
+    @Autowired
+    private final IProductService productService;
+
     @GetMapping("/list")
     public ResponseEntity<ListProductPageResponse> getListProductPage(@RequestParam int page,
             @RequestParam int size) {
@@ -32,12 +36,9 @@ public class ProductPageController {
     public ResponseEntity<ListProductPageResponse> getListProductPageByCategoryId(@RequestParam int page,
             @RequestParam int size,
             @PathVariable Long categoryId) {
-        if (categoryId == null) {
-            throw new NotFoundException("Mã danh mục không được để trống!");
-        }
         pageService.checkRequestProductPageParams(page, size);
 
-        return ResponseEntity.ok(productPageService.getListProductPageByCategoryId(categoryId, page, size));
+        return ResponseEntity.ok(productService.getListProductPageByCategoryId(categoryId, page, size));
     }
 
     @GetMapping("/shop/{shopId}")

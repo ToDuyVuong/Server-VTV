@@ -84,11 +84,8 @@ public class ProductServiceImpl implements IProductService {
         for (Category childCategory : childCategories) {
             List<Product> categoryProducts;
             if (checkExistCategoryHasChild(childCategory.getCategoryId())) {
-                // Check if the child category has more child categories before making the recursive call
-                if (!categoryId.equals(childCategory.getCategoryId())) {
-                    categoryProducts = getProductsByCategoryAndDescendants(childCategory.getCategoryId());
-                    products.addAll(categoryProducts);
-                }
+                categoryProducts = getProductsByCategoryAndDescendants(childCategory.getCategoryId());
+                products.addAll(categoryProducts);
             } else {
                 categoryProducts = productRepository
                         .findAllByCategoryCategoryIdAndStatus(childCategory.getCategoryId(), Status.ACTIVE)

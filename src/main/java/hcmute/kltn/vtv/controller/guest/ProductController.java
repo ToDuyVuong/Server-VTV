@@ -21,13 +21,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     @Autowired
-    private IProductService productService;
+    private final IProductService productService;
     @Autowired
-    private IFavoriteProductGuestService favoriteProductGuestService;
+    private final IFavoriteProductGuestService favoriteProductGuestService;
     @Autowired
     private final IPageService pageService;
-    @Autowired
-    private IProductPageService productPageService;
+
 
     @GetMapping("/detail/{productId}")
     public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long productId) {
