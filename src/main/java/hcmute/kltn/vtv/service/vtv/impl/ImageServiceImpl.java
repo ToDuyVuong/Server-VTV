@@ -46,7 +46,7 @@ public class ImageServiceImpl implements IImageService {
 
     @Override
     @Transactional
-    public void deleteImageFromFirebase(String imageUrl) {
+    public void deleteImageInFirebase(String imageUrl) {
         try {
             String fileName = getFileNameFromUrl(imageUrl);
             deleteFile(fileName);

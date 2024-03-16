@@ -1,27 +1,22 @@
 package hcmute.kltn.vtv.service.vendor.impl;
 
+import hcmute.kltn.vtv.model.data.vendor.request.ProductAttributeRequest;
 import hcmute.kltn.vtv.repository.vendor.AttributeRepository;
-import hcmute.kltn.vtv.repository.user.CustomerRepository;
-import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.vendor.request.AttributeRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.AttributeResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListAttributeResponse;
-import hcmute.kltn.vtv.model.dto.vendor.AttributeDTO;
 import hcmute.kltn.vtv.model.entity.vendor.Attribute;
 import hcmute.kltn.vtv.model.entity.vtv.Shop;
-import hcmute.kltn.vtv.service.user.impl.CustomerServiceImpl;
 import hcmute.kltn.vtv.service.vendor.IAttributeShopService;
 import hcmute.kltn.vtv.service.vendor.IShopService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -32,56 +27,58 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
     private AttributeRepository attributeRepository;
     @Autowired
     private IShopService shopService;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private CustomerServiceImpl customerService;
-    @Autowired
-    ModelMapper modelMapper;
+
+
+    @Override
+    @Transactional
+    public List<Attribute> addNewAttributesByProductAttributeRequests(List<ProductAttributeRequest> productAttributeRequests, Shop shop) {
+        try {
+            List<Attribute> attributes = new ArrayList<>();
+            for (ProductAttributeRequest request : productAttributeRequests) {
+                attributes.add(addNewAttributeByProductAttributeRequest(request, shop));
+            }
+            return attributes;
+        } catch (Exception e) {
+            throw new BadRequestException("Thêm danh sách thuộc tính thất bại!");
+        }
+    }
+
+    @Override
+    @Transactional
+    public Attribute addNewAttributeByProductAttributeRequest(ProductAttributeRequest request, Shop shop) {
+        Attribute attribute;
+        try {
+            if (existsAttributeByNameAndValueAndShopId(request.getName(), request.getValue(), shop.getShopId())) {
+                attribute = getAttributeByNameAndValueAndShopId(request.getName(), request.getValue(), shop.getShopId());
+            } else {
+                attribute = createAttributeByNameAndValueAndShop(request.getName(), request.getValue(), shop);
+
+                attributeRepository.save(attribute);
+            }
+            return attribute;
+        } catch (Exception e) {
+            throw new BadRequestException("Thêm thuộc tính thất bại!");
+        }
+    }
+
 
     @Override
     @Transactional
     public AttributeResponse addNewAttribute(AttributeRequest attributeRequest) {
-
         Shop shop = shopService.getShopByUsername(attributeRequest.getUsername());
-        boolean checkExist = existsAttribute(attributeRequest.getName(), attributeRequest.getValue(), shop.getShopId());
+        Attribute attribute;
+        if (existsAttributeByNameAndValueAndShopId(attributeRequest.getName(), attributeRequest.getValue(), shop.getShopId())) {
+            attribute = getAttributeByNameAndValueAndShopId(attributeRequest.getName(), attributeRequest.getValue(), shop.getShopId());
 
-        if (checkExist) {
-            Attribute attribute = attributeRepository.findByNameAndValueAndShop_ShopId(
-                    attributeRequest.getName(),
-                    attributeRequest.getValue(),
-                    shop.getShopId())
-                    .orElseThrow(() -> new BadRequestException("Thuộc tính không tồn tại!"));
-
-            AttributeResponse attributeResponse = new AttributeResponse();
-            attributeResponse.setStatus("error");
-            attributeResponse.setMessage("Thuộc tính đã tồn tại trong cửa hàng!");
-            attributeResponse.setCode(400);
-            attributeResponse.setAttributeDTO(AttributeDTO.convertEntityToDTO(attribute));
-
-            return attributeResponse;
+            return AttributeResponse.attributeResponse(attribute, "Thuộc tính đã tồn tại trong cửa hàng!", "OK");
         }
 
-        Attribute attribute = new Attribute();
-        attribute.setName(attributeRequest.getName());
-        attribute.setValue(attributeRequest.getValue());
-        attribute.setShop(shop);
-        attribute.setActive(true);
-        attribute.setCreateAt(LocalDateTime.now());
-        attribute.setUpdateAt(LocalDateTime.now());
+        attribute = createAttributeByNameAndValueAndShop(attributeRequest.getName(), attributeRequest.getValue(), shop);
 
         try {
             attributeRepository.save(attribute);
 
-            AttributeResponse attributeResponse = new AttributeResponse();
-            attributeResponse.setAttributeDTO(modelMapper.map(attribute, AttributeDTO.class));
-            attributeResponse.setStatus("success");
-            attributeResponse.setMessage("Thêm thuộc tính trong cửa hàng thành công!");
-            attributeResponse.setCode(200);
-
-            return attributeResponse;
+            return AttributeResponse.attributeResponse(attribute, "Thêm thuộc tính trong cửa hàng thành công!", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Thêm thuộc tính thất bại!");
         }
@@ -93,33 +90,15 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
         Shop shop = shopService.getShopByUsername(username);
         Attribute attribute = checkAttributeInShop(attributeId, shop.getShopId());
 
-        AttributeResponse attributeResponse = new AttributeResponse();
-        attributeResponse.setAttributeDTO(modelMapper.map(attribute, AttributeDTO.class));
-        attributeResponse.setStatus("ok");
-        attributeResponse.setMessage("Lấy thông tin thuộc tính thành công!");
-        attributeResponse.setCode(200);
-
-        return attributeResponse;
+        return AttributeResponse.attributeResponse(attribute, "Lấy thông tin thuộc tính thành công!", "OK");
     }
 
     @Override
     public ListAttributeResponse getListAttributeByShopId(String username) {
         Shop shop = shopService.getShopByUsername(username);
-
         List<Attribute> attributes = attributeRepository.findAllByShop_ShopIdAndActive(shop.getShopId(), true);
-        if (attributes.isEmpty()) {
-            throw new BadRequestException("Cửa hàng không có thuộc tính!");
-        }
-        attributes.sort(Comparator.comparing(Attribute::getName).thenComparing(Attribute::getValue));
-        List<AttributeDTO> attributeDTOs = AttributeDTO.convertToListDTO(attributes);
 
-        ListAttributeResponse response = new ListAttributeResponse();
-        response.setAttributeDTOs(attributeDTOs);
-        response.setStatus("ok");
-        response.setMessage("Lấy danh sách thuộc tính trong cửa hàng thành công!");
-        response.setCode(200);
-
-        return response;
+        return ListAttributeResponse.listAttributeResponse(attributes, "Lấy danh sách thuộc tính trong cửa hàng thành công!", "OK");
     }
 
     @Override
@@ -127,23 +106,13 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
     public AttributeResponse updateAttribute(AttributeRequest attributeRequest) {
         Shop shop = shopService.getShopByUsername(attributeRequest.getUsername());
         Attribute attribute = checkAttributeInShop(attributeRequest.getAttributeId(), shop.getShopId());
-        // existsAttribute(attributeRequest.getName(), attributeRequest.getValue(),
-        // shop.getShopId());
-
         attribute.setName(attributeRequest.getName());
         attribute.setValue(attributeRequest.getValue());
         attribute.setUpdateAt(LocalDateTime.now());
-
         try {
             attributeRepository.save(attribute);
 
-            AttributeResponse attributeResponse = new AttributeResponse();
-            attributeResponse.setAttributeDTO(modelMapper.map(attribute, AttributeDTO.class));
-            attributeResponse.setStatus("success");
-            attributeResponse.setMessage("Cập nhật thuộc tính thành công!");
-            attributeResponse.setCode(200);
-
-            return attributeResponse;
+            return AttributeResponse.attributeResponse(attribute, "Cập nhật thuộc tính thành công!", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật thuộc tính thất bại!");
         }
@@ -164,13 +133,7 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
         try {
             attributeRepository.save(attribute);
 
-            AttributeResponse attributeResponse = new AttributeResponse();
-            attributeResponse.setAttributeDTO(modelMapper.map(attribute, AttributeDTO.class));
-            attributeResponse.setStatus("success");
-            attributeResponse.setMessage(message + " thuộc tính trong cửa hàng thành công.");
-            attributeResponse.setCode(200);
-
-            return attributeResponse;
+            return AttributeResponse.attributeResponse(attribute, message + " thuộc tính thành công!", "Success");
         } catch (Exception e) {
             throw new BadRequestException(message + " thuộc tính thất bại!");
         }
@@ -184,17 +147,10 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
         if (attribute.isUsedInProductVariants()) {
             throw new BadRequestException("Thuộc tính đã được sử dụng trong sản phẩm nên không thể xóa!");
         }
-
         try {
             attributeRepository.delete(attribute);
 
-            AttributeResponse attributeResponse = new AttributeResponse();
-            attributeResponse.setAttributeDTO(modelMapper.map(attribute, AttributeDTO.class));
-            attributeResponse.setStatus("success");
-            attributeResponse.setMessage("Xóa thuộc tính trong cửa hàng thành công.");
-            attributeResponse.setCode(200);
-
-            return attributeResponse;
+            return AttributeResponse.attributeResponse(attribute, "Xóa thuộc tính trong cửa hàng thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Xóa thuộc tính thất bại trong cửa hàng!");
         }
@@ -206,26 +162,43 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
         List<Attribute> attributes = new ArrayList<>();
         if (attributeIds != null) {
             attributeIds.forEach(attributeId -> {
-                Attribute attribute = attributeRepository.findById(attributeId)
-                        .orElseThrow(() -> new BadRequestException("Mã thuộc tính không tồn tại!"));
-                if (!attribute.isActive()) {
-                    throw new BadRequestException("Mã thuộc tính đã bị khóa trong cửa hàng!");
-                }
-                if (!attribute.getShop().getShopId().equals(shopId)) {
-                    throw new BadRequestException("Mã thuộc tính không tồn tại trong cửa hàng!");
-                }
-
+                Attribute attribute = getAttributeByAttributeIdAndShopId(attributeId, shopId);
                 attributes.add(attributeRepository.findByAttributeId(attributeId));
             });
         }
-        attributes.sort(Comparator.comparing(Attribute::getName).thenComparing(Attribute::getValue));
 
         return attributes;
     }
 
+
+    private Attribute getAttributeByAttributeIdAndShopId(Long attributeId, Long shopId) {
+        Attribute attribute = attributeRepository.findByAttributeIdAndShopShopId(attributeId, shopId).orElseThrow(() -> new BadRequestException("Mã thuộc tính không tồn tại trong cửa hàng!"));
+        if (!attribute.isActive()) {
+            throw new BadRequestException("Mã thuộc tính đã bị khóa trong cửa hàng!");
+        }
+        return attribute;
+    }
+
+    private Attribute getAttributeByNameAndValueAndShopId(String name, String value, Long shopId) {
+        return attributeRepository.findByNameAndValueAndShop_ShopId(name, value, shopId).orElseThrow(() -> new BadRequestException("Thuộc tính không tồn tại!"));
+    }
+
+
+    private Attribute createAttributeByNameAndValueAndShop(String name, String value, Shop shop) {
+        Attribute attribute = new Attribute();
+        attribute.setName(name);
+        attribute.setValue(value);
+        attribute.setShop(shop);
+        attribute.setActive(true);
+        attribute.setCreateAt(LocalDateTime.now());
+        attribute.setUpdateAt(LocalDateTime.now());
+
+        return attribute;
+    }
+
+
     private Attribute checkAttributeInShop(Long attributeId, Long shopId) {
-        Attribute attribute = attributeRepository.findById(attributeId)
-                .orElseThrow(() -> new BadRequestException("Không tìm thấy thuộc tính!"));
+        Attribute attribute = attributeRepository.findById(attributeId).orElseThrow(() -> new BadRequestException("Không tìm thấy thuộc tính!"));
 
         if (!attribute.getShop().getShopId().equals(shopId)) {
             throw new BadRequestException("Không tìm thấy thuộc tính trong cửa hàng!");
@@ -233,12 +206,8 @@ public class AttributeShopServiceImpl implements IAttributeShopService {
         return attribute;
     }
 
-    public boolean existsAttribute(String name, String value, Long shopId) {
-        boolean existsAttribute = attributeRepository.existsByNameAndValueAndShop_ShopId(
-                name,
-                value,
-                shopId);
-        return existsAttribute;
+    public boolean existsAttributeByNameAndValueAndShopId(String name, String value, Long shopId) {
+        return attributeRepository.existsByNameAndValueAndShop_ShopId(name, value, shopId);
     }
 
 }

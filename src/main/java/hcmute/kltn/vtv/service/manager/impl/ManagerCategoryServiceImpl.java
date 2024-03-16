@@ -68,13 +68,13 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         try {
             categoryRepository.save(category);
             if (request.isChangeImage()) {
-                imageService.deleteImageFromFirebase(oldImage);
+                imageService.deleteImageInFirebase(oldImage);
             }
 
             return CategoryResponse.categoryResponse(category, "Cập nhật danh mục thành công!", "Success");
         } catch (Exception e) {
             if (request.isChangeImage()) {
-                imageService.deleteImageFromFirebase(category.getImage());
+                imageService.deleteImageInFirebase(category.getImage());
             }
             throw new InternalServerErrorException("Cập nhật danh mục thất bại!");
         }
@@ -89,7 +89,7 @@ public class ManagerCategoryServiceImpl implements IManagerCategoryService {
         String oldImage = getCategoryById(categoryId).getImage();
         try {
             categoryRepository.deleteById(categoryId);
-            imageService.deleteImageFromFirebase(oldImage);
+            imageService.deleteImageInFirebase(oldImage);
 
             return ResponseClass.responseClass("Xóa danh mục thành công!", "Success");
         } catch (Exception e) {

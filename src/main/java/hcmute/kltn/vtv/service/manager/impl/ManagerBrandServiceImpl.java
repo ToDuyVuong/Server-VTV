@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class BrandManagerServiceImpl implements IManagerBrandService {
+public class ManagerBrandServiceImpl implements IManagerBrandService {
 
     @Autowired
     private final BrandRepository brandRepository;
@@ -50,7 +50,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
 
             return BrandResponse.brandResponse(brand, "Thêm thương hiệu thành công!", "Success");
         } catch (Exception e) {
-            imageService.deleteImageFromFirebase(brand.getImage());
+            imageService.deleteImageInFirebase(brand.getImage());
             throw new BadRequestException("Thêm thương hiệu thất bại!");
         }
     }
@@ -69,12 +69,12 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
         try {
             brandRepository.save(brand);
             if (brandRequest.isChangeImage() ) {
-                imageService.deleteImageFromFirebase(oldImage);
+                imageService.deleteImageInFirebase(oldImage);
             }
 
             return BrandResponse.brandResponse(brand, "Cập nhật thương hiệu thành công!", "Success");
         } catch (Exception e) {
-            imageService.deleteImageFromFirebase(brand.getImage());
+            imageService.deleteImageInFirebase(brand.getImage());
             throw new BadRequestException("Cập nhật thương hiệu thất bại!");
         }
     }
@@ -92,7 +92,7 @@ public class BrandManagerServiceImpl implements IManagerBrandService {
         try {
             brandRepository.delete(brand);
             if (oldImage != null) {
-                imageService.deleteImageFromFirebase(oldImage);
+                imageService.deleteImageInFirebase(oldImage);
             }
             return ResponseClass.responseClass("Xóa thương hiệu thành công!", "Success");
         } catch (Exception e) {

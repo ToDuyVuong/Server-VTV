@@ -14,6 +14,8 @@ public interface AttributeRepository extends JpaRepository<Attribute, Long> {
 
     Optional<Attribute> findByNameAndValueAndShop_ShopId(String name, String value, Long shopId);
 
+    Optional<Attribute> findByAttributeIdAndShopShopId(Long attributeId, Long shopId);
+
     boolean existsByNameAndValueAndShop_ShopId(String name, String value, Long shopId);
 
     boolean existsByAttributeIdAndActive(Long attributeId, boolean active);

@@ -4,7 +4,9 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +20,9 @@ public class ProductVariantRequest {
 
     private String sku;
 
-    private String image;
+    private MultipartFile image;
+
+    private boolean changeImage;
 
     private Long originalPrice;
 
@@ -26,12 +30,14 @@ public class ProductVariantRequest {
 
     private int quantity;
 
-    private List<Long> attributeIds;
+    private List<ProductAttributeRequest> productAttributeRequests;
 
     public void validate() {
         if (sku == null || sku.isEmpty()) {
             throw new BadRequestException("Mã biến thể sản phẩm không được để trống!");
         }
+
+        this.sku = this.sku.trim();
 
         if (originalPrice == null) {
             throw new BadRequestException("Giá gốc sản phẩm không được để trống!");
@@ -43,10 +49,6 @@ public class ProductVariantRequest {
 
         if (originalPrice < price) {
             throw new BadRequestException("Giá gốc sản phẩm không được nhỏ hơn giá bán!");
-        }
-
-        if (price == null) {
-            throw new BadRequestException("Giá sản phẩm không được để trống!");
         }
 
         if (price < 0) {
@@ -61,33 +63,51 @@ public class ProductVariantRequest {
             throw new BadRequestException("Số lượng sản phẩm không được nhỏ hơn 0!");
         }
 
-        if (containsDuplicate(attributeIds)) {
-            throw new BadRequestException("Có mã thuộc tính trùng lặp trong danh sách thuộc tính!");
+        if (changeImage && image == null) {
+            throw new BadRequestException("Hình ảnh biến thể sản phẩm không được để trống!");
         }
 
-        trim();
-    }
-
-    public void validateUpdate() {
-        if (productVariantId == null) {
-            throw new BadRequestException("Mã biến thể sản phẩm không được để trống!");
+        // check image
+        if (changeImage && !isImage(image)) {
+            throw new BadRequestException("Hình ảnh không hợp lệ! Vui lòng chọn hình ảnh khác!");
         }
-        validate();
 
+        validateProductAttributeRequest(productAttributeRequests);
     }
 
-    private boolean containsDuplicate(List<Long> list) {
-        Set<Long> set = new HashSet<>();
-        for (Long item : list) {
-            if (!set.add(item)) {
+
+
+
+    private boolean isImage(MultipartFile file) {
+        return file != null && file.getContentType() != null && file.getContentType().startsWith("image");
+    }
+
+
+
+    private void validateProductAttributeRequest(List<ProductAttributeRequest> productAttributeRequest) {
+        if (productAttributeRequest != null) {
+            for (ProductAttributeRequest attributeRequest : productAttributeRequest) {
+                attributeRequest.validate();
+            }
+            if (containsDuplicateByNameAndValue(productAttributeRequest)) {
+                throw new BadRequestException("Có tên và giá trị thuộc tính sản phẩm trùng lặp trong danh sách thuộc tính của biến thể sản phẩm!");
+            }
+        }
+    }
+
+
+    private static boolean containsDuplicateByNameAndValue(List<ProductAttributeRequest> list) {
+        List<String> attributeValues = new ArrayList<>();
+        for (ProductAttributeRequest request : list) {
+            String key = request.getName() + "_" + request.getValue();
+            if (attributeValues.contains(key)) {
                 return true;
+            } else {
+                attributeValues.add(key);
             }
         }
         return false;
     }
 
-    public void trim() {
-        this.sku = this.sku.trim();
-        this.image = this.image.trim();
-    }
+
 }

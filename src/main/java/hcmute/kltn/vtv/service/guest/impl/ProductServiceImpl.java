@@ -10,6 +10,7 @@ import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;
+import hcmute.kltn.vtv.service.vendor.IProductShopServiceV2;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    private IProductShopService productShopService;
+    private IProductShopServiceV2 productShopService;
     @Autowired
     private CategoryRepository categoryRepository;
 

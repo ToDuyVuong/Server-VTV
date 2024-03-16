@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Data
@@ -60,10 +61,11 @@ public class ProductVariantDTO {
 
     public static List<ProductVariantDTO> convertToListDTO(List<ProductVariant> productVariants) {
         List<ProductVariantDTO> productVariantDTOs = new ArrayList<>();
-
         for (ProductVariant productVariant : productVariants) {
             productVariantDTOs.add(convertEntityToDTO(productVariant));
         }
+        productVariantDTOs.sort(Comparator.comparing(ProductVariantDTO::getSku));
+
         return productVariantDTOs;
     }
 

@@ -11,5 +11,5 @@ public interface IImageService {
     String uploadImageToFirebase(MultipartFile multipartFile);
 
     @Transactional
-    void deleteImageFromFirebase(String imageUrl);
+    void deleteImageInFirebase(String imageUrl);
 }

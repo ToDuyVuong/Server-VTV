@@ -1,13 +1,22 @@
 package hcmute.kltn.vtv.service.vendor;
 
 import hcmute.kltn.vtv.model.data.vendor.request.AttributeRequest;
+import hcmute.kltn.vtv.model.data.vendor.request.ProductAttributeRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.AttributeResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListAttributeResponse;
 import hcmute.kltn.vtv.model.entity.vendor.Attribute;
+import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface IAttributeShopService {
+    @Transactional
+    List<Attribute> addNewAttributesByProductAttributeRequests(List<ProductAttributeRequest> productAttributeRequests, Shop shop);
+
+    @Transactional
+    Attribute addNewAttributeByProductAttributeRequest(ProductAttributeRequest request, Shop shop);
+
     AttributeResponse addNewAttribute(AttributeRequest attributeRequest);
 
     AttributeResponse getAttributeById(Long attributeId, String username);

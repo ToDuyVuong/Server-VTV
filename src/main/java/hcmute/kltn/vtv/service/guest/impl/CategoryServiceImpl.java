@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.guest.ICategoryService;
+import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public void checkExistCategoryHasChild(Long categoryId) {
         if (categoryRepository.existsByParentCategoryIdAndStatus(categoryId, Status.ACTIVE)) {
-            throw new NotFoundException("Danh mục này có danh mục con không thể thực hiện thao tác này!");
+            throw new BadRequestException("Danh mục này có danh mục con không thể thực hiện thao tác này!");
         }
     }
 
