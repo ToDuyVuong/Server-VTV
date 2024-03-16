@@ -9,15 +9,12 @@ import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.service.guest.IProductService;
-import hcmute.kltn.vtv.service.vendor.IProductShopService;
-import hcmute.kltn.vtv.service.vendor.IProductShopServiceV2;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,8 +26,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private IProductShopServiceV2 productShopService;
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -120,44 +116,44 @@ public class ProductServiceImpl implements IProductService {
     }
 
 
-    @Override
-    public ListProductResponse getListNewProduct(Long shopId) {
-
-        List<Product> products;
-        if (shopId == null) {
-            Pageable pageable = PageRequest.of(0, 20);
-            Page<Product> page = productRepository.findNewestProducts(Status.ACTIVE, pageable)
-                    .orElseThrow(() -> new NotFoundException("Không có sản phẩm mới!"));
-            products = page.getContent();
-        } else {
-            products = productRepository.findByShopShopIdAndStatusOrderByCreateAtDesc(shopId, Status.ACTIVE)
-                    .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm mới!"));
-        }
-
-        String message = shopId == null ? "Lấy danh sách sản phẩm mới thành công!"
-                : "Lấy danh sách sản phẩm mới trong cửa hàng thành công!";
-
-        return productShopService.getListProductResponseSort(products, message, false);
-    }
-
-    @Override
-    public ListProductResponse getListProductByPriceRange(Long shopId, Long minPrice, Long maxPrice) {
-        List<Product> products;
-
-        if (shopId == null) {
-            products = productRepository.findByPriceRange(Status.ACTIVE, minPrice, maxPrice)
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong khoảng giá này!"));
-        } else {
-            products = productRepository.findByPriceRange(shopId, Status.ACTIVE, minPrice, maxPrice)
-                    .orElseThrow(() -> new NotFoundException(
-                            "Không tìm thấy sản phẩm nào trong cửa hàng có khoảng giá này!"));
-        }
-
-        String message = shopId == null ? "Lọc sản phẩm theo giá thành công."
-                : "Lọc sản phẩm theo giá trong cửa hàng thành công.";
-
-        return productShopService.getListProductResponseSort(products, message, true);
-    }
+//    @Override
+//    public ListProductResponse getListNewProduct(Long shopId) {
+//
+//        List<Product> products;
+//        if (shopId == null) {
+//            Pageable pageable = PageRequest.of(0, 20);
+//            Page<Product> page = productRepository.findNewestProducts(Status.ACTIVE, pageable)
+//                    .orElseThrow(() -> new NotFoundException("Không có sản phẩm mới!"));
+//            products = page.getContent();
+//        } else {
+//            products = productRepository.findByShopShopIdAndStatusOrderByCreateAtDesc(shopId, Status.ACTIVE)
+//                    .orElseThrow(() -> new NotFoundException("Cửa hàng không có sản phẩm mới!"));
+//        }
+//
+//        String message = shopId == null ? "Lấy danh sách sản phẩm mới thành công!"
+//                : "Lấy danh sách sản phẩm mới trong cửa hàng thành công!";
+//
+//        return productShopService.getListProductResponseSort(products, message, false);
+//    }
+//
+//    @Override
+//    public ListProductResponse getListProductByPriceRange(Long shopId, Long minPrice, Long maxPrice) {
+//        List<Product> products;
+//
+//        if (shopId == null) {
+//            products = productRepository.findByPriceRange(Status.ACTIVE, minPrice, maxPrice)
+//                    .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong khoảng giá này!"));
+//        } else {
+//            products = productRepository.findByPriceRange(shopId, Status.ACTIVE, minPrice, maxPrice)
+//                    .orElseThrow(() -> new NotFoundException(
+//                            "Không tìm thấy sản phẩm nào trong cửa hàng có khoảng giá này!"));
+//        }
+//
+//        String message = shopId == null ? "Lọc sản phẩm theo giá thành công."
+//                : "Lọc sản phẩm theo giá trong cửa hàng thành công.";
+//
+//        return productShopService.getListProductResponseSort(products, message, true);
+//    }
 
 
     @Override

@@ -39,6 +39,8 @@ public class ProductVariantDTO {
 
     private String discountPercent;
 
+    private int countAttribute;
+
     private List<AttributeDTO> attributeDTOs;
 
     public static ProductVariantDTO convertEntityToDTO(ProductVariant productVariant) {
@@ -50,6 +52,7 @@ public class ProductVariantDTO {
         productVariantDTO.setPrice(productVariant.getPrice());
         productVariantDTO.setQuantity(productVariant.getQuantity());
         productVariantDTO.setStatus(productVariant.getStatus());
+        productVariantDTO.setCountAttribute(productVariant.getAttributes().size());
         productVariantDTO.setAttributeDTOs(AttributeDTO.convertToListDTO(productVariant.getAttributes()));
         productVariantDTO.setProductId(productVariant.getProduct().getProductId());
         productVariantDTO.setProductName(productVariant.getProduct().getName());

@@ -71,31 +71,31 @@ public class ProductController {
         return ResponseEntity.ok(productService.getBestSellingProducts(null, limit, false));
     }
 
-    @GetMapping("/list-new/{shopId}")
-    public ResponseEntity<ListProductResponse> getListNewProductOnShop(@PathVariable Long shopId) {
+//    @GetMapping("/list-new/{shopId}")
+//    public ResponseEntity<ListProductResponse> getListNewProductOnShop(@PathVariable Long shopId) {
+//
+//        return ResponseEntity.ok(productService.getListNewProduct(shopId));
+//    }
+//
+//    @GetMapping("/list-new")
+//    public ResponseEntity<ListProductResponse> getListNewProduct() {
+//        return ResponseEntity.ok(productService.getListNewProduct(null));
+//    }
 
-        return ResponseEntity.ok(productService.getListNewProduct(shopId));
-    }
-
-    @GetMapping("/list-new")
-    public ResponseEntity<ListProductResponse> getListNewProduct() {
-        return ResponseEntity.ok(productService.getListNewProduct(null));
-    }
-
-    @GetMapping("/price-range/{shopId}")
-    public ResponseEntity<ListProductResponse> getListProductByPriceRangeOnShop(@PathVariable Long shopId,
-                                                                                @RequestParam Long minPrice,
-                                                                                @RequestParam Long maxPrice) {
-        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
-        return ResponseEntity.ok(productService.getListProductByPriceRange(shopId, minPrice, maxPrice));
-    }
-
-    @GetMapping("/price-range")
-    public ResponseEntity<ListProductResponse> getListProductByPriceRange(@RequestParam Long minPrice,
-                                                                          @RequestParam Long maxPrice) {
-        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
-        return ResponseEntity.ok(productService.getListProductByPriceRange(null, minPrice, maxPrice));
-    }
+//    @GetMapping("/price-range/{shopId}")
+//    public ResponseEntity<ListProductResponse> getListProductByPriceRangeOnShop(@PathVariable Long shopId,
+//                                                                                @RequestParam Long minPrice,
+//                                                                                @RequestParam Long maxPrice) {
+//        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
+//        return ResponseEntity.ok(productService.getListProductByPriceRange(shopId, minPrice, maxPrice));
+//    }
+//
+//    @GetMapping("/price-range")
+//    public ResponseEntity<ListProductResponse> getListProductByPriceRange(@RequestParam Long minPrice,
+//                                                                          @RequestParam Long maxPrice) {
+//        pageService.checkRequestPriceRangeParams(minPrice, maxPrice);
+//        return ResponseEntity.ok(productService.getListProductByPriceRange(null, minPrice, maxPrice));
+//    }
 
 
     @GetMapping("/count-favorite/{productId}")

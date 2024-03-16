@@ -44,6 +44,8 @@ public class ProductDTO {
 
     private String rating;
 
+    private int countProductVariant;
+
     private List<ProductVariantDTO> productVariantDTOs;
 
 
@@ -68,6 +70,7 @@ public class ProductDTO {
         productDTO.setCategoryId(product.getCategory().getCategoryId());
         productDTO.setShopId(product.getShop().getShopId());
         productDTO.setBrandId(product.getBrand() != null ? product.getBrand().getBrandId() : null);
+        productDTO.setCountProductVariant(product.getProductVariants().size());
         productDTO.setProductVariantDTOs(ProductVariantDTO.convertToListDTO(product.getProductVariants()));
 
         productDTO.setMinPrice(calculateMinPrices(productDTO.getProductVariantDTOs()));
