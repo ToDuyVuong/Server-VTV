@@ -5,6 +5,7 @@ import hcmute.kltn.vtv.model.extra.Status;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -64,7 +65,7 @@ public class AddressDTO {
             AddressDTO addressDTO = convertEntityToDTO(address);
             addressDTOs.add(addressDTO);
         }
-        addressDTOs.sort((o1, o2) -> o2.getStatus().compareTo(o1.getStatus()));
+        addressDTOs.sort(Comparator.comparing(AddressDTO::getStatus));
 
         return addressDTOs;
     }
