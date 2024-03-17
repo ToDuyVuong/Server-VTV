@@ -20,11 +20,11 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressId;
 
-    private String province;
+    private String provinceName;
 
-    private String district;
+    private String districtName;
 
-    private String ward;
+    private String wardName;
 
     private String fullAddress;
 
@@ -47,6 +47,6 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ward_code")
-    private Ward wardCode;
+    private Ward ward;
 
 }

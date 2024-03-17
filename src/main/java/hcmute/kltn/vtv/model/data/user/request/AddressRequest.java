@@ -19,11 +19,11 @@ public class AddressRequest {
 
     private Long addressId;
 
-    private String province;
+    private String provinceName;
 
-    private String district;
+    private String districtName;
 
-    private String ward;
+    private String wardName;
 
     private String fullAddress;
 
@@ -31,9 +31,7 @@ public class AddressRequest {
 
     private String phone;
 
-    private Status status;
-
-    private String codeWard;
+    private String wardCode;
 
     public void validate() {
 
@@ -41,15 +39,15 @@ public class AddressRequest {
             throw new BadRequestException("Tài khoản không được để trống.");
         }
 
-        if (province == null || province.isEmpty()) {
+        if (provinceName == null || provinceName.isEmpty()) {
             throw new BadRequestException("Tỉnh/Thành phố không được để trống.");
         }
 
-        if (district == null || district.isEmpty()) {
+        if (districtName == null || districtName.isEmpty()) {
             throw new BadRequestException("Quận/Huyện không được để trống.");
         }
 
-        if (ward == null || ward.isEmpty()) {
+        if (wardName == null || wardName.isEmpty()) {
             throw new BadRequestException("Phường/Xã không được để trống.");
         }
 
@@ -73,7 +71,7 @@ public class AddressRequest {
             throw new BadRequestException("Số điện thoại không hợp lệ.");
         }
 
-        if (codeWard == null || codeWard.isEmpty()) {
+        if (wardCode == null || wardCode.isEmpty()) {
             throw new BadRequestException("Mã xã/phường không được để trống.");
         }
 
@@ -83,36 +81,12 @@ public class AddressRequest {
 
     public void trim() {
         this.username = this.username.trim();
-        this.province = this.province.trim();
-        this.district = this.district.trim();
-        this.ward = this.ward.trim();
+        this.provinceName = this.provinceName.trim();
+        this.districtName = this.districtName.trim();
+        this.wardName = this.wardName.trim();
         this.fullAddress = this.fullAddress.trim();
         this.fullName = this.fullName.trim();
         this.phone = this.phone.trim();
 
-    }
-
-    public static AddressDTO convertUpdateRequestToDTO(AddressRequest addressRequest) {
-        AddressDTO addressDTO = new AddressDTO();
-        addressDTO.setAddressId(addressRequest.getAddressId());
-        addressDTO.setProvince(addressRequest.getProvince());
-        addressDTO.setDistrict(addressRequest.getDistrict());
-        addressDTO.setWard(addressRequest.getWard());
-        addressDTO.setFullAddress(addressRequest.getFullAddress());
-        addressDTO.setFullName(addressRequest.getFullName());
-        addressDTO.setPhone(addressRequest.getPhone());
-        addressDTO.setStatus(addressRequest.getStatus());
-        return addressDTO;
-    }
-
-    public static AddressDTO convertRequestToDTO(AddressRequest addressRequest) {
-        AddressDTO addressDTO = new AddressDTO();
-        addressDTO.setProvince(addressRequest.getProvince());
-        addressDTO.setDistrict(addressRequest.getDistrict());
-        addressDTO.setWard(addressRequest.getWard());
-        addressDTO.setFullAddress(addressRequest.getFullAddress());
-        addressDTO.setFullName(addressRequest.getFullName());
-        addressDTO.setPhone(addressRequest.getPhone());
-        return addressDTO;
     }
 }

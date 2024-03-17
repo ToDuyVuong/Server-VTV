@@ -15,6 +15,7 @@ public class ProvinceDTO {
 
     private String provinceCode;
     private String name;
+    private String fullName;
     private String administrativeUnitShortName;
     // private String nameEn;
     // private String fullName;
@@ -27,9 +28,9 @@ public class ProvinceDTO {
         ProvinceDTO dto = new ProvinceDTO();
         dto.setProvinceCode(entity.getProvinceCode());
         dto.setName(entity.getName());
+        dto.setFullName(entity.getFullName());
         dto.setAdministrativeUnitShortName(entity.getAdministrativeUnit().getShortName());
         // dto.setNameEn(entity.getNameEn());
-        // dto.setFullName(entity.getFullName());
         // dto.setFullNameEn(entity.getFullNameEn());
         // dto.setCodeName(entity.getCodeName());
         // dto.setAdministrativeRegionId(entity.getAdministrativeRegion().getAdministrativeRegionId());

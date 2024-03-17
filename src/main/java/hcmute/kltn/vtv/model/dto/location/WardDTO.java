@@ -14,6 +14,7 @@ import java.util.List;
 public class WardDTO {
     private String wardCode;
     private String name;
+    private String fullName;
     private String administrativeUnitShortName;
 
     // private String nameEn;
@@ -28,8 +29,8 @@ public class WardDTO {
         dto.setWardCode(entity.getWardCode());
         dto.setName(entity.getName());
         dto.setAdministrativeUnitShortName(entity.getAdministrativeUnit().getShortName());
+        dto.setFullName(entity.getFullName());
         // dto.setNameEn(entity.getNameEn());
-        // dto.setFullName(entity.getFullName());
         // dto.setFullNameEn(entity.getFullNameEn());
         // dto.setCodeName(entity.getCodeName());
         // dto.setAdministrativeUnitId(entity.getAdministrativeUnit().getAdministrativeUnitId());

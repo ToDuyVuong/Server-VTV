@@ -16,11 +16,17 @@ public class AddressDTO {
 
     private Long addressId;
 
-    private String province;
+    private String provinceName;
 
-    private String district;
+    private String provinceFullName;
 
-    private String ward;
+    private String districtName;
+
+    private String districtFullName;
+
+    private String wardName;
+
+    private String wardFullName;
 
     private String fullAddress;
 
@@ -36,14 +42,18 @@ public class AddressDTO {
     public static AddressDTO convertEntityToDTO(Address address) {
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setAddressId(address.getAddressId());
-        addressDTO.setProvince(address.getProvince());
-        addressDTO.setDistrict(address.getDistrict());
-        addressDTO.setWard(address.getWard());
+        addressDTO.setProvinceName(address.getProvinceName());
+        addressDTO.setProvinceFullName(address.getWard().getDistrict().getProvince().getFullName());
+        addressDTO.setDistrictName(address.getDistrictName());
+        addressDTO.setDistrictFullName(address.getWard().getDistrict().getFullName());
+        addressDTO.setWardName(address.getWardName());
+        addressDTO.setWardFullName(address.getWard().getFullName());
         addressDTO.setFullAddress(address.getFullAddress());
         addressDTO.setFullName(address.getFullName());
         addressDTO.setPhone(address.getPhone());
         addressDTO.setStatus(address.getStatus());
-        addressDTO.setWardCode(address.getWardCode().getWardCode());
+        addressDTO.setWardCode(address.getWard().getWardCode());
+
         return addressDTO;
 
     }
@@ -59,17 +69,6 @@ public class AddressDTO {
         return addressDTOs;
     }
 
-    public static Address convertDTOToEntity(AddressDTO addressDTO) {
-        Address address = new Address();
-        address.setAddressId(addressDTO.getAddressId());
-        address.setProvince(addressDTO.getProvince());
-        address.setDistrict(addressDTO.getDistrict());
-        address.setWard(addressDTO.getWard());
-        address.setFullAddress(addressDTO.getFullAddress());
-        address.setFullName(addressDTO.getFullName());
-        address.setPhone(addressDTO.getPhone());
-        address.setStatus(addressDTO.getStatus());
-        return address;
-    }
+
 
 }

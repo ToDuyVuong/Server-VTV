@@ -30,7 +30,7 @@ public class AddressController {
         return ResponseEntity.ok(addressService.addNewAddress(addressRequest));
     }
 
-    @GetMapping("/{addressId}")
+    @GetMapping("/get/{addressId}")
     public ResponseEntity<AddressResponse> getAddressById(@PathVariable("addressId") Long addressId,
             HttpServletRequest request) {
         String username = (String) request.getAttribute("username");

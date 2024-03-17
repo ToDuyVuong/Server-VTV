@@ -1,5 +1,7 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.model.entity.location.Ward;
+import hcmute.kltn.vtv.service.location.IWardService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.request.AddressRequest;
 import hcmute.kltn.vtv.model.data.user.request.AddressStatusRequest;
@@ -30,21 +32,23 @@ public class AddressServiceImpl implements IAddressService {
     private final AddressRepository addressRepository;
     @Autowired
     private final ICustomerService customerService;
+    @Autowired
+    private final IWardService wardService;
 
 
     @Override
     @Transactional
     public AddressResponse addNewAddress(AddressRequest request) {
+        Ward ward = checkWardCodeMatchWithFullLocation(request);
         Customer customer = customerService.getCustomerByUsername(request.getUsername());
-        Address address = createAddressByAddressRequest(request);
-        address.setCustomer(customer);
+        Address address = createAddressByAddressRequest(request, ward, customer);
 
         try {
             addressRepository.save(address);
             updateStatusInActiveWithAddress(customer, address.getAddressId());
             String message = "Thêm địa chỉ mới của khách hàng: " + customer.getFullName() + " thành công.";
 
-            return AddressResponse.addressResponse(address, customer, message, "Success");
+            return AddressResponse.addressResponse(address, message, "Success");
         } catch (Exception e) {
             throw new BadRequestException("Thêm địa chỉ mới thất bại.");
         }
@@ -55,21 +59,21 @@ public class AddressServiceImpl implements IAddressService {
     public AddressResponse getAddressById(Long addressId, String username) {
         Address address = checkAddress(addressId, username);
 
-        return AddressResponse.addressResponse(address, address.getCustomer(),
-                "Lấy thông tin địa chỉ thành công.", "OK");
+        return AddressResponse.addressResponse(address, "Lấy thông tin địa chỉ thành công.", "OK");
     }
 
     @Override
     @Transactional
     public AddressResponse updateAddress(AddressRequest request) {
+        Ward ward = checkWardCodeMatchWithFullLocation(request);
         Customer customer = customerService.getCustomerByUsername(request.getUsername());
         Address address = checkAddress(request.getAddressId(), request.getUsername());
-
+        updateAddressByAddressRequest(address, ward, request);
         try {
-            addressRepository.save(editAddressByAddressRequest(address, request));
+            addressRepository.save(address);
             String message = "Cập nhật địa chỉ của khách hàng: " + customer.getFullName() + " thành công.";
 
-            return AddressResponse.addressResponse(address, customer, message, "Success");
+            return AddressResponse.addressResponse(address, message, "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật địa chỉ mới thất bại.");
         }
@@ -90,7 +94,7 @@ public class AddressServiceImpl implements IAddressService {
             addressRepository.save(address);
             String message = setMessageUpdateStatus(request.getStatus(), customer.getFullName());
 
-            return AddressResponse.addressResponse(address, customer, message, "Success");
+            return AddressResponse.addressResponse(address, message, "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật trạng thái địa chỉ mới thất bại.");
         }
@@ -105,7 +109,7 @@ public class AddressServiceImpl implements IAddressService {
                 .orElseThrow(() -> new NotFoundException("Khách hàng chưa có địa chỉ nào."));
         String message = "Lấy danh sách địa chỉ của khách hàng: " + customer.getFullName() + " thành công.";
 
-        return ListAddressResponse.listAddressResponse(addresses, customer, message, "OK");
+        return ListAddressResponse.listAddressResponse(addresses, username, message, "OK");
     }
 
     @Override
@@ -134,6 +138,23 @@ public class AddressServiceImpl implements IAddressService {
     }
 
 
+    private Ward checkWardCodeMatchWithFullLocation(AddressRequest request) {
+        wardService.checkWardCodeExist(request.getWardCode());
+        Ward ward = wardService.getWardByWardCode(request.getWardCode());
+        if (!ward.getName().equals(request.getWardName())) {
+            throw new BadRequestException("Mã xã/phường không khớp với tên xã/phường.");
+        }
+        if (!ward.getDistrict().getName().equals(request.getDistrictName())) {
+            throw new BadRequestException("Tên quận/huyện không khớp với tên quận/huyện thuộc mã xã/phường.");
+        }
+        if (!ward.getDistrict().getProvince().getName().equals(request.getProvinceName())) {
+            throw new BadRequestException("Tên tỉnh/thành phố không khớp với tên tỉnh/thành phố thuộc mã quận/huyện.");
+        }
+
+        return ward;
+    }
+
+
     private void checkStatus(AddressStatusRequest request, Address address, Customer customer, Long addressId) {
         if (request.getStatus().equals(Status.DELETED)) {
             address.setStatus(Status.DELETED);
@@ -156,53 +177,49 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     private void updateStatusInActiveWithAddress(Customer customer, Long addressId) {
-        List<Address> addresses = addressRepository
-                .findAllByCustomerAndStatusAndAddressIdNot(customer, Status.ACTIVE, addressId)
-                .orElseThrow(() -> new NotFoundException("Khách hàng chưa có địa chỉ nào."));
-
-        for (Address address : addresses) {
-            address.setStatus(Status.INACTIVE);
-            address.setUpdateAt(LocalDateTime.now());
-            try {
+        try {
+            List<Address> addresses = addressRepository
+                    .findAllByCustomerAndStatusAndAddressIdNot(customer, Status.ACTIVE, addressId)
+                    .orElseThrow(() -> new NotFoundException("Khách hàng chưa có địa chỉ nào."));
+            for (Address address : addresses) {
+                address.setStatus(Status.INACTIVE);
+                address.setUpdateAt(LocalDateTime.now());
 
                 addressRepository.save(address);
-            } catch (Exception e) {
-                throw new InternalServerErrorException("Cập nhật trạng thái địa chỉ mới thất bại.");
-
             }
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Cập nhật trạng thái địa chỉ mới thất bại.");
         }
     }
 
 
-    private Address createAddressByAddressRequest(AddressRequest addressRequest) {
+    private Address createAddressByAddressRequest(AddressRequest addressRequest, Ward ward, Customer customer) {
         Address address = new Address();
-
-        address.setProvince(addressRequest.getProvince());
-        address.setDistrict(addressRequest.getDistrict());
-        address.setWard(addressRequest.getWard());
+        address.setProvinceName(addressRequest.getProvinceName());
+        address.setDistrictName(addressRequest.getDistrictName());
+        address.setWardName(addressRequest.getWardName());
         address.setFullAddress(addressRequest.getFullAddress());
         address.setFullName(addressRequest.getFullName());
         address.setPhone(addressRequest.getPhone());
-        address.setStatus(addressRequest.getStatus());
+        address.setWard(ward);
+        address.setCustomer(customer);
+        address.setStatus(Status.ACTIVE);
         address.setCreateAt(LocalDateTime.now());
         address.setUpdateAt(LocalDateTime.now());
-        address.setStatus(Status.ACTIVE);
+
         return address;
     }
 
 
-    private Address editAddressByAddressRequest(Address address, AddressRequest addressRequest) {
-
-        address.setProvince(addressRequest.getProvince());
-        address.setDistrict(addressRequest.getDistrict());
-        address.setWard(addressRequest.getWard());
+    private void updateAddressByAddressRequest(Address address, Ward ward, AddressRequest addressRequest) {
+        address.setProvinceName(addressRequest.getProvinceName());
+        address.setDistrictName(addressRequest.getDistrictName());
+        address.setWardName(addressRequest.getWardName());
+        address.setWard(ward);
         address.setFullAddress(addressRequest.getFullAddress());
         address.setFullName(addressRequest.getFullName());
         address.setPhone(addressRequest.getPhone());
-        address.setStatus(addressRequest.getStatus());
         address.setUpdateAt(LocalDateTime.now());
-
-        return address;
     }
 
 

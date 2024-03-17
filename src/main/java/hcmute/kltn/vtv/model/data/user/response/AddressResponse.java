@@ -14,15 +14,14 @@ import lombok.*;
 @AllArgsConstructor
 public class AddressResponse extends ResponseAbstract {
 
+    private String username;
     private AddressDTO addressDTO;
-    private CustomerDTO customerDTO;
 
 
-    public static AddressResponse addressResponse(Address address, Customer customer,
-                                                  String message, String status) {
+    public static AddressResponse addressResponse(Address address, String message, String status) {
         AddressResponse addressResponse = new AddressResponse();
         addressResponse.setAddressDTO(AddressDTO.convertEntityToDTO(address));
-        addressResponse.setCustomerDTO(CustomerDTO.convertEntityToDTO(customer));
+        addressResponse.setUsername(address.getCustomer().getUsername());
         addressResponse.setMessage(message);
         addressResponse.setStatus(status);
         addressResponse.setCode(200);
