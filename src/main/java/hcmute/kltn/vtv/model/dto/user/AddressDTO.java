@@ -43,11 +43,11 @@ public class AddressDTO {
     public static AddressDTO convertEntityToDTO(Address address) {
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setAddressId(address.getAddressId());
-        addressDTO.setProvinceName(address.getProvinceName());
+        addressDTO.setProvinceName(address.getWard().getDistrict().getProvince().getName());
         addressDTO.setProvinceFullName(address.getWard().getDistrict().getProvince().getFullName());
-        addressDTO.setDistrictName(address.getDistrictName());
+        addressDTO.setDistrictName(address.getWard().getDistrict().getName());
         addressDTO.setDistrictFullName(address.getWard().getDistrict().getFullName());
-        addressDTO.setWardName(address.getWardName());
+        addressDTO.setWardName(address.getWard().getName());
         addressDTO.setWardFullName(address.getWard().getFullName());
         addressDTO.setFullAddress(address.getFullAddress());
         addressDTO.setFullName(address.getFullName());

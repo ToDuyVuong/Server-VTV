@@ -67,7 +67,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
 
     public OrderItem createOrderItem(UUID cartId, String username) {
         OrderItem orderItem = new OrderItem();
-        Cart cart = cartService.getCartByUserNameAndId(username, cartId);
+        Cart cart = cartService.getCartByCartIdAndUsername(cartId, username);
         orderItem.setOrder(null);
         orderItem.setCart(cart);
         return orderItem;

@@ -11,13 +11,14 @@ import java.util.UUID;
 
 public interface ICartService {
     @Transactional
-    CartResponse addNewCart(CartRequest request);
+    CartResponse addNewCart(CartRequest request, String username);
 
     @Transactional
-    CartResponse updateCart(CartRequest request);
+    CartResponse updateCart(UUID cartId, int quantity, String username);
+
 
     @Transactional
-    CartResponse deleteCart(UUID cartId, String username);
+    CartResponse deleteCartById(UUID cartId, String username);
 
     ListCartResponse getListCartByUsername(String username);
 
@@ -25,7 +26,7 @@ public interface ICartService {
 
     List<Cart> getListCartByUsernameAndIds(String username, List<UUID> cartIds);
 
-    Cart getCartByUserNameAndId(String username, UUID cartId);
+    Cart getCartByCartIdAndUsername(UUID cartId, String username);
 
     @Transactional
     ListCartResponse deleteCartByShopId(Long shopId, String username);

@@ -24,6 +24,8 @@ public class ListCartByShopDTO {
 
     private String avatar;
 
+    private int countCartInShop;
+
     private List<CartDTO> carts;
 
     public static List<ListCartByShopDTO> convertToListDTOByShop(List<Cart> carts) {
@@ -43,6 +45,7 @@ public class ListCartByShopDTO {
             listCartByShopDTO.setShopId(shop.getShopId());
             listCartByShopDTO.setShopName(shop.getName());
             listCartByShopDTO.setAvatar(shop.getAvatar());
+            listCartByShopDTO.setCountCartInShop(cartDTOs.size());
             listCartByShopDTO.setCarts(cartDTOs);
 
             listCartByShopDTOs.add(listCartByShopDTO);

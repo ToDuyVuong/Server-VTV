@@ -36,16 +36,21 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public CartResponse addNewCart(CartRequest request) {
-        if (checkCardExistProductVariantId(request.getProductVariantId(), request.getUsername())) {
-            return updateCart(request);
+    public CartResponse addNewCart(CartRequest request, String username) {
+        Cart cart;
+        if (checkCardExistProductVariantId(request.getProductVariantId(), username)) {
+            cart = getCartByProductVariantIdAndUsername(request.getProductVariantId(), username);
+            return updateCart(cart.getCartId(), request.getQuantity(), username);
         }
-        Cart cart = createCartByCartRequest(request);
+        ProductVariant productVariant = productVariantService.checkAndProductVariantAvailableWithQuantity(
+                request.getProductVariantId(),
+                request.getQuantity());
+        Customer customer = customerService.getCustomerByUsername(username);
+        cart = createCartByCartRequest(request, productVariant, customer);
         try {
             cartRepository.save(cart);
 
-            return CartResponse.cartResponse(request.getUsername(), cart,
-                    "Thêm sản phẩm vào giỏ hàng thành công.", "Success");
+            return CartResponse.cartResponse(cart, "Thêm sản phẩm vào giỏ hàng thành công.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Thêm sản phẩm vào giỏ hàng thất bại.");
         }
@@ -54,40 +59,36 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     @Transactional
-    public CartResponse updateCart(CartRequest request) {
-        Cart cart = getCartByProductVariantIdAndUsername(request.getProductVariantId(), request.getUsername());
-
-        if (request.getQuantity() <= 0) {
-            return deleteCart(cart.getCartId(), request.getUsername());
+    public CartResponse updateCart(UUID cartId, int quantity, String username) {
+        checkCartIdExists(cartId);
+        Cart cart = getCartByCartIdAndUsername(cartId, username);
+        int quantityUpdate = quantity + cart.getQuantity();
+        if (quantityUpdate <= 0) {
+            return deleteCartById(cartId, username);
         }
-        productVariantService.checkAndProductVariantAvailableWithQuantity(request.getProductVariantId(), request.getQuantity());
-
-        cart.setQuantity(request.getQuantity());
+        productVariantService.checkAndProductVariantAvailableWithQuantity(
+                cart.getProductVariant().getProductVariantId(), quantityUpdate);
+        cart.setQuantity(quantityUpdate);
         cart.setUpdateAt(LocalDateTime.now());
-
         try {
             cartRepository.save(cart);
 
-            return CartResponse.cartResponse(request.getUsername(), cart,
-                    "Cập nhật giỏ hàng thành công.", "Success");
+            return CartResponse.cartResponse(cart, "Cập nhật giỏ hàng thành công.", "Success");
         } catch (Exception e) {
-            throw new InternalServerErrorException("Cập nhật giỏ hàng thất bại." + e.getMessage());
+            throw new InternalServerErrorException("Cập nhật giỏ hàng thất bại!" + e.getMessage());
         }
     }
 
 
     @Override
     @Transactional
-    public CartResponse deleteCart(UUID cartId, String username) {
+    public CartResponse deleteCartById(UUID cartId, String username) {
+        checkCartIdExists(cartId);
         checkExistsCartIdAndUsername(cartId, username);
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng."));
-
         try {
-            cartRepository.delete(cart);
+            cartRepository.deleteById(cartId);
 
-            return CartResponse.cartResponse(username, null,
-                    "Xóa sản phẩm khỏi giỏ hàng thành công.", "Success");
+            return CartResponse.cartResponseDelete("Xóa sản phẩm khỏi giỏ hàng thành công.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Xóa sản phẩm khỏi giỏ hàng thất bại.");
         }
@@ -98,7 +99,7 @@ public class CartServiceImpl implements ICartService {
     public ListCartResponse getListCartByUsername(String username) {
         List<Cart> carts = getCartsByUsernameAndStatus(username);
 
-        return ListCartResponse.listCartResponse(username, carts, "Lấy danh sách giỏ hàng thành công.", "OK");
+        return ListCartResponse.listCartResponse(carts, "Lấy danh sách giỏ hàng thành công.", "OK");
     }
 
 
@@ -106,7 +107,7 @@ public class CartServiceImpl implements ICartService {
     public ListCartResponse getListCartByUsernameAndListCartId(String username, List<UUID> cartIds) {
         List<Cart> carts = getListCartByUsernameAndIds(username, cartIds);
 
-        return ListCartResponse.listCartResponse(username, carts, "Lấy danh sách giỏ hàng theo danh sách mã giỏ hàng thành công.", "OK");
+        return ListCartResponse.listCartResponse(carts, "Lấy danh sách giỏ hàng theo danh sách mã giỏ hàng thành công.", "OK");
     }
 
 
@@ -119,10 +120,10 @@ public class CartServiceImpl implements ICartService {
 
 
     @Override
-    public Cart getCartByUserNameAndId(String username, UUID cartId) {
+    public Cart getCartByCartIdAndUsername(UUID cartId, String username) {
 
-        return cartRepository.findByCustomerUsernameAndCartId(username, cartId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng."));
+        return cartRepository.findByCartIdAndCustomerUsername(cartId, username)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy mã giỏ hàng trong tài khoản của bạn."));
     }
 
 
@@ -136,10 +137,7 @@ public class CartServiceImpl implements ICartService {
         try {
             cartRepository.deleteAll(carts);
 
-            List<Cart> cartsUpdate = getCartsByUsernameAndStatus(username);
-            String message = "Xóa giỏ hàng theo cửa hàng thành công.";
-
-            return ListCartResponse.listCartResponse(username, cartsUpdate, message, "Success");
+            return ListCartResponse.listCartResponse("Xóa giỏ hàng theo cửa hàng thành công.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Xóa giỏ hàng thất bại.");
         }
@@ -197,13 +195,7 @@ public class CartServiceImpl implements ICartService {
     }
 
 
-    private Cart createCartByCartRequest(CartRequest request) {
-
-        Customer customer = customerService.getCustomerByUsername(request.getUsername());
-        ProductVariant productVariant = productVariantService
-                .checkAndProductVariantAvailableWithQuantity(request.getProductVariantId(),
-                        request.getQuantity());
-
+    private Cart createCartByCartRequest(CartRequest request, ProductVariant productVariant, Customer customer) {
         Cart cart = new Cart();
         cart.setCustomer(customer);
         cart.setProductVariant(productVariant);

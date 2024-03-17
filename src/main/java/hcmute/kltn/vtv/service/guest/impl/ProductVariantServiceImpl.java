@@ -33,9 +33,8 @@ public class ProductVariantServiceImpl implements IProductVariantService {
                 .findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy biến thể sản phẩm!"));
 
-        if (productVariant.getStatus() == Status.DELETED ||
-                productVariant.getProduct().getStatus() == Status.DELETED) {
-            throw new BadRequestException("Sản phẩm đã bị xóa. " + productVariant.getProduct().getProductId());
+        if (!productVariant.getStatus().equals(Status.ACTIVE)) {
+            throw new BadRequestException("Sản phẩm không khả dụng.");
         }
 
         if (productVariant.getQuantity() <= 0) {

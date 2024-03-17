@@ -11,7 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 public class CartRequest {
 
-    private String username;
 
     private Long productVariantId;
 
@@ -23,9 +22,7 @@ public class CartRequest {
             throw new BadRequestException("Mã biến thể cửa sản phẩm không được để trống.");
         }
 
-        if (username == null || username.isEmpty()) {
-            throw new BadRequestException("Tên đăng nhập không được để trống.");
-        }
+
 
         if (quantity <= 0) {
             throw new BadRequestException("Số lượng sản phẩm không hợp lệ.");
@@ -36,10 +33,6 @@ public class CartRequest {
 
         if (productVariantId == null) {
             throw new BadRequestException("Mã biến thể cửa sản phẩm không được để trống.");
-        }
-
-        if (username == null || username.isEmpty()) {
-            throw new BadRequestException("Tên đăng nhập không được để trống.");
         }
     }
 

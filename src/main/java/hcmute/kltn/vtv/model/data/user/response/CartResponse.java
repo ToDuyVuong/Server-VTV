@@ -12,17 +12,22 @@ import lombok.*;
 @AllArgsConstructor
 public class CartResponse extends ResponseAbstract {
 
-    private String username;
-
     private CartDTO cartDTO;
 
 
-    public static CartResponse cartResponse(String username, Cart cart, String message, String status) {
+    public static CartResponse cartResponse(Cart cart, String message, String status) {
         CartResponse cartResponse = new CartResponse();
-        cartResponse.setUsername(username);
-        if (cart != null) {
-            cartResponse.setCartDTO(CartDTO.convertEntityToDTO(cart));
-        }
+        cartResponse.setCartDTO(cart != null ? CartDTO.convertEntityToDTO(cart) : null);
+        cartResponse.setMessage(message);
+        cartResponse.setStatus(status);
+        cartResponse.setCode(200);
+
+        return cartResponse;
+    }
+
+
+    public static CartResponse cartResponseDelete(String message, String status) {
+        CartResponse cartResponse = new CartResponse();
         cartResponse.setMessage(message);
         cartResponse.setStatus(status);
         cartResponse.setCode(200);

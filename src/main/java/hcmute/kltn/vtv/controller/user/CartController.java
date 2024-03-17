@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.controller.user;
 
+import hcmute.kltn.vtv.model.data.guest.ResponseClass;
 import hcmute.kltn.vtv.model.data.user.request.CartRequest;
 import hcmute.kltn.vtv.model.data.user.response.CartResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListCartResponse;
@@ -25,26 +26,29 @@ public class CartController {
     @PostMapping("/add")
     public ResponseEntity<CartResponse> addNewCart(@RequestBody CartRequest cartRequest, HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
-        cartRequest.setUsername(username);
         cartRequest.validate();
 
-        return ResponseEntity.ok(cartService.addNewCart(cartRequest));
+        return ResponseEntity.ok(cartService.addNewCart(cartRequest, username));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<CartResponse> updateCart(@RequestBody CartRequest cartRequest, HttpServletRequest request) {
+    @PutMapping("/update/{cartId}")
+    public ResponseEntity<CartResponse> updateCart(@PathVariable UUID cartId,
+                                                   @RequestParam int quantity,
+                                                   HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
-        cartRequest.setUsername(username);
-        cartRequest.validateUpdate();
 
-        return ResponseEntity.ok(cartService.updateCart(cartRequest));
+        if (quantity == 0) {
+            throw new NotFoundException("Số lượng sản phẩm không hợp lệ! Cần tăng hoặc giảm số lượng sản phẩm.");
+        }
+
+        return ResponseEntity.ok(cartService.updateCart(cartId, quantity, username));
     }
 
     @DeleteMapping("/delete/{cartId}")
     public ResponseEntity<CartResponse> deleteCart(@PathVariable UUID cartId, HttpServletRequest request) {
 
         String username = (String) request.getAttribute("username");
-        return ResponseEntity.ok(cartService.deleteCart(cartId, username));
+        return ResponseEntity.ok(cartService.deleteCartById(cartId, username));
     }
 
     @GetMapping("/get-list")

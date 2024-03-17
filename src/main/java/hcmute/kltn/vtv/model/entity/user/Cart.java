@@ -23,14 +23,14 @@ public class Cart {
 
     private int quantity;
 
+    @Enumerated(EnumType.STRING)
+    private CartStatus status;
+
     private LocalDateTime createAt;
 
     private LocalDateTime updateAt;
 
-    @Enumerated(EnumType.STRING)
-    private CartStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
