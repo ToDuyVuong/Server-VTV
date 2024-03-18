@@ -39,7 +39,8 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     @Transactional
     public AddressResponse addNewAddress(AddressRequest request) {
-        Ward ward = checkWardCodeMatchWithFullLocation(request);
+        Ward ward = wardService.checkWardCodeMatchWithFullLocation(
+                request.getProvinceName(), request.getDistrictName(), request.getWardName(), request.getWardCode());
         Customer customer = customerService.getCustomerByUsername(request.getUsername());
         Address address = createAddressByAddressRequest(request, ward, customer);
 
@@ -65,7 +66,8 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     @Transactional
     public AddressResponse updateAddress(AddressRequest request) {
-        Ward ward = checkWardCodeMatchWithFullLocation(request);
+        Ward ward = wardService.checkWardCodeMatchWithFullLocation(request.getProvinceName(), request.getDistrictName(),
+                request.getWardName(), request.getWardCode());
         Customer customer = customerService.getCustomerByUsername(request.getUsername());
         Address address = checkAddress(request.getAddressId(), request.getUsername());
         updateAddressByAddressRequest(address, ward, request);
@@ -135,23 +137,6 @@ public class AddressServiceImpl implements IAddressService {
         }
 
         return address;
-    }
-
-
-    private Ward checkWardCodeMatchWithFullLocation(AddressRequest request) {
-        wardService.checkWardCodeExist(request.getWardCode());
-        Ward ward = wardService.getWardByWardCode(request.getWardCode());
-        if (!ward.getName().equals(request.getWardName())) {
-            throw new BadRequestException("Mã xã/phường không khớp với tên xã/phường.");
-        }
-        if (!ward.getDistrict().getName().equals(request.getDistrictName())) {
-            throw new BadRequestException("Tên quận/huyện không khớp với tên quận/huyện thuộc mã xã/phường.");
-        }
-        if (!ward.getDistrict().getProvince().getName().equals(request.getProvinceName())) {
-            throw new BadRequestException("Tên tỉnh/thành phố không khớp với tên tỉnh/thành phố thuộc mã quận/huyện.");
-        }
-
-        return ward;
     }
 
 

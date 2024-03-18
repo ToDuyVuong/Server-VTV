@@ -22,6 +22,18 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     boolean existsByName(String name);
 
+    boolean existsByNameAndCustomerUsernameNot(String name, String username);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndCustomerUsernameNot(String email, String username);
+
+    boolean existsByPhone(String phone);
+
+    boolean existsByPhoneAndCustomerUsernameNot(String phone, String username);
+
+    boolean existsByCustomerUsername(String username);
+
     int countAllByStatus(Status status);
 
     Optional<Page<Shop>> findAllByStatus(Status status, Pageable pageable);

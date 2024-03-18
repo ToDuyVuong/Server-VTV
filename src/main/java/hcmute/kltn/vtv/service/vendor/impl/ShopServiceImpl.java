@@ -1,10 +1,11 @@
 package hcmute.kltn.vtv.service.vendor.impl;
 
+import hcmute.kltn.vtv.model.entity.location.Ward;
+import hcmute.kltn.vtv.service.location.IWardService;
+import hcmute.kltn.vtv.service.vtv.IImageService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
-import hcmute.kltn.vtv.model.data.vendor.request.RegisterShopRequest;
-import hcmute.kltn.vtv.model.data.vendor.request.UpdateShopRequest;
+import hcmute.kltn.vtv.model.data.vendor.request.ShopRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.ShopResponse;
-import hcmute.kltn.vtv.model.dto.user.CustomerDTO;
 import hcmute.kltn.vtv.model.dto.vtv.ShopDTO;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.vtv.Shop;
@@ -14,6 +15,7 @@ import hcmute.kltn.vtv.repository.user.CustomerRepository;
 import hcmute.kltn.vtv.repository.vtv.ShopRepository;
 import hcmute.kltn.vtv.service.user.impl.CustomerServiceImpl;
 import hcmute.kltn.vtv.service.vendor.IShopService;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,116 +33,55 @@ public class ShopServiceImpl implements IShopService {
     private CustomerRepository customerRepository;
     @Autowired
     private CustomerServiceImpl customerService;
-    // @Autowired
-    // ModelMapper modelMapper;
+    @Autowired
+    private final IImageService imageService;
+    @Autowired
+    private final IWardService wardService;
 
     @Override
     @Transactional
-    public ShopResponse registerShop(RegisterShopRequest request) {
+    public ShopResponse registerShop(ShopRequest request, String username) {
 
-        Customer customer = customerService.getCustomerByUsername(request.getUsername());
-        checkEmailAndPhoneAndUsername(request.getEmail(), request.getPhone(), request.getUsername());
-
-        if (shopRepository.existsByName(request.getName())) {
-            throw new BadRequestException("Tên cửa hàng đã được sử dụng!");
-        }
-
-        // Shop shop = modelMapper.map(request, Shop.class);
-        Shop shop = new Shop();
-        shop.setName(request.getName());
-        shop.setAvatar(request.getAvatar());
-        shop.setAddress(request.getAddress());
-        shop.setProvince(request.getProvince());
-        shop.setDistrict(request.getDistrict());
-        shop.setWard(request.getWard());
-        shop.setPhone(request.getPhone());
-        shop.setEmail(request.getEmail());
-        shop.setOpenTime(request.getOpenTime());
-        shop.setCloseTime(request.getCloseTime());
-        shop.setDescription(request.getDescription());
-
-        shop.setCustomer(customer);
-        shop.setStatus(Status.ACTIVE);
-        shop.setCreateAt(LocalDateTime.now());
-        shop.setUpdateAt(LocalDateTime.now());
-
+        Customer customer = customerService.getCustomerByUsername(username);
+        checkExistShoppByUsernameAndNameAndEmailAndPhone(username, request.getName(), request.getEmail(), request.getPhone());
+        Ward ward = wardService.checkWardCodeMatchWithFullLocation(
+                request.getProvinceName(), request.getDistrictName(), request.getWardName(), request.getWardCode());
+        Shop shop = createShopByShopRequest(request, customer, ward);
         try {
-            Shop save = shopRepository.save(shop);
-
-            // ShopDTO shopDTO = modelMapper.map(save, ShopDTO.class);
-            // customer = addRoleVendor(customer);
-
-            // shopDTO.setCustomerDTO(modelMapper.map(customer, CustomerDTO.class));
-
-            ShopDTO shopDTO = ShopDTO.convertEntityToDTO(save);
+            shopRepository.save(shop);
             addRoleVendor(customer);
-            ShopResponse shopResponse = new ShopResponse();
-            shopResponse.setShopDTO(shopDTO);
-            shopResponse.setCustomerDTO(CustomerDTO.convertEntityToDTO(customer));
-            shopResponse.setCode(200);
-            shopResponse.setMessage("Đăng ký cửa hàng thành công.");
-            shopResponse.setStatus("success");
-            return shopResponse;
 
+            return ShopResponse.shopResponse(shop, "Đăng ký cửa hàng thành công.", "Success");
         } catch (Exception e) {
-            throw new BadRequestException("Đăng ký cửa hàng thất bại!");
+            imageService.deleteImageInFirebase(shop.getAvatar());
+            throw new InternalServerErrorException("Đăng ký cửa hàng thất bại!");
         }
-
     }
 
     @Override
     public ShopResponse getProfileShop(String username) {
-        // Customer customer = customerService.getCustomerByUsername(username);
         Shop shop = getShopByUsername(username);
 
-        // ShopDTO shopDTO = modelMapper.map(shop, ShopDTO.class);
-        // shopDTO.setCustomerDTO(modelMapper.map(customer, CustomerDTO.class));
-        ShopDTO shopDTO = ShopDTO.convertEntityToDTO(shop);
-
-        ShopResponse shopResponse = new ShopResponse();
-        shopResponse.setShopDTO(shopDTO);
-        shopResponse.setCode(200);
-        shopResponse.setMessage("Lấy thông tin cửa hàng thành công.");
-        shopResponse.setStatus("ok");
-
-        return shopResponse;
-
+        return ShopResponse.shopResponse(shop, "Lấy thông tin cửa hàng thành công.", "OK");
     }
 
     @Override
     @Transactional
-    public ShopResponse updateShop(UpdateShopRequest request) {
-        checkEmailAndPhoneAndUsernameInShop(request.getEmail(), request.getPhone(), request.getUsername());
+    public ShopResponse updateShop(ShopRequest request, String username) {
+        checkExistInShopByUsernameAndNameAndEmailAndPhone(
+                username, request.getName(), request.getEmail(), request.getPhone());
+        Shop shop = getShopByUsername(username);
+        String oldAvatar = shop.getAvatar();
 
-        Shop shop = shopRepository.findByCustomer_Username(request.getUsername());
-        shop.setName(request.getName());
-        shop.setAddress(request.getAddress());
-        shop.setProvince(request.getProvince());
-        shop.setDistrict(request.getDistrict());
-        shop.setWard(request.getWard());
-        shop.setPhone(request.getPhone());
-        shop.setEmail(request.getEmail());
-        shop.setOpenTime(request.getOpenTime());
-        shop.setCloseTime(request.getCloseTime());
-        shop.setDescription(request.getDescription());
-        shop.setUpdateAt(LocalDateTime.now());
-
+        Ward ward = wardService.checkWardCodeMatchWithFullLocation(request.getProvinceName(),
+                request.getDistrictName(), request.getWardName(), request.getWardCode());
+        updateShopByShopRequest(shop, request, ward);
         try {
             shopRepository.save(shop);
-
-            // Customer customer =
-            // customerService.getCustomerByUsername(request.getUsername());
-            // ShopDTO shopDTO = modelMapper.map(shop, ShopDTO.class);
-            // shopDTO.setCustomerDTO(modelMapper.map(customer, CustomerDTO.class));
-
-            ShopDTO shopDTO = ShopDTO.convertEntityToDTO(shop);
-
-            ShopResponse shopResponse = new ShopResponse();
-            shopResponse.setShopDTO(shopDTO);
-            shopResponse.setCode(200);
-            shopResponse.setMessage("Cập nhật cửa hàng thành công.");
-            shopResponse.setStatus("ok");
-            return shopResponse;
+            if (request.isChangeAvatar()){
+                imageService.deleteImageInFirebase(oldAvatar);
+            }
+            return ShopResponse.shopResponse(shop, "Cập nhật cửa hàng thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật cửa hàng thất bại!");
         }
@@ -150,24 +91,15 @@ public class ShopServiceImpl implements IShopService {
     @Transactional
     public ShopResponse updateStatusShop(String username, Status status) {
         Shop shop = getShopByUsername(username);
+        if (shop.getStatus().equals(Status.DELETED) || status.equals(Status.LOCKED)) {
+            throw new BadRequestException("Cửa hàng đã bị xóa hoặc khóa không thể cập nhật trạng thái!");
+        }
         shop.setStatus(status);
         shop.setUpdateAt(LocalDateTime.now());
-
         try {
             shopRepository.save(shop);
 
-            // Customer customer = customerService.getCustomerByUsername(username);
-            // ShopDTO shopDTO = modelMapper.map(shop, ShopDTO.class);
-            // shopDTO.setCustomerDTO(modelMapper.map(customer, CustomerDTO.class));
-
-            ShopDTO shopDTO = ShopDTO.convertEntityToDTO(shop);
-
-            ShopResponse shopResponse = new ShopResponse();
-            shopResponse.setShopDTO(shopDTO);
-            shopResponse.setCode(200);
-            shopResponse.setMessage("Cập nhật trạng thái cửa hàng thành công.");
-            shopResponse.setStatus("ok");
-            return shopResponse;
+            return ShopResponse.shopResponse(shop, "Cập nhật trạng thái cửa hàng thành công.", "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật trạng thái cửa hàng thất bại!");
         }
@@ -180,57 +112,94 @@ public class ShopServiceImpl implements IShopService {
     }
 
 
+    private Shop createShopByShopRequest(ShopRequest request, Customer customer, Ward ward) {
+        Shop shop = new Shop();
+        shop.setName(request.getName());
+        shop.setAddress(request.getAddress());
+        shop.setWardName(request.getWardName());
+        shop.setProvinceName(request.getProvinceName());
+        shop.setAvatar(imageService.uploadImageToFirebase(request.getAvatar()));
+        shop.setWardName(request.getWardName());
+        shop.setPhone(request.getPhone());
+        shop.setEmail(request.getEmail());
+        shop.setOpenTime(request.getOpenTime());
+        shop.setCloseTime(request.getCloseTime());
+        shop.setDescription(request.getDescription());
+        shop.setCustomer(customer);
+        shop.setWard(ward);
+        shop.setStatus(Status.ACTIVE);
+        shop.setCreateAt(LocalDateTime.now());
+        shop.setUpdateAt(LocalDateTime.now());
 
-
-    private void checkEmailAndPhoneAndUsernameInShop(String email, String phone, String username) {
-        Shop shop = shopRepository.findByCustomer_Username(username);
-
-        if (shop == null) {
-            throw new BadRequestException("Tài khoản chưa đăng ký cửa hàng!");
-        } else {
-            // Check if email is used by a shop other than the current shop
-            Shop shopByEmail = shopRepository.findByEmail(email);
-            if (shopByEmail != null && !shopByEmail.getEmail().equals(shop.getEmail())) {
-                throw new BadRequestException("Email đã được sử dụng ở một cửa hàng khác!");
-            }
-
-            // Check if phone is used by a shop other than the current shop
-            Shop shopByPhone = shopRepository.findByPhone(phone);
-            if (shopByPhone != null && !shopByPhone.getPhone().equals(shop.getPhone())) {
-                throw new BadRequestException("Số điện thoại đã được sử dụng ở một cửa hàng khác!");
-            }
-        }
+        return shop;
     }
 
-    private Customer addRoleVendor(Customer customer) {
+    private void updateShopByShopRequest(Shop shop, ShopRequest request, Ward ward) {
+        shop.setName(request.getName());
+        shop.setAvatar(request.isChangeAvatar() ? imageService.uploadImageToFirebase(request.getAvatar()) : shop.getAvatar());
+        shop.setAddress(request.getAddress());
+        shop.setWardName(request.getWardName());
+        shop.setProvinceName(request.getProvinceName());
+        shop.setWardName(request.getWardName());
+        shop.setPhone(request.getPhone());
+        shop.setEmail(request.getEmail());
+        shop.setOpenTime(request.getOpenTime());
+        shop.setCloseTime(request.getCloseTime());
+        shop.setDescription(request.getDescription());
+        shop.setWard(ward);
+        shop.setUpdateAt(LocalDateTime.now());
+    }
+
+
+    private void checkExistShoppByUsernameAndNameAndEmailAndPhone(String username, String name, String email, String phone) {
+        if (shopRepository.existsByName(name)) {
+            throw new BadRequestException("Tên cửa hàng đã được sử dụng!");
+        }
+
+        if (shopRepository.existsByCustomerUsername(username)) {
+            throw new BadRequestException("Tài khoản đã đăng ký cửa hàng!");
+        }
+
+        if (shopRepository.existsByEmail(email)) {
+            throw new BadRequestException("Email đã được sử dụng!");
+        }
+
+        if (shopRepository.existsByPhone(phone)) {
+            throw new BadRequestException("Số điện thoại đã được sử dụng!");
+        }
+
+    }
+
+
+    private void checkExistInShopByUsernameAndNameAndEmailAndPhone(String username, String name, String email, String phone) {
+        if (!shopRepository.existsByCustomerUsername(username)) {
+            throw new BadRequestException("Tài khoản chưa đăng ký cửa hàng!");
+        }
+
+        if (shopRepository.existsByNameAndCustomerUsernameNot(name, username)) {
+            throw new BadRequestException("Tên cửa hàng mới đã được sử dụng!");
+        }
+
+        if (shopRepository.existsByEmailAndCustomerUsernameNot(email, username)) {
+            throw new BadRequestException("Email mới đã được sử dụng!");
+        }
+
+        if (shopRepository.existsByPhoneAndCustomerUsernameNot(phone, username)) {
+            throw new BadRequestException("Số điện thoại mới đã được sử dụng!");
+        }
+
+    }
+
+
+    private void addRoleVendor(Customer customer) {
         customer.addRole(Role.VENDOR);
         try {
-            return customerRepository.save(customer);
+            customerRepository.save(customer);
         } catch (Exception e) {
-            throw new BadRequestException("Cập nhật quyền cho tài khoản thất bại!");
+            throw new InternalServerErrorException("Cập nhật quyền cho tài khoản thất bại!");
         }
 
     }
 
-    private void checkEmailAndPhoneAndUsername(String email, String phone, String username) {
-        // Check if the email is already used by a shop
-        Shop shop = shopRepository.findByEmail(email);
-        if (shop != null) {
-            throw new BadRequestException("Email đã được sử dụng ở một cửa hàng khác!");
-        }
-
-        // Check if the phone is already used by a shop
-        shop = shopRepository.findByPhone(phone);
-        if (shop != null) {
-            throw new BadRequestException("Số điện thoại đã được sử dụng ở một cửa hàng khác!");
-        }
-
-        // Check if the username is already used by a customer
-        shop = shopRepository.findByCustomer_Username(username);
-        if (shop != null) {
-            throw new BadRequestException("Tài khoản đã được sử dụng ở một cửa hàng khác!");
-        }
-
-    }
 
 }

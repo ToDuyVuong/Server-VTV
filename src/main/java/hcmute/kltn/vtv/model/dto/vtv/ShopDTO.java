@@ -22,11 +22,11 @@ public class ShopDTO {
 
     private String address;
 
-    private String province;
+    private String provinceName;
 
-    private String district;
+    private String districtName;
 
-    private String ward;
+    private String wardName;
 
     private String phone;
 
@@ -47,16 +47,15 @@ public class ShopDTO {
     private String wardCode;
 
 
-    // private CustomerDTO customerDTO;
 
     public static ShopDTO convertEntityToDTO(Shop shop) {
         ShopDTO shopDTO = new ShopDTO();
         shopDTO.setShopId(shop.getShopId());
         shopDTO.setName(shop.getName());
         shopDTO.setAddress(shop.getAddress());
-        shopDTO.setProvince(shop.getProvince());
-        shopDTO.setDistrict(shop.getDistrict());
-        shopDTO.setWard(shop.getWard());
+        shopDTO.setProvinceName(shop.getWard().getDistrict().getProvince().getName());
+        shopDTO.setDistrictName(shop.getWard().getDistrict().getName());
+        shopDTO.setWardName(shop.getWard().getName());
         shopDTO.setPhone(shop.getPhone());
         shopDTO.setEmail(shop.getEmail());
         shopDTO.setAvatar(shop.getAvatar());
@@ -65,9 +64,8 @@ public class ShopDTO {
         shopDTO.setCloseTime(shop.getCloseTime());
         shopDTO.setStatus(shop.getStatus());
         shopDTO.setCustomerId(shop.getCustomer().getCustomerId());
-        shopDTO.setWardCode(shop.getWardCode().getWardCode());
+        shopDTO.setWardCode(shop.getWard().getWardCode());
 
-        // shopDTO.setCustomerDTO(CustomerDTO.convertEntityToDTO(shop.getCustomer()));
         return shopDTO;
     }
 

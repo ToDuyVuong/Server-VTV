@@ -25,11 +25,11 @@ public class Shop {
 
     private String address;
 
-    private String province;
+    private String provinceName;
 
-    private String district;
+    private String districtName;
 
-    private String ward;
+    private String wardName;
 
     private String phone;
 
@@ -56,6 +56,6 @@ public class Shop {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ward_code")
-    private Ward wardCode;
+    private Ward ward;
 
 }

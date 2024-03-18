@@ -5,38 +5,40 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.regex.Pattern;
 
 @Data
 @ToString
 @RequiredArgsConstructor
-public class RegisterShopRequest {
+public class ShopRequest {
+
     private String name;
 
     private String address;
 
-    private String province;
+    private String provinceName;
 
-    private String district;
+    private String districtName;
 
-    private String ward;
+    private String wardName;
 
-    private String codeWard;
+    private String wardCode;
 
     private String phone;
 
     private String email;
 
-    private String avatar;
+    private MultipartFile avatar;
+
+    private boolean changeAvatar;
 
     private String description;
 
     private String openTime;
 
     private String closeTime;
-
-    private String username;
 
     public void validate() {
         if (this.name == null || this.name.isEmpty()) {
@@ -47,19 +49,19 @@ public class RegisterShopRequest {
             throw new BadRequestException("Địa chỉ cửa hàng không được để trống!");
         }
 
-        if (this.province == null || this.province.isEmpty()) {
+        if (this.provinceName == null || this.provinceName.isEmpty()) {
             throw new BadRequestException("Tỉnh/Thành phố không được để trống!");
         }
 
-        if (this.district == null || this.district.isEmpty()) {
+        if (this.districtName == null || this.districtName.isEmpty()) {
             throw new BadRequestException("Quận/Huyện không được để trống!");
         }
 
-        if (this.ward == null || this.ward.isEmpty()) {
+        if (this.wardName == null || this.wardName.isEmpty()) {
             throw new BadRequestException("Phường/Xã không được để trống!");
         }
 
-        if (this.codeWard == null || this.codeWard.isEmpty()) {
+        if (this.wardCode == null || this.wardCode.isEmpty()) {
             throw new BadRequestException("Mã phường/Xã không được để trống!");
         }
 
@@ -103,7 +105,20 @@ public class RegisterShopRequest {
             throw new BadRequestException("Số điện thoại không hợp lệ.");
         }
 
+        if (this.changeAvatar && (this.avatar == null || this.avatar.isEmpty())) {
+            throw new BadRequestException("Không thể thay đổi ảnh đại diện khi không có ảnh mới!");
+        }
+
+        if (this.changeAvatar && !isImage(this.avatar)) {
+            throw new BadRequestException("Ảnh đại diện không hợp lệ! Vui lòng chọn ảnh khác!");
+        }
+
         trim();
+    }
+
+
+    private boolean isImage(MultipartFile file) {
+        return file != null && file.getContentType() != null && file.getContentType().startsWith("image");
     }
 
     public void trim() {
@@ -111,15 +126,13 @@ public class RegisterShopRequest {
         this.address = this.address.trim();
         this.phone = this.phone.trim();
         this.email = this.email.trim();
-        this.avatar = this.avatar.trim();
         this.description = this.description.trim();
         this.openTime = this.openTime.trim();
         this.closeTime = this.closeTime.trim();
-        this.username = this.username.trim();
-        this.province = this.province.trim();
-        this.district = this.district.trim();
-        this.ward = this.ward.trim();
-        this.codeWard = this.codeWard.trim();
+        this.provinceName = this.provinceName.trim();
+        this.districtName = this.districtName.trim();
+        this.wardName = this.wardName.trim();
+        this.wardCode = this.wardCode.trim();
     }
 
 }

@@ -11,6 +11,8 @@ public interface IWardService {
 
     Ward getWardByWardCode(String wardCode);
 
+    Ward checkWardCodeMatchWithFullLocation(String provinceName, String districtName, String wardName, String wardCode);
+
     ListWardResponse getAllWardByDistrictCode(String districtCode);
 
 
