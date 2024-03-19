@@ -10,6 +10,9 @@ public interface IVoucherOrderService {
     VoucherOrder saveVoucherOrder(Long voucherId, Order order, boolean isShop);
 
     @Transactional
+    VoucherOrder addNewVoucherOrderByCode(String code, Order order, Long shopId);
+
+    @Transactional
     VoucherOrder cancelVoucherOrder(Long voucherOrderId);
 
     /*
@@ -17,5 +20,8 @@ public interface IVoucherOrderService {
      * VoucherOrder cancelVoucherOrder(Long voucherOrderId, boolean isShop);
      */
 
+
     int calculateVoucher(Long voucherId, Long shopId, Long totalPrice, boolean isShop);
+
+    VoucherOrder createVoucherOrder(String voucherCode, Long shopId);
 }

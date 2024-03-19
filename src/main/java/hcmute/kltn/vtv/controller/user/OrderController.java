@@ -33,8 +33,7 @@ public class OrderController {
 
     @Autowired
     private OrderItemServiceImpl orderItemService;
-    @Autowired
-    private OrderItemServiceImpl orderItemServiceImpl;
+
 
     @PostMapping("/create/by-cartIds")
     public ResponseEntity<OrderResponse> createOrderByCartIds(@RequestBody List<UUID> cartIds,
@@ -54,6 +53,16 @@ public class OrderController {
 
         String username = (String) request.getAttribute("username");
         return ResponseEntity.ok(orderService.createOrderByOrderRequestWithCartIds(orderRequestWithCartIds, username));
+    }
+
+
+    @PostMapping("/add/with-cart")
+    public ResponseEntity<OrderResponse> addNewOrderByOrderRequestWithCart(@RequestBody OrderRequestWithCartIds orderRequestWithCartIds,
+                                                             HttpServletRequest request) {
+        OrderRequestWithCartIds.validate(orderRequestWithCartIds);
+
+        String username = (String) request.getAttribute("username");
+        return ResponseEntity.ok(orderService.addNewOrderByOrderRequestWithCart(orderRequestWithCartIds, username));
     }
 
 
@@ -87,27 +96,9 @@ public class OrderController {
     }
 
 
-    @GetMapping("/create-update")
-    public ResponseEntity<OrderResponse> createOrderUpdate(CreateOrderUpdateRequest request,
-                                                           HttpServletRequest requestHttp) {
 
-        String username = (String) requestHttp.getAttribute("username");
-        request.setUsername(username);
-        // System.out.println(request);
-        request.validate();
-        return ResponseEntity.ok(orderService.createOrderUpdate(request));
 
-    }
 
-    @PostMapping("/save")
-    public ResponseEntity<OrderResponse> saveOrder(@RequestBody CreateOrderUpdateRequest request,
-                                                   HttpServletRequest requestHttp) {
-
-        String username = (String) requestHttp.getAttribute("username");
-        request.setUsername(username);
-        request.validate();
-        return ResponseEntity.ok(orderService.saveOrder(request));
-    }
 
     @GetMapping("/list")
     public ResponseEntity<ListOrderResponse> getOrders(HttpServletRequest requestHttp) {

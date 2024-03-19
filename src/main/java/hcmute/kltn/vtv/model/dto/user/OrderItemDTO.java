@@ -23,11 +23,12 @@ public class OrderItemDTO {
 
     private UUID cartId;
 
-    private ProductVariantDTO productVariantDTO;
-
     private int quantity;
 
     private Long price;
+
+    private ProductVariantDTO productVariantDTO;
+
 
     public static OrderItemDTO convertEntityToDTO(OrderItem orderItem) {
         ProductVariantDTO productVariantDTO = ProductVariantDTO

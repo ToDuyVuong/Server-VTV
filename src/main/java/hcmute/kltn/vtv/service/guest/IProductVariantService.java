@@ -2,6 +2,7 @@ package hcmute.kltn.vtv.service.guest;
 
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,4 +16,7 @@ public interface IProductVariantService {
     void checkDuplicateProductVariantIds(List<Long> productVariantIds);
 
     ProductVariant getProductVariantById(Long productVariantId);
+
+    @Transactional
+    void updateProductVariantQuantity(Long productVariantId, int quantity);
 }

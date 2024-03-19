@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.service.user.IVoucherCustomerService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.vendor.Voucher;
@@ -27,6 +28,8 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
     private final VoucherShopServiceImpl voucherShopService;
     @Autowired
     private final VoucherAdminServiceImpl voucherSystemService;
+    @Autowired
+    private final IVoucherCustomerService voucherCustomerService;
 
     @Transactional
     @Override
@@ -50,6 +53,31 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
             throw new BadRequestException("Thêm mới mã giảm giá thất bại!");
         }
     }
+
+
+    @Transactional
+    @Override
+    public VoucherOrder addNewVoucherOrderByCode(String code, Order order, Long shopId) {
+        Voucher voucher;
+        if (shopId != null) {
+            voucher = voucherCustomerService.getVoucherByShopVoucherCodeAndShopId(code, shopId);
+
+        } else {
+            voucher = voucherCustomerService.getVoucherBySystemVoucherCode(code);
+        }
+        VoucherOrder voucherOrder = new VoucherOrder();
+        voucherOrder.setType(shopId != null);
+        voucherOrder.setVoucher(voucher);
+        voucherOrder.setOrder(order);
+        try {
+            voucher.setQuantityUsed(voucher.getQuantityUsed() + 1);
+            voucherRepository.save(voucher);
+            return voucherOrderRepository.save(voucherOrder);
+        } catch (Exception e) {
+            throw new BadRequestException("Thêm mới mã giảm giá thất bại!");
+        }
+    }
+
 
     @Transactional
     @Override
@@ -87,6 +115,22 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
         }
 
         return voucher.getDiscount();
+    }
+
+
+
+    @Override
+    public VoucherOrder createVoucherOrder(String voucherCode, Long shopId) {
+        Voucher voucher;
+        if (shopId != null) {
+            voucher = voucherCustomerService.getVoucherByShopVoucherCodeAndShopId(voucherCode, shopId);
+        } else {
+            voucher = voucherCustomerService.getVoucherBySystemVoucherCode(voucherCode);
+        }
+        VoucherOrder voucherOrder = new VoucherOrder();
+        voucherOrder.setType(shopId != null);
+        voucherOrder.setVoucher(voucher);
+        return voucherOrder;
     }
 
 }

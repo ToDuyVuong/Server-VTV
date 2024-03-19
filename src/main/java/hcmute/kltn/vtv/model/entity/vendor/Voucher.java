@@ -46,6 +46,8 @@ public class Voucher {
 
     private LocalDateTime updateAt;
 
+
+    @Enumerated(EnumType.STRING)
     private VoucherType type;
 
     // @ManyToMany(cascade = CascadeType.ALL)

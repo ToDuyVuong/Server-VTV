@@ -67,7 +67,7 @@ public class VoucherCustomerServiceImpl implements IVoucherCustomerService {
     public Voucher getVoucherBySystemVoucherCode(String systemVoucherCode) {
         checkSystemVoucherCode(systemVoucherCode);
         Voucher voucher = voucherRepository.findByCode(systemVoucherCode)
-                .orElseThrow(() -> new BadRequestException("Mã giảm giá hệ thống không tồn tại!"));
+                .orElseThrow(() -> new BadRequestException("Không tìm thấy mã giảm giá hệ thống có mã: " + systemVoucherCode));
         checkExpiredVoucher(voucher.getStartDate(), voucher.getEndDate());
         checkVoucherUsage(voucher.getQuantityUsed(), voucher.getQuantity());
         checkVoucherAvailability(voucher.getStatus());

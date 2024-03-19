@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.model.data.user.response.ListCartResponse;
 import hcmute.kltn.vtv.model.entity.user.Cart;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
+import hcmute.kltn.vtv.model.extra.CartStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -40,4 +41,7 @@ public interface ICartService {
     void checkDuplicateCartIds(List<UUID> cartIds);
 
     void checkListCartSameShop(String username, List<UUID> cartIds);
+
+    @Transactional
+    Cart updateOrderCart(UUID cartId, String username, CartStatus status);
 }

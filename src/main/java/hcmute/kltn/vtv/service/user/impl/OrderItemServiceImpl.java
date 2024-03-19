@@ -78,6 +78,36 @@ public class OrderItemServiceImpl implements IOrderItemService {
         return orderItem;
     }
 
+
+    @Transactional
+    public OrderItem addNewOrderItem(Order order, UUID cartId, String username) {
+        OrderItem orderItem = new OrderItem();
+        Cart cart = cartService.getCartByCartIdAndUsername(cartId, username);
+        orderItem.setOrder(order);
+        orderItem.setCart(cart);
+        try {
+            productVariantService.updateProductVariantQuantity(cart.getProductVariant().getProductVariantId(), -cart.getQuantity());
+            cartService.updateOrderCart(cartId, username, CartStatus.ORDER);
+
+            return orderItemRepository.save(orderItem);
+        } catch (Exception e) {
+            throw new BadRequestException("Thêm mới sản phẩm vào đơn hàng thất bại!");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public List<OrderItem> addNewOrderItemsByCartIds(Order order, List<UUID> cartIds, String username) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (UUID cartId : cartIds) {
+            orderItems.add(addNewOrderItem(order, cartId, username));
+        }
+
+        return orderItems;
+    }
+
+
     @Override
     public List<OrderItem> createOrderItemsByCartIds(String username, List<UUID> cartIds) {
         List<OrderItem> orderItems = new ArrayList<>();

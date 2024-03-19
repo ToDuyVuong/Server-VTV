@@ -51,12 +51,11 @@ public class VoucherAdminRequest {
             throw new BadRequestException("Giá trị giảm giá không được nhỏ hơn 0%");
         }
         if (this.discount == 0) {
-            throw new BadRequestException("Giá trị giảm giá không được bằng 0%");
+            throw new BadRequestException("Giá trị giảm giá không được bằng 0");
         }
-        if (this.quantity < 0) {
-            throw new BadRequestException("Số lượng giảm giá không được nhỏ hơn 0");
+        if (this.quantity <= 0) {
+            throw new BadRequestException("Số lượng giảm giá không được nhỏ hơn hoặc bằng 0");
         }
-
         if (this.quantity > 1000) {
             throw new BadRequestException("Số lượng giảm giá không được lớn hơn 1000");
         }

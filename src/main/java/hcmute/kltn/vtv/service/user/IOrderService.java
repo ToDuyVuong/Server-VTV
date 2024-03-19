@@ -16,15 +16,19 @@ import java.util.UUID;
 public interface IOrderService {
 
 
-
+    @Transactional
     OrderResponse createOrderByCartIds(String username, List<UUID> cartIds);
-
+    @Transactional
     OrderResponse createOrderByMapProductVariantsAndQuantities(String username, Map<Long, Integer> productVariantIdsAndQuantities);
-
+    @Transactional
     OrderResponse createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username);
-
+    @Transactional
     OrderResponse createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username);
 
+    @Transactional
+    OrderResponse addNewOrderByOrderRequestWithCart(OrderRequestWithCartIds request, String username);
+
+    @Transactional
     OrderResponse createOrderUpdate(CreateOrderUpdateRequest request);
 
     @Transactional

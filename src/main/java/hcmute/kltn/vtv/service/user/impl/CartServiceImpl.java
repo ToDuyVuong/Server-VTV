@@ -196,6 +196,22 @@ public class CartServiceImpl implements ICartService {
     }
 
 
+    @Override
+    @Transactional
+    public Cart updateOrderCart(UUID cartId, String username, CartStatus status) {
+        checkCartIdExists(cartId);
+        Cart cart = getCartByCartIdAndUsername(cartId, username);
+        cart.setStatus(status);
+        cart.setUpdateAt(LocalDateTime.now());
+        try {
+            return cartRepository.save(cart);
+
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Cập nhật trạng thái đặt hàng cho giỏ hàng thất bại!");
+        }
+    }
+
+
     private void checkExistsCartIdAndUsername(UUID cartId, String username) {
         checkCartIdExists(cartId);
         if (!cartRepository.existsByCartIdAndCustomerUsername(cartId, username)) {

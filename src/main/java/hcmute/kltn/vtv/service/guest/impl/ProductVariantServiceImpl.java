@@ -9,6 +9,7 @@ import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -79,5 +80,19 @@ public class ProductVariantServiceImpl implements IProductVariantService {
     public ProductVariant getProductVariantById(Long productVariantId) {
         return productVariantRepository.findById(productVariantId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy biến thể sản phẩm!"));
+    }
+
+
+    @Override
+    @Transactional
+    public void updateProductVariantQuantity(Long productVariantId, int quantity) {
+        ProductVariant productVariant = getProductVariantById(productVariantId);
+        productVariant.setQuantity(productVariant.getQuantity() + quantity);
+
+        try {
+            productVariantRepository.save(productVariant);
+        } catch (Exception e) {
+            throw new BadRequestException("Cập nhật số lượng sản phẩm trong kho thất bại!");
+        }
     }
 }
