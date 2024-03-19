@@ -69,7 +69,7 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
     }
 
     @Override
-    public Long calculateVoucher(Long voucherId, Long shopId, Long totalPrice, boolean isShop) {
+    public int calculateVoucher(Long voucherId, Long shopId, Long totalPrice, boolean isShop) {
         Voucher voucher;
         if (isShop) {
             voucher = voucherShopService.checkVoucherShop(voucherId, shopId);
@@ -83,7 +83,7 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
 
         if (voucher.getType().equals(VoucherType.PERCENTAGE_SHOP)
                 || voucher.getType().equals(VoucherType.PERCENTAGE_SYSTEM)) {
-            return voucher.getDiscount() * totalPrice / 100;
+            return (int) (voucher.getDiscount() * totalPrice / 100);
         }
 
         return voucher.getDiscount();

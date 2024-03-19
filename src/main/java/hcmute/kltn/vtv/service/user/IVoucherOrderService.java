@@ -17,5 +17,5 @@ public interface IVoucherOrderService {
      * VoucherOrder cancelVoucherOrder(Long voucherOrderId, boolean isShop);
      */
 
-    Long calculateVoucher(Long voucherId, Long shopId, Long totalPrice, boolean isShop);
+    int calculateVoucher(Long voucherId, Long shopId, Long totalPrice, boolean isShop);
 }

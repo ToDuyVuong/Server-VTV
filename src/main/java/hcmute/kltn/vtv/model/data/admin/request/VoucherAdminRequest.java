@@ -24,9 +24,9 @@ public class VoucherAdminRequest {
 
     private String description;
 
-    private Long discount;
+    private int discount;
 
-    private Long quantity;
+    private int quantity;
 
     private Date startDate;
 
@@ -46,19 +46,17 @@ public class VoucherAdminRequest {
         if (this.description == null || this.description.isEmpty()) {
             throw new BadRequestException("Mô tả giảm giá không được để trống");
         }
-        if (this.discount == null) {
-            throw new BadRequestException("Giá trị giảm giá không được để trống");
-        }
+
         if (this.discount < 0) {
             throw new BadRequestException("Giá trị giảm giá không được nhỏ hơn 0%");
         }
         if (this.discount == 0) {
             throw new BadRequestException("Giá trị giảm giá không được bằng 0%");
         }
-
-        if (this.quantity == null) {
-            throw new BadRequestException("Số lượng giảm giá không được để trống");
+        if (this.quantity < 0) {
+            throw new BadRequestException("Số lượng giảm giá không được nhỏ hơn 0");
         }
+
         if (this.quantity > 1000) {
             throw new BadRequestException("Số lượng giảm giá không được lớn hơn 1000");
         }
@@ -116,7 +114,7 @@ public class VoucherAdminRequest {
         voucher.setEndDate(request.getEndDate());
         voucher.setCreateAt(LocalDateTime.now());
         voucher.setUpdateAt(LocalDateTime.now());
-        voucher.setQuantityUsed(0L);
+        voucher.setQuantityUsed(0);
         voucher.setStatus(Status.ACTIVE);
         voucher.setType(convertType(request.getType()));
 

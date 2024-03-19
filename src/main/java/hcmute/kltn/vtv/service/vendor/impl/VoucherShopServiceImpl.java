@@ -156,7 +156,7 @@ public class VoucherShopServiceImpl implements IVoucherShopService {
             throw new BadRequestException("Mã giảm giá đã bị xóa!");
         }
 
-        if (voucher.getQuantityUsed().equals(voucher.getQuantity())) {
+        if (voucher.getQuantityUsed() >= voucher.getQuantity()) {
             throw new BadRequestException("Mã giảm giá đã hết lượt sử dụng!");
         }
 

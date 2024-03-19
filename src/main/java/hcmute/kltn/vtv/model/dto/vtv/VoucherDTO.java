@@ -24,15 +24,15 @@ public class VoucherDTO {
 
     private String description;
 
-    private Long discount;
+    private int discount;
 
-    private Long quantity;
+    private int quantity;
 
     private Date startDate;
 
     private Date endDate;
 
-    private Long quantityUsed;
+    private int quantityUsed;
 
     private String type;
 
