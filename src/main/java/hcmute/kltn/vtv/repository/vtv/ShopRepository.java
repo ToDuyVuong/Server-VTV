@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.repository.vtv;
 
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.repository.vtv;
 
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import org.springframework.data.jpa.repository.JpaRepository;

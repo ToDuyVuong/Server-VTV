@@ -1,10 +1,8 @@
 package hcmute.kltn.vtv.controller.guest;
 
 import hcmute.kltn.vtv.util.exception.BadRequestException;
-import hcmute.kltn.vtv.model.data.guest.ShopDetailResponse;
 import hcmute.kltn.vtv.service.guest.IFollowedGuestService;
-import hcmute.kltn.vtv.service.guest.IShopDetailService;
-import jakarta.servlet.http.HttpServletRequest;
+import hcmute.kltn.vtv.service.guest.IShopGuestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ShopDetailController {
 
     @Autowired
-    private IShopDetailService shopDetailService;
+    private IShopGuestService shopDetailService;
     @Autowired
     private IFollowedGuestService followedGuestService;
 

@@ -1,6 +1,7 @@
-package hcmute.kltn.vtv.model.entity.vtv;
+package hcmute.kltn.vtv.model.entity.vendor;
 
 import hcmute.kltn.vtv.model.entity.user.Customer;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import jakarta.persistence.*;

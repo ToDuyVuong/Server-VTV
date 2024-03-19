@@ -1,18 +1,21 @@
 package hcmute.kltn.vtv.service.guest.impl;
 
 import hcmute.kltn.vtv.model.data.guest.ShopDetailResponse;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
+import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.repository.user.FollowedShopRepository;
 import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.ShopRepository;
-import hcmute.kltn.vtv.service.guest.IShopDetailService;
+import hcmute.kltn.vtv.service.guest.IShopGuestService;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShopDetailServiceImpl implements IShopDetailService {
+public class ShopGuestServiceImpl implements IShopGuestService {
 
     @Autowired
     private ProductRepository productRepository;
@@ -23,7 +26,25 @@ public class ShopDetailServiceImpl implements IShopDetailService {
     @Autowired
     private FollowedShopRepository followedShopRepository;
     // @Autowired
-    // ModelMapper modelMapper;
+    // ModelMapper modelMapper;]]
+
+
+    @Override
+    public Shop getShopById(Long shopId) {
+        Shop shop =  shopRepository.findById(shopId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy cửa hàng theo mã cửa hàng!"));
+        if (shop.getStatus().equals(Status.INACTIVE)) {
+            throw new NotFoundException("Cửa hàng đang tạm dừng hoạt động!");
+        }
+        if (shop.getStatus().equals(Status.DELETED)) {
+            throw new NotFoundException("Cửa hàng đã bị xóa!");
+        }
+        if (shop.getStatus().equals(Status.LOCKED)) {
+            throw new NotFoundException("Cửa hàng đã bị khóa!");
+        }
+
+        return shop;
+    }
 
     @Override
     public ShopDetailResponse getShopDetailByShopId(Long shopId, String username) {

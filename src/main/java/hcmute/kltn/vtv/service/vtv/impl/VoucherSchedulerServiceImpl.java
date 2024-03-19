@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.service.vtv.impl;
 
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.VoucherRepository;
 import hcmute.kltn.vtv.service.vtv.IVoucherSchedulerService;

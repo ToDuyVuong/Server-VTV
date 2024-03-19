@@ -1,11 +1,13 @@
 package hcmute.kltn.vtv.service.user.impl;
 
 import hcmute.kltn.vtv.model.entity.user.Cart;
+import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
 import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.CartStatus;
+import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
 import hcmute.kltn.vtv.model.extra.Status;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -34,6 +37,8 @@ public class OrderItemServiceImpl implements IOrderItemService {
     private final ICartService cartService;
     @Autowired
     private final ProductVariantRepository productVariantRepository;
+    @Autowired
+    private final IProductVariantService productVariantService;
     @Autowired
     private final CartRepository cartRepository;
     @Autowired
@@ -74,15 +79,35 @@ public class OrderItemServiceImpl implements IOrderItemService {
     }
 
     @Override
-    public List<OrderItem> createOrderItems(String username, List<UUID> cartIds) {
+    public List<OrderItem> createOrderItemsByCartIds(String username, List<UUID> cartIds) {
         List<OrderItem> orderItems = new ArrayList<>();
-
         for (UUID cartId : cartIds) {
             orderItems.add(createOrderItem(cartId, username));
         }
 
         return orderItems;
     }
+
+    public OrderItem createOrderItemByProductVariantIdAndQuantity(Customer customer, Long productVariantId, int quantity) {
+        ProductVariant productVariant = productVariantService
+                .checkAndProductVariantAvailableWithQuantity(productVariantId, quantity);
+        OrderItem orderItem = new OrderItem();
+        orderItem.setCart(cartService.createCartByProductVariant(productVariant, quantity, customer));
+
+        return orderItem;
+    }
+
+
+    @Override
+    public List<OrderItem> createOrderItemsByMapProductVariantIdsAndQuantities(Customer customer, Map<Long, Integer> mapProductVariantIdsAndQuantities) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (Map.Entry<Long, Integer> entry : mapProductVariantIdsAndQuantities.entrySet()) {
+            orderItems.add(createOrderItemByProductVariantIdAndQuantity(customer, entry.getKey(), entry.getValue()));
+        }
+
+        return orderItems;
+    }
+
 
     @Transactional
     @Override

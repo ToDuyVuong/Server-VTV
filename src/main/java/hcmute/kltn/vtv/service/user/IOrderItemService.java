@@ -1,17 +1,21 @@
 package hcmute.kltn.vtv.service.user;
 
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
+import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface IOrderItemService {
     OrderItemResponse getOrderItemByOrderItemId(UUID orderItemId);
 
-    List<OrderItem> createOrderItems(String username, List<UUID> cartIds);
+    List<OrderItem> createOrderItemsByCartIds(String username, List<UUID> cartIds);
+
+    List<OrderItem> createOrderItemsByMapProductVariantIdsAndQuantities(Customer customer, Map<Long, Integer> mapProductVariantIdsAndQuantities);
 
     @Transactional
     List<OrderItem> saveOrderItem(Order order);

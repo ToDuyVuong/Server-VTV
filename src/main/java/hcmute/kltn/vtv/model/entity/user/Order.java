@@ -58,8 +58,8 @@ public class Order {
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ward_code")
-    private Ward wardCode;
+    @JoinColumn(name = "shop_ward_code")
+    private Ward shopWardCode;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id")

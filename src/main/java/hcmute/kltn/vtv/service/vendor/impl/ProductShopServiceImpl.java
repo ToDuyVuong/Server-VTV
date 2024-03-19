@@ -4,7 +4,7 @@ import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.request.ProductRequest;
 import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
 import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.guest.ICategoryService;

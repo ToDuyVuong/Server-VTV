@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.model.dto.user;
 
 import hcmute.kltn.vtv.model.entity.user.Cart;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import lombok.*;
 
 import java.time.LocalDateTime;

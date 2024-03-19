@@ -4,6 +4,8 @@ import hcmute.kltn.vtv.model.data.user.request.CartRequest;
 import hcmute.kltn.vtv.model.data.user.response.CartResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListCartResponse;
 import hcmute.kltn.vtv.model.entity.user.Cart;
+import hcmute.kltn.vtv.model.entity.user.Customer;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -32,4 +34,10 @@ public interface ICartService {
     ListCartResponse deleteCartByShopId(Long shopId, String username);
 
     boolean checkCartsSameShop(String username, List<UUID> cartIds);
+
+    Cart createCartByProductVariant(ProductVariant productVariant, int quantity, Customer customer);
+
+    void checkDuplicateCartIds(List<UUID> cartIds);
+
+    void checkListCartSameShop(String username, List<UUID> cartIds);
 }

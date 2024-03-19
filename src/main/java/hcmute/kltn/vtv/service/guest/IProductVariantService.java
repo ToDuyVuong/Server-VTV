@@ -8,5 +8,11 @@ import java.util.List;
 public interface IProductVariantService {
     ProductVariant checkAndProductVariantAvailableWithQuantity(Long productVariantId, int quantity);
 
+    void checkProductVariantsSameShop(List<Long> productVariantIds, Long shopId);
+
     List<ProductVariant> filterProductVariantsByStatus(List<ProductVariant> productVariants, Status status);
+
+    void checkDuplicateProductVariantIds(List<Long> productVariantIds);
+
+    ProductVariant getProductVariantById(Long productVariantId);
 }

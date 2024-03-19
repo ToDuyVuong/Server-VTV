@@ -3,7 +3,7 @@ package hcmute.kltn.vtv.service.admin;
 import hcmute.kltn.vtv.model.data.admin.request.VoucherAdminRequest;
 import hcmute.kltn.vtv.model.data.admin.response.ListVoucherAdminResponse;
 import hcmute.kltn.vtv.model.data.admin.response.VoucherAdminResponse;
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import org.springframework.transaction.annotation.Transactional;

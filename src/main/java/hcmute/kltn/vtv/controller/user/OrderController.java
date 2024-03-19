@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -28,21 +30,36 @@ public class OrderController {
 
     @Autowired
     private OrderItemServiceImpl orderItemService;
+    @Autowired
+    private OrderItemServiceImpl orderItemServiceImpl;
 
-    @GetMapping("/create")
-    public ResponseEntity<OrderResponse> createOrder(@RequestParam List<UUID> cartIds,
-            HttpServletRequest request) {
-
-        String username = (String) request.getAttribute("username");
+    @PostMapping("/create/by-cartIds")
+    public ResponseEntity<OrderResponse> createOrderByCartIds(@RequestBody List<UUID> cartIds,
+                                                              HttpServletRequest request) {
         if (cartIds.isEmpty()) {
             throw new NotFoundException("Danh sách mã giỏ hàng không được để trống!");
         }
-        return ResponseEntity.ok(orderService.createOrder(username, cartIds));
+
+        String username = (String) request.getAttribute("username");
+        return ResponseEntity.ok(orderService.createOrderByCartIds(username, cartIds));
     }
+
+
+    @PostMapping("/create/by-product-variant")
+    public ResponseEntity<OrderResponse> createOrderByProductVariantIdsAndQuantities(@RequestBody Map<Long, Integer> productVariantIdsAndQuantities,
+                                                                                     HttpServletRequest request) {
+        if (productVariantIdsAndQuantities.isEmpty()) {
+            throw new NotFoundException("Danh sách mã sản phẩm không được để trống!");
+        }
+
+        String username = (String) request.getAttribute("username");
+        return ResponseEntity.ok(orderService.createOrderByMapProductVariantsAndQuantities(username, productVariantIdsAndQuantities));
+    }
+
 
     @GetMapping("/create-update")
     public ResponseEntity<OrderResponse> createOrderUpdate(CreateOrderUpdateRequest request,
-            HttpServletRequest requestHttp) {
+                                                           HttpServletRequest requestHttp) {
 
         String username = (String) requestHttp.getAttribute("username");
         request.setUsername(username);
@@ -54,7 +71,7 @@ public class OrderController {
 
     @PostMapping("/save")
     public ResponseEntity<OrderResponse> saveOrder(@RequestBody CreateOrderUpdateRequest request,
-            HttpServletRequest requestHttp) {
+                                                   HttpServletRequest requestHttp) {
 
         String username = (String) requestHttp.getAttribute("username");
         request.setUsername(username);
@@ -70,28 +87,28 @@ public class OrderController {
 
     @GetMapping("/list/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersByStatus(@PathVariable OrderStatus status,
-            HttpServletRequest requestHttp) {
+                                                               HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.getOrdersByStatus(username, status));
     }
 
     @GetMapping("/detail/{orderId}")
     public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable UUID orderId,
-            HttpServletRequest requestHttp) {
+                                                        HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.getOrderDetail(username, orderId));
     }
 
     @PostMapping("/cancel/{orderId}")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable UUID orderId,
-            HttpServletRequest requestHttp) {
+                                                     HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.cancelOrder(username, orderId));
     }
 
     @GetMapping("/order-item/detail/{orderItemId}")
     public ResponseEntity<OrderItemResponse> getOrderItemByOrderItemId(@PathVariable UUID orderItemId,
-            HttpServletRequest requestHttp) {
+                                                                       HttpServletRequest requestHttp) {
         return ResponseEntity.ok(orderItemService.getOrderItemByOrderItemId(orderItemId));
     }
 

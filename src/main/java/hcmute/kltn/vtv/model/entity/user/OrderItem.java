@@ -18,8 +18,7 @@ public class OrderItem {
     @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderItemId;
-//
-//    private OrderStatus status;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

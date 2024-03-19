@@ -1,7 +1,7 @@
 package hcmute.kltn.vtv.model.data.user.response;
 
 import hcmute.kltn.vtv.model.dto.vtv.VoucherDTO;
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.extra.ResponseAbstract;
 import lombok.*;
 

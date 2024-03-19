@@ -9,7 +9,7 @@ import hcmute.kltn.vtv.model.dto.user.OrderDTO;
 import hcmute.kltn.vtv.model.dto.vtv.ShopDTO;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.model.entity.user.VoucherOrder;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.CartRepository;
@@ -105,7 +105,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         response.setSize(size);
         response.setTotalPage(totalPage);
         response.setCount(orders.size());
-        response.setOrderDTOs(OrderDTO.convertListEntityToDTOs(orders));
+        response.setOrderDTOs(OrderDTO.convertEntitiesToDTOs(orders));
         response.setShopDTO(ShopDTO.convertEntityToDTO(shop));
         response.setMessage(message);
         response.setStatus("ok");
@@ -120,7 +120,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         List<Order> orders = orderRepository.findAllByShopId(shop.getShopId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
-        return listOrderResponse(orders, "Lấy danh sách đơn hàng thành công!", username);
+        return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng thành công!", "OK");
     }
 
     @Override
@@ -132,7 +132,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
         String message = orderService.messageByOrderStatus(status);
 
-        return listOrderResponse(orders, message, username);
+        return ListOrderResponse.listOrderResponse(orders, message, "OK");
     }
 
     @Override
@@ -145,7 +145,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         List<Order> orders = orderRepository.findAllByShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
-        return listOrderResponse(orders, "Lấy danh sách đơn hàng trong cùng ngày thành công.", username);
+        return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng trong cùng ngày thành công.", "OK");
     }
 
     @Override
@@ -161,7 +161,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
         String message = orderService.messageByOrderStatus(status);
 
-        return listOrderResponse(orders, message, username);
+        return ListOrderResponse.listOrderResponse(orders, message, username);
     }
 
     @Override
@@ -174,7 +174,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         List<Order> orders = orderRepository.findAllByShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
-        return listOrderResponse(orders, "Lấy danh sách đơn hàng trong khoảng thời gian thành công.", username);
+        return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng trong khoảng thời gian thành công.", "OK");
     }
 
     @Override
@@ -191,7 +191,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
         String message = orderService.messageByOrderStatus(status);
 
-        return listOrderResponse(orders, message, username);
+        return ListOrderResponse.listOrderResponse(orders, message, "Success");
     }
 
     @Override
@@ -205,7 +205,8 @@ public class OrderShopServiceImpl implements IOrderShopService {
             throw new NotFoundException("Không tìm thấy đơn hàng nào!");
         }
 
-        return orderResponse(username, order, "Lấy đơn hàng thành công!", true);
+        return OrderResponse.orderResponse(order, "Lấy đơn hàng thành công!", "OK");
+
     }
 
     @Override
@@ -240,7 +241,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
             String message = messageUpdateStatusOrder(status);
 
-            return orderResponse(username, save, message, false);
+            return OrderResponse.orderResponse(save, message, "Success");
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật trạng thái đơn hàng thất bại! " + e.getMessage());
         }
@@ -299,30 +300,30 @@ public class OrderShopServiceImpl implements IOrderShopService {
         return calendar.getTime();
     }
 
-    private OrderResponse orderResponse(String username, Order order, String message, boolean created) {
+//    private OrderResponse orderResponse(String username, Order order, String message, boolean created) {
+//
+//        OrderDTO orderDTO = OrderDTO.convertEntityToDTOCreate(order);
+//
+//        OrderResponse response = new OrderResponse();
+//        response.setUsername(username);
+//        response.setOrderDTO(orderDTO);
+//        response.setMessage(message);
+//        response.setStatus(created ? "ok" : "success");
+//        response.setCode(200);
+//        return OrderResponse.orderResponse
+//    }
 
-        OrderDTO orderDTO = OrderDTO.convertEntityToDTOCreate(order);
-
-        OrderResponse response = new OrderResponse();
-        response.setUsername(username);
-        response.setOrderDTO(orderDTO);
-        response.setMessage(message);
-        response.setStatus(created ? "ok" : "success");
-        response.setCode(200);
-        return response;
-    }
-
-    public ListOrderResponse listOrderResponse(List<Order> orders, String message, String username) {
-        List<OrderDTO> orderDTOs = OrderDTO.convertListEntityToDTOs(orders);
-        ListOrderResponse response = new ListOrderResponse();
-        response.setOrderDTOs(orderDTOs);
-        response.setUsername(username);
-        response.setMessage(message);
-        response.setStatus("ok");
-        response.setCode(200);
-        response.setCount(orders.size());
-        return response;
-    }
+//    public ListOrderResponse listOrderResponse(List<Order> orders, String message, String username) {
+//        List<OrderDTO> orderDTOs = OrderDTO.convertEntitiesToDTOs(orders);
+//        ListOrderResponse response = new ListOrderResponse();
+//        response.setOrderDTOs(orderDTOs);
+//        response.setUsername(username);
+//        response.setMessage(message);
+//        response.setStatus("ok");
+//        response.setCode(200);
+//        response.setCount(orders.size());
+//        return response;
+//    }
 
     @Override
     public void checkRequestPageParams(int page, int size) {

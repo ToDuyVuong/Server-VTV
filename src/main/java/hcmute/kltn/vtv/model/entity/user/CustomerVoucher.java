@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.model.entity.user;
 
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import jakarta.persistence.*;
 import lombok.Data;
 

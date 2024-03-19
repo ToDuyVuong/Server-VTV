@@ -5,7 +5,7 @@ import hcmute.kltn.vtv.model.data.vendor.request.ProductAttributeRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.AttributeResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListAttributeResponse;
 import hcmute.kltn.vtv.model.entity.vendor.Attribute;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

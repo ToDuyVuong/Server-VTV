@@ -6,11 +6,11 @@ import lombok.Getter;
 public enum TransportStatus {
 
     WAITING,
-    RECEIVED,
-    WAREHOUSE,
     IN_TRANSIT,
+    WAREHOUSE,
     TRANSPORTING,
     DELIVERED,
+    RECEIVED,
     RETURNED,
     CANCEL;
 

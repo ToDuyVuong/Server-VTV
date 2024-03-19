@@ -4,7 +4,7 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.guest.ListVoucherResponse;
 import hcmute.kltn.vtv.model.data.guest.VoucherResponse;
 import hcmute.kltn.vtv.model.dto.vtv.VoucherDTO;
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import hcmute.kltn.vtv.repository.vtv.VoucherRepository;

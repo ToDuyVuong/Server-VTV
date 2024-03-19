@@ -38,7 +38,7 @@ public class OrderDTO {
 
     private Long paymentTotal;
 
-    private String wardCode;
+    private String shopWardCode;
 
     private OrderStatus status;
 
@@ -50,7 +50,10 @@ public class OrderDTO {
 
     private Date orderDate;
 
-    public static List<OrderDTO> convertListEntityToDTOs(List<Order> orders) {
+
+
+
+    public static List<OrderDTO> convertEntitiesToDTOs(List<Order> orders) {
         List<OrderDTO> orderDTOs = new ArrayList<>();
         for (Order order : orders) {
             orderDTOs.add(convertEntityToDTOCreate(order));
@@ -60,6 +63,8 @@ public class OrderDTO {
 
         return orderDTOs;
     }
+
+
 
     public static OrderDTO convertEntityToDTOCreate(Order order) {
         OrderDTO orderDTO = new OrderDTO();
@@ -78,7 +83,32 @@ public class OrderDTO {
         orderDTO.setOrderDate(order.getOrderDate());
         orderDTO.setTotalPrice(order.getTotalPrice());
         orderDTO.setShippingFee(order.getShippingFee());
-        orderDTO.setWardCode(order.getWardCode().getWardCode());
+        orderDTO.setShopWardCode(order.getShopWardCode().getWardCode());
+
+        orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
+        orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));
+        orderDTO.setVoucherOrderDTOs(VoucherOrderDTO.convertListEntityToListDTO(order.getVoucherOrders()));
+
+        return orderDTO;
+    }
+
+
+    public static OrderDTO convertEntityToDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setOrderId(order.getOrderId());
+        orderDTO.setNote(order.getNote());
+        orderDTO.setPaymentMethod(order.getPaymentMethod());
+        orderDTO.setShippingMethod(order.getShippingMethod());
+        orderDTO.setCount(order.getCount());
+        orderDTO.setShopId(order.getShopId());
+        orderDTO.setShopName(order.getShopName());
+        orderDTO.setDiscount(order.getDiscount());
+        orderDTO.setPaymentTotal(order.getPaymentTotal());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setOrderDate(order.getOrderDate());
+        orderDTO.setTotalPrice(order.getTotalPrice());
+        orderDTO.setShippingFee(order.getShippingFee());
+        orderDTO.setShopWardCode(order.getShopWardCode().getWardCode());
 
         orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
         orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));

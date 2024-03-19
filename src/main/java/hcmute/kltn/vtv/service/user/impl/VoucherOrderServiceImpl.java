@@ -2,7 +2,7 @@ package hcmute.kltn.vtv.service.user.impl;
 
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.entity.user.Order;
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.entity.user.VoucherOrder;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import hcmute.kltn.vtv.repository.user.VoucherOrderRepository;

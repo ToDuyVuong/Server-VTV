@@ -4,7 +4,7 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.manager.response.ListShopManagerResponse;
 import hcmute.kltn.vtv.model.data.manager.response.ManagerShopResponse;
 import hcmute.kltn.vtv.model.dto.vtv.ShopDTO;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
 import hcmute.kltn.vtv.repository.vtv.ShopRepository;

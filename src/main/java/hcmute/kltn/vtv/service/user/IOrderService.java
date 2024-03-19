@@ -8,10 +8,16 @@ import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface IOrderService {
-    OrderResponse createOrder(String username, List<UUID> cartIds);
+
+
+
+    OrderResponse createOrderByCartIds(String username, List<UUID> cartIds);
+
+    OrderResponse createOrderByMapProductVariantsAndQuantities(String username, Map<Long, Integer> productVariantIdsAndQuantities);
 
     OrderResponse createOrderUpdate(CreateOrderUpdateRequest request);
 
@@ -28,4 +34,6 @@ public interface IOrderService {
     OrderResponse cancelOrder(String username, UUID orderId);
 
     String messageByOrderStatus(OrderStatus status);
+
+
 }

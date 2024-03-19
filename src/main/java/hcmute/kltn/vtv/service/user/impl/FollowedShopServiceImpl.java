@@ -6,7 +6,7 @@ import hcmute.kltn.vtv.model.data.user.response.ListFollowedShopResponse;
 import hcmute.kltn.vtv.model.dto.user.FollowedShopDTO;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.user.FollowedShop;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.repository.user.FollowedShopRepository;
 import hcmute.kltn.vtv.repository.vtv.ShopRepository;
 import hcmute.kltn.vtv.service.user.ICustomerService;

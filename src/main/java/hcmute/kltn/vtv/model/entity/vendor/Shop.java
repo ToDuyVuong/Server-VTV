@@ -1,4 +1,4 @@
-package hcmute.kltn.vtv.model.entity.vtv;
+package hcmute.kltn.vtv.model.entity.vendor;
 
 import hcmute.kltn.vtv.model.entity.location.Ward;
 import hcmute.kltn.vtv.model.entity.user.Customer;

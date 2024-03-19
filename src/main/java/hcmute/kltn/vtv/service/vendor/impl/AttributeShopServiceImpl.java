@@ -7,7 +7,7 @@ import hcmute.kltn.vtv.model.data.vendor.request.AttributeRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.AttributeResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListAttributeResponse;
 import hcmute.kltn.vtv.model.entity.vendor.Attribute;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.service.vendor.IAttributeShopService;
 import hcmute.kltn.vtv.service.vendor.IShopService;
 import lombok.RequiredArgsConstructor;

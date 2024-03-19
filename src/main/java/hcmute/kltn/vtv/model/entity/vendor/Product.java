@@ -3,7 +3,6 @@ package hcmute.kltn.vtv.model.entity.vendor;
 import hcmute.kltn.vtv.model.entity.user.Review;
 import hcmute.kltn.vtv.model.entity.vtv.Brand;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
-import hcmute.kltn.vtv.model.entity.vtv.Shop;
 import hcmute.kltn.vtv.model.extra.Status;
 import jakarta.persistence.*;
 import lombok.*;

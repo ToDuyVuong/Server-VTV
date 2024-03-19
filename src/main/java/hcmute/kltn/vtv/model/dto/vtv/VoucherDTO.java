@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.model.dto.vtv;
 
-import hcmute.kltn.vtv.model.entity.vtv.Voucher;
+import hcmute.kltn.vtv.model.entity.vendor.Voucher;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import lombok.*;

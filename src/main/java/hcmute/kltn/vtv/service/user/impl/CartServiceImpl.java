@@ -11,6 +11,7 @@ import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.repository.user.CartRepository;
 import hcmute.kltn.vtv.service.user.ICartService;
 import hcmute.kltn.vtv.service.user.ICustomerService;
+import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -115,7 +118,7 @@ public class CartServiceImpl implements ICartService {
     public List<Cart> getListCartByUsernameAndIds(String username, List<UUID> cartIds) {
 
         return cartRepository.findAllByCustomerUsernameAndStatusAndCartIdIn(username, CartStatus.CART, cartIds)
-                .orElseThrow(() -> new NotFoundException("Giỏ hàng trống."));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy giỏ hàng theo danh sách mã giỏ hàng."));
     }
 
 
@@ -156,8 +159,40 @@ public class CartServiceImpl implements ICartService {
                     .count();
 
             return distinctShopCount <= 1;
+        } else {
+            throw new NotFoundException("Không tìm thấy danh sách giỏ hàng theo danh sách mã giỏ hàng.");
         }
-        return false;
+
+    }
+
+
+    @Override
+    public Cart createCartByProductVariant(ProductVariant productVariant, int quantity, Customer customer) {
+        Cart cart = new Cart();
+        cart.setCustomer(customer);
+        cart.setProductVariant(productVariant);
+        cart.setQuantity(quantity);
+        cart.setCreateAt(LocalDateTime.now());
+        cart.setUpdateAt(LocalDateTime.now());
+        cart.setStatus(CartStatus.CART);
+
+        return cart;
+    }
+
+
+    @Override
+    public void checkDuplicateCartIds(List<UUID> cartIds) {
+        Set<UUID> set = new HashSet<>(cartIds);
+        if (set.size() < cartIds.size()) {
+            throw new BadRequestException("Danh giỏ hàng không được trùng lặp!");
+        }
+    }
+
+    @Override
+    public void checkListCartSameShop(String username, List<UUID> cartIds) {
+        if (!checkCartsSameShop(username, cartIds)) {
+            throw new BadRequestException("Các sản phẩm trong giỏ hàng không cùng một cửa hàng!");
+        }
     }
 
 
