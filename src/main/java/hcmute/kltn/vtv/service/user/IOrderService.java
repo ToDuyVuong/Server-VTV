@@ -1,6 +1,8 @@
 package hcmute.kltn.vtv.service.user;
 
 import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCartIds;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithProductVariant;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
@@ -18,6 +20,10 @@ public interface IOrderService {
     OrderResponse createOrderByCartIds(String username, List<UUID> cartIds);
 
     OrderResponse createOrderByMapProductVariantsAndQuantities(String username, Map<Long, Integer> productVariantIdsAndQuantities);
+
+    OrderResponse createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username);
+
+    OrderResponse createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username);
 
     OrderResponse createOrderUpdate(CreateOrderUpdateRequest request);
 

@@ -1,12 +1,15 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCartIds;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithProductVariant;
+import hcmute.kltn.vtv.model.dto.shipping.ShippingDTO;
 import hcmute.kltn.vtv.model.entity.user.*;
-import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.entity.vendor.Shop;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.service.guest.IShopGuestService;
 import hcmute.kltn.vtv.service.location.IDistanceLocationService;
+import hcmute.kltn.vtv.service.shipping.IShippingService;
 import hcmute.kltn.vtv.service.vtv.shippingstrategy.*;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
@@ -44,19 +47,28 @@ public class OrderServiceImpl implements IOrderService {
     private final IShopGuestService shopGuestService;
     @Autowired
     private final IProductVariantService productVariantService;
-
+    @Autowired
+    private final IVoucherCustomerService voucherCustomerService;
+    @Autowired
+    private final IShippingService shippingService;
 
     @Override
     public OrderResponse createOrderByCartIds(String username, List<UUID> cartIds) {
         cartService.checkDuplicateCartIds(cartIds);
         cartService.checkListCartSameShop(username, cartIds);
+
         List<OrderItem> orderItems = orderItemService.createOrderItemsByCartIds(username, cartIds);
         Long shopId = orderItems.get(0).getCart().getProductVariant().getProduct().getShop().getShopId();
-        Order order = createOrderByUsernameAndShopId(username, shopId);
+        Address address = addressService.getAddressActiveByUsername(username);
+
+        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
         updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, "COD");
         updateShippingInCreateOrder(order, "VTV Express");
 
-        return OrderResponse.orderResponse(order, "Tạo đơn hàng mới thành công từ danh sách sản phẩm trong giỏ hàng.", "OK");
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(address.getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), "VTV Express").getShippingDTO();
+
+        return OrderResponse.orderResponse(order,  shippingDTO, "Tạo đơn hàng mới thành công từ danh sách sản phẩm trong giỏ hàng.", "OK");
     }
 
 
@@ -65,14 +77,51 @@ public class OrderServiceImpl implements IOrderService {
         productVariantService.checkDuplicateProductVariantIds(new ArrayList<>(productVariantIdsAndQuantities.keySet()));
         Long shopId = getShopIdOfProductVariantId(new ArrayList<>(productVariantIdsAndQuantities.keySet()).get(0));
         productVariantService.checkProductVariantsSameShop(new ArrayList<>(productVariantIdsAndQuantities.keySet()), shopId);
-        Order order = createOrderByUsernameAndShopId(username, shopId);
+        Address address = addressService.getAddressActiveByUsername(username);
+
+        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
         List<OrderItem> orderItems = orderItemService.createOrderItemsByMapProductVariantIdsAndQuantities(order.getCustomer(),
                 productVariantIdsAndQuantities);
         updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, "COD");
         updateShippingInCreateOrder(order, "VTV Express");
 
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(address.getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), "VTV Express").getShippingDTO();
 
-        return OrderResponse.orderResponse(order, "Tạo đơn hàng mới thành công từ danh sách sản phẩm và số lượng.", "OK");
+        return OrderResponse.orderResponse(order,  shippingDTO,  "Tạo đơn hàng mới thành công từ danh sách sản phẩm và số lượng.", "OK");
+    }
+
+
+
+    @Override
+    public OrderResponse createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username) {
+        productVariantService.checkDuplicateProductVariantIds(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()));
+        Long shopId = getShopIdOfProductVariantId(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()).get(0));
+        productVariantService.checkProductVariantsSameShop(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()), shopId);
+        Address address = addressService.checkAddress(request.getAddressId(), username);
+
+        Order order = createOrderByOrderRequestWithProductVariant(request, username, shopId, address);
+
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(address.getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), "VTV Express").getShippingDTO();
+
+        return OrderResponse.orderResponse(order,  shippingDTO,  "Tạo đơn hàng mới thành công từ danh sách sản phẩm và số lượng.", "OK");
+    }
+
+
+
+    @Override
+    public OrderResponse createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username) {
+        cartService.checkDuplicateCartIds(request.getCartIds());
+        cartService.checkListCartSameShop(username, request.getCartIds());
+        Address address = addressService.checkAddress(request.getAddressId(), username);
+
+        Order order = createOrderByOrderRequestWithCartIds(request, username, request.getShopId(), address);
+
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(address.getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), "VTV Express").getShippingDTO();
+
+        return OrderResponse.orderResponse(order,  shippingDTO, "Tạo đơn hàng mới thành công từ danh sách sản phẩm trong giỏ hàng.", "OK");
     }
 
 
@@ -211,8 +260,71 @@ public class OrderServiceImpl implements IOrderService {
 
 
 
+    private Order createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username, Long shopId, Address address) {
+        List<OrderItem> orderItems = orderItemService.createOrderItemsByCartIds(username, request.getCartIds());
 
 
+        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
+        updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, request.getPaymentMethod());
+
+        if (!request.getNote().isEmpty()) {
+            order.setNote(request.getNote());
+        }
+
+        if (request.getShopVoucherCode() != null) {
+            Long discount = voucherCustomerService
+                    .discountVoucherByShopVoucherCodeAndShopIdAndTotalPrice(
+                            request.getShopVoucherCode(),
+                            shopId,
+                            order.getTotalPrice());
+            order.setDiscountShop(discount);
+        }
+
+        if (request.getSystemVoucherCode() != null) {
+            Long discount = voucherCustomerService
+                    .discountVoucherBySystemVoucherCodeAndTotalPrice(
+                            request.getSystemVoucherCode(),
+                            order.getTotalPrice());
+            order.setDiscountSystem(discount);
+        }
+
+        updateShippingInCreateOrder(order, request.getShippingMethod());
+
+        return order;
+    }
+
+
+    private Order createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username, Long shopId, Address address) {
+        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
+        List<OrderItem> orderItems = orderItemService.createOrderItemsByMapProductVariantIdsAndQuantities(order.getCustomer(),
+                request.getProductVariantIdsAndQuantities());
+        updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, request.getPaymentMethod());
+
+        if (!request.getNote().isEmpty()) {
+            order.setNote(request.getNote());
+        }
+
+        if (request.getShopVoucherCode() != null) {
+            Long discount = voucherCustomerService
+                    .discountVoucherByShopVoucherCodeAndShopIdAndTotalPrice(
+                            request.getShopVoucherCode(),
+                            shopId,
+                            order.getTotalPrice());
+            order.setDiscountShop(discount);
+        }
+
+        if (request.getSystemVoucherCode() != null) {
+            Long discount = voucherCustomerService
+                    .discountVoucherBySystemVoucherCodeAndTotalPrice(
+                            request.getSystemVoucherCode(),
+                            order.getTotalPrice());
+            order.setDiscountSystem(discount);
+        }
+
+        updateShippingInCreateOrder(order, request.getShippingMethod());
+
+        return order;
+    }
 
 
     private Order createTemporaryOrderUpdate(CreateOrderUpdateRequest request) {
@@ -233,19 +345,19 @@ public class OrderServiceImpl implements IOrderService {
             order.setNote(request.getNote());
         }
 
-        if (request.getVoucherShopId() != null) {
-            Long discount = voucherOrderService.calculateVoucher(request.getVoucherShopId(), order.getShopId(),
-                    order.getTotalPrice(), true);
-            order.setDiscount(order.getDiscount() + discount);
-        }
+//        if (request.getVoucherShopId() != null) {
+//            Long discount = voucherOrderService.calculateVoucher(request.getVoucherShopId(), order.getShopId(),
+//                    order.getTotalPrice(), true);
+//            order.setDiscount(order.getDiscount() + discount);
+//        }
+//
+//        if (request.getVoucherSystemId() != null) {
+//            Long discount = voucherOrderService.calculateVoucher(request.getVoucherSystemId(), null,
+//                    order.getTotalPrice(), false);
+//            order.setDiscount(order.getDiscount() + discount);
+//        }
 
-        if (request.getVoucherSystemId() != null) {
-            Long discount = voucherOrderService.calculateVoucher(request.getVoucherSystemId(), null,
-                    order.getTotalPrice(), false);
-            order.setDiscount(order.getDiscount() + discount);
-        }
-
-        order.setPaymentTotal(order.getTotalPrice() + order.getShippingFee() - order.getDiscount());
+//        order.setPaymentTotal(order.getTotalPrice() + order.getShippingFee() - order.getDiscount());
         order.setTotalPrice(order.getTotalPrice());
 
         return order;
@@ -262,9 +374,8 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    private Order createOrderByUsernameAndShopId(String username, Long shopId) {
+    private Order createOrderByUsernameAndShopIdAndAddress(String username, Long shopId, Address address) {
         Customer customer = customerService.getCustomerByUsername(username);
-        Address address = addressService.getAddressActiveByUsername(username);
         Shop shop = shopGuestService.getShopById(shopId);
 
         Order order = new Order();
@@ -273,6 +384,8 @@ public class OrderServiceImpl implements IOrderService {
         order.setShopId(shop.getShopId());
         order.setShopName(shop.getName());
         order.setShopWardCode(shop.getWard());
+        order.setDiscountShop(0L);
+        order.setDiscountSystem(0L);
 
         return order;
     }
@@ -284,8 +397,6 @@ public class OrderServiceImpl implements IOrderService {
         order.setTotalPrice(getTotalPrice(orderItems));
         order.setVoucherOrders(null);
         order.setPaymentMethod(paymentMethod);
-        order.setPaymentTotal(order.getTotalPrice());
-        order.setDiscount(0L);
         order.setNote(null);
         order.setOrderDate(new Date());
         order.setCount(getTotalCount(orderItems));
@@ -298,7 +409,7 @@ public class OrderServiceImpl implements IOrderService {
 
         order.setShippingMethod(shippingMethod);
         order.setShippingFee(shippingFee);
-        order.setTotalPrice(order.getTotalPrice() + shippingFee);
+        order.setPaymentTotal(order.getTotalPrice() + shippingFee - order.getDiscountShop() - order.getDiscountSystem());
     }
 
     private Long shippingFeeByShippingMethodAndCustomerWardCodeAndShopWardCode(String shippingMethod, String customerWardCode, String shopWardCode) {
@@ -353,7 +464,9 @@ public class OrderServiceImpl implements IOrderService {
         order.setPaymentMethod("COD");
         order.setShippingMethod("GHN");
         order.setPaymentTotal(totalPayment);
-        order.setDiscount(discount);
+        order.setDiscountShop(0L);
+        order.setDiscountSystem(0L);
+
         order.setNote(null);
         order.setOrderDate(new Date());
         order.setOrderItems(orderItems);
@@ -386,9 +499,6 @@ public class OrderServiceImpl implements IOrderService {
     private Long getShopIdOfProductVariantId(Long productVariantId) {
         return productVariantService.getProductVariantById(productVariantId).getProduct().getShop().getShopId();
     }
-
-
-
 
 
 }

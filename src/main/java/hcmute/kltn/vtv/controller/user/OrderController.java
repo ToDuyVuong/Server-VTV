@@ -1,6 +1,8 @@
 package hcmute.kltn.vtv.controller.user;
 
 import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCartIds;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithProductVariant;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
@@ -8,6 +10,7 @@ import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.service.user.IOrderService;
 import hcmute.kltn.vtv.service.user.impl.OrderItemServiceImpl;
+import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,15 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrderByCartIds(username, cartIds));
     }
 
+    @PostMapping("/create-update/with-cart")
+    public ResponseEntity<OrderResponse> createOrderWithCart(@RequestBody OrderRequestWithCartIds orderRequestWithCartIds,
+                                                              HttpServletRequest request) {
+        OrderRequestWithCartIds.validate(orderRequestWithCartIds);
+
+        String username = (String) request.getAttribute("username");
+        return ResponseEntity.ok(orderService.createOrderByOrderRequestWithCartIds(orderRequestWithCartIds, username));
+    }
+
 
     @PostMapping("/create/by-product-variant")
     public ResponseEntity<OrderResponse> createOrderByProductVariantIdsAndQuantities(@RequestBody Map<Long, Integer> productVariantIdsAndQuantities,
@@ -52,8 +64,26 @@ public class OrderController {
             throw new NotFoundException("Danh sách mã sản phẩm không được để trống!");
         }
 
+        productVariantIdsAndQuantities.forEach((k, v) -> {
+            if (k == null || v == null ) {
+                throw new BadRequestException("Danh sách sản phẩm không hợp lệ!");
+            }
+            if (v <= 0){
+                throw new BadRequestException("Số lượng biến thể sản phẩm của mã biến thể sản phẩm " + k + " không hợp lệ!");
+            }
+        });
+
         String username = (String) request.getAttribute("username");
         return ResponseEntity.ok(orderService.createOrderByMapProductVariantsAndQuantities(username, productVariantIdsAndQuantities));
+    }
+
+    @PostMapping("/create-update/with-product-variant")
+    public ResponseEntity<OrderResponse> createOrderWithProductVariant(@RequestBody OrderRequestWithProductVariant orderRequestWithProductVariant,
+                                                                                     HttpServletRequest request) {
+        OrderRequestWithProductVariant.validate(orderRequestWithProductVariant);
+        String username = (String) request.getAttribute("username");
+
+        return ResponseEntity.ok(orderService.createOrderByOrderRequestWithProductVariant(orderRequestWithProductVariant, username));
     }
 
 

@@ -32,7 +32,9 @@ public class OrderDTO {
 
     private Long totalPrice;
 
-    private Long discount;
+    private Long discountShop;
+
+    private Long discountSystem;
 
     private Long shippingFee;
 
@@ -42,13 +44,14 @@ public class OrderDTO {
 
     private OrderStatus status;
 
+    private Date orderDate;
+
     private AddressDTO addressDTO;
 
     private List<VoucherOrderDTO> voucherOrderDTOs;
 
     private List<OrderItemDTO> orderItemDTOs;
 
-    private Date orderDate;
 
 
 
@@ -56,7 +59,7 @@ public class OrderDTO {
     public static List<OrderDTO> convertEntitiesToDTOs(List<Order> orders) {
         List<OrderDTO> orderDTOs = new ArrayList<>();
         for (Order order : orders) {
-            orderDTOs.add(convertEntityToDTOCreate(order));
+            orderDTOs.add(convertEntityToDTO(order));
         }
 
         orderDTOs.sort(Comparator.comparing(OrderDTO::getOrderDate, Comparator.reverseOrder()));
@@ -66,31 +69,32 @@ public class OrderDTO {
 
 
 
-    public static OrderDTO convertEntityToDTOCreate(Order order) {
-        OrderDTO orderDTO = new OrderDTO();
-        if (order.getOrderId() != null) {
-            orderDTO.setOrderId(order.getOrderId());
-        }
-        orderDTO.setNote(order.getNote());
-        orderDTO.setPaymentMethod(order.getPaymentMethod());
-        orderDTO.setShippingMethod(order.getShippingMethod());
-        orderDTO.setCount(order.getCount());
-        orderDTO.setShopId(order.getShopId());
-        orderDTO.setShopName(order.getShopName());
-        orderDTO.setDiscount(order.getDiscount());
-        orderDTO.setPaymentTotal(order.getPaymentTotal());
-        orderDTO.setStatus(order.getStatus());
-        orderDTO.setOrderDate(order.getOrderDate());
-        orderDTO.setTotalPrice(order.getTotalPrice());
-        orderDTO.setShippingFee(order.getShippingFee());
-        orderDTO.setShopWardCode(order.getShopWardCode().getWardCode());
-
-        orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
-        orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));
-        orderDTO.setVoucherOrderDTOs(VoucherOrderDTO.convertListEntityToListDTO(order.getVoucherOrders()));
-
-        return orderDTO;
-    }
+//    public static OrderDTO convertEntityToDTOCreate(Order order) {
+//        OrderDTO orderDTO = new OrderDTO();
+//        if (order.getOrderId() != null) {
+//            orderDTO.setOrderId(order.getOrderId());
+//        }
+//        orderDTO.setNote(order.getNote());
+//        orderDTO.setPaymentMethod(order.getPaymentMethod());
+//        orderDTO.setShippingMethod(order.getShippingMethod());
+//        orderDTO.setCount(order.getCount());
+//        orderDTO.setShopId(order.getShopId());
+//        orderDTO.setShopName(order.getShopName());
+//        orderDTO.setDiscountShop(order.getDiscountShop());
+//        orderDTO.setDiscountSystem(order.getDiscountSystem());
+//        orderDTO.setPaymentTotal(order.getPaymentTotal());
+//        orderDTO.setStatus(order.getStatus());
+//        orderDTO.setOrderDate(order.getOrderDate());
+//        orderDTO.setTotalPrice(order.getTotalPrice());
+//        orderDTO.setShippingFee(order.getShippingFee());
+//        orderDTO.setShopWardCode(order.getShopWardCode().getWardCode());
+//
+//        orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
+//        orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));
+//        orderDTO.setVoucherOrderDTOs(VoucherOrderDTO.convertListEntityToListDTO(order.getVoucherOrders()));
+//
+//        return orderDTO;
+//    }
 
 
     public static OrderDTO convertEntityToDTO(Order order) {
@@ -102,7 +106,8 @@ public class OrderDTO {
         orderDTO.setCount(order.getCount());
         orderDTO.setShopId(order.getShopId());
         orderDTO.setShopName(order.getShopName());
-        orderDTO.setDiscount(order.getDiscount());
+        orderDTO.setDiscountShop(order.getDiscountShop());
+        orderDTO.setDiscountSystem(order.getDiscountSystem());
         orderDTO.setPaymentTotal(order.getPaymentTotal());
         orderDTO.setStatus(order.getStatus());
         orderDTO.setOrderDate(order.getOrderDate());

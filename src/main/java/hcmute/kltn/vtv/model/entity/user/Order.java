@@ -39,7 +39,9 @@ public class Order {
 
     private Long totalPrice;
 
-    private Long discount;
+    private Long discountShop;
+
+    private Long discountSystem;
 
     private Long shippingFee;
 
