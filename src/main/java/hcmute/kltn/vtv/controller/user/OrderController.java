@@ -26,10 +26,8 @@ import java.util.UUID;
 public class OrderController {
 
     @Autowired
-    private IOrderService orderService;
+    private final IOrderService orderService;
 
-    @Autowired
-    private OrderItemServiceImpl orderItemService;
 
 
     @PostMapping("/create/by-cartIds")
@@ -86,7 +84,7 @@ public class OrderController {
 
     @PostMapping("/add/with-cart")
     public ResponseEntity<OrderResponse> addNewOrderWithCart(@RequestBody OrderRequestWithCart orderRequestWithCart,
-                                                                           HttpServletRequest request) {
+                                                             HttpServletRequest request) {
         OrderRequestWithCart.validate(orderRequestWithCart);
         String username = (String) request.getAttribute("username");
 
@@ -95,7 +93,7 @@ public class OrderController {
 
     @PostMapping("/add/with-product-variant")
     public ResponseEntity<OrderResponse> addNewOrderWithProductVariant(@RequestBody OrderRequestWithProductVariant orderRequestWithProductVariant,
-                                                                                     HttpServletRequest request) {
+                                                                       HttpServletRequest request) {
         OrderRequestWithProductVariant.validate(orderRequestWithProductVariant);
         String username = (String) request.getAttribute("username");
 
@@ -109,12 +107,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrders(username));
     }
 
+
     @GetMapping("/list/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersByStatus(@PathVariable OrderStatus status,
                                                                HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
         return ResponseEntity.ok(orderService.getOrdersByStatus(username, status));
     }
+
 
     @GetMapping("/detail/{orderId}")
     public ResponseEntity<OrderResponse> getOrderDetail(@PathVariable UUID orderId,
@@ -123,17 +123,26 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderDetail(username, orderId));
     }
 
-    @PostMapping("/cancel/{orderId}")
-    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable UUID orderId,
-                                                     HttpServletRequest requestHttp) {
+
+    @PatchMapping("/cancel/{orderId}")
+    public ResponseEntity<OrderResponse> cancelOrderById(@PathVariable UUID orderId,
+                                                                  HttpServletRequest requestHttp) {
         String username = (String) requestHttp.getAttribute("username");
-        return ResponseEntity.ok(orderService.cancelOrder(username, orderId));
+        return ResponseEntity.ok(orderService.cancelOrderById(username, orderId));
     }
 
-    @GetMapping("/order-item/detail/{orderItemId}")
-    public ResponseEntity<OrderItemResponse> getOrderItemByOrderItemId(@PathVariable UUID orderItemId,
-                                                                       HttpServletRequest requestHttp) {
-        return ResponseEntity.ok(orderItemService.getOrderItemByOrderItemId(orderItemId));
+
+    @PatchMapping("/complete/{orderId}")
+    public ResponseEntity<OrderResponse> completeOrderById(@PathVariable UUID orderId,
+                                                           HttpServletRequest requestHttp) {
+        String username = (String) requestHttp.getAttribute("username");
+        return ResponseEntity.ok(orderService.completeOrderById(username, orderId));
     }
+
+//    @GetMapping("/order-item/detail/{orderItemId}")
+//    public ResponseEntity<OrderItemResponse> getOrderItemByOrderItemId(@PathVariable UUID orderItemId,
+//                                                                       HttpServletRequest requestHttp) {
+//        return ResponseEntity.ok(orderItemService.getOrderItemByOrderItemId(orderItemId));
+//    }
 
 }

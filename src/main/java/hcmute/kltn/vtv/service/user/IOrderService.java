@@ -36,8 +36,13 @@ public interface IOrderService {
 
     OrderResponse getOrderDetail(String username, UUID orderId);
 
+
+    //
     @Transactional
-    OrderResponse cancelOrder(String username, UUID orderId);
+    OrderResponse completeOrderById(String username, UUID orderId);
+
+    @Transactional
+    OrderResponse cancelOrderById(String username, UUID orderId);
 
     String messageByOrderStatus(OrderStatus status);
 

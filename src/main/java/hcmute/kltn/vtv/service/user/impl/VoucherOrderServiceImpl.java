@@ -11,6 +11,7 @@ import hcmute.kltn.vtv.repository.vtv.VoucherRepository;
 import hcmute.kltn.vtv.service.admin.impl.VoucherAdminServiceImpl;
 import hcmute.kltn.vtv.service.user.IVoucherOrderService;
 import hcmute.kltn.vtv.service.vendor.impl.VoucherShopServiceImpl;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
             voucherRepository.save(voucher);
             return voucherOrderRepository.save(voucherOrder);
         } catch (Exception e) {
-            throw new BadRequestException("Thêm mới mã giảm giá thất bại!");
+            throw new InternalServerErrorException("Thêm mới mã giảm giá thất bại!");
         }
     }
 
@@ -74,7 +75,7 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
             voucherRepository.save(voucher);
             return voucherOrderRepository.save(voucherOrder);
         } catch (Exception e) {
-            throw new BadRequestException("Thêm mới mã giảm giá thất bại!");
+            throw new InternalServerErrorException("Thêm mới mã giảm giá thất bại!");
         }
     }
 
@@ -92,7 +93,7 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
             voucherRepository.save(voucher);
             return voucherOrder;
         } catch (Exception e) {
-            throw new BadRequestException("Cập nhật mã giảm giá thất bại!");
+            throw new InternalServerErrorException("Cập nhật mã giảm giá thất bại!");
         }
     }
 

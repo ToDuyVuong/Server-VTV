@@ -37,13 +37,10 @@ public class OrderItemServiceImpl implements IOrderItemService {
     @Autowired
     private final ICartService cartService;
     @Autowired
-    private final ProductVariantRepository productVariantRepository;
-    @Autowired
     private final IProductVariantService productVariantService;
     @Autowired
     private final CartRepository cartRepository;
-    @Autowired
-    private final ProductRepository productRepository;
+
 
     @Override
     public OrderItemResponse getOrderItemByOrderItemId(UUID orderItemId) {
@@ -138,6 +135,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
         return orderItems;
     }
 
+
     public OrderItem createOrderItemByProductVariantIdAndQuantity(Customer customer, Long productVariantId, int quantity) {
         ProductVariant productVariant = productVariantService
                 .checkAndProductVariantAvailableWithQuantity(productVariantId, quantity);
@@ -161,75 +159,23 @@ public class OrderItemServiceImpl implements IOrderItemService {
 
     @Transactional
     @Override
-    public List<OrderItem> saveOrderItem(Order order) {
-        List<OrderItem> orderItems = new ArrayList<>();
-        for (OrderItem orderItem : order.getOrderItems()) {
-            Cart cart = orderItem.getCart();
-
-            if (cart.getProductVariant().getStatus() == Status.DELETED ||
-                    cart.getProductVariant().getProduct().getStatus() == Status.DELETED) {
-                throw new BadRequestException("Sản phẩm đã bị xóa!");
-            }
-
-            cart.setStatus(CartStatus.ORDER);
-            cart.setUpdateAt(order.getUpdateAt());
-            try {
-                cartRepository.save(cart);
-            } catch (Exception e) {
-                throw new BadRequestException("Cập nhật trạng thái giỏ hàng thất bại!");
-            }
-
-            ProductVariant productVariant = cart.getProductVariant();
-
-            productVariant.setQuantity(productVariant.getQuantity() - cart.getQuantity());
-            try {
-                productVariantRepository.save(productVariant);
-            } catch (Exception e) {
-                throw new BadRequestException("Cập nhật số lượng sản phẩm thất bại!");
-            }
-
-            Product product = productVariant.getProduct();
-            product.setSold(product.getSold() + cart.getQuantity());
-            try {
-                productRepository.save(product);
-            } catch (Exception e) {
-                throw new BadRequestException("Cập nhật số lượng sản phẩm đã bán thất bại!");
-            }
-
-            orderItem.setOrder(order);
-            try {
-                OrderItem item = orderItemRepository.save(orderItem);
-                orderItems.add(item);
-            } catch (Exception e) {
-                throw new BadRequestException("Cập nhật đơn hàng thất bại!");
-            }
-
-        }
-
-        return orderItems;
-    }
-
-    @Transactional
-    @Override
     public List<OrderItem> cancelOrderItem(Order order) {
         List<OrderItem> orderItems = new ArrayList<>();
-        for (OrderItem orderItem : order.getOrderItems()) {
-            Cart cart = orderItem.getCart();
-            cart.setStatus(CartStatus.CANCEL);
-            cart.setUpdateAt(order.getUpdateAt());
-            try {
+        try {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                Cart cart = orderItem.getCart();
+                cart.setStatus(CartStatus.CANCEL);
+                cart.setUpdateAt(order.getUpdateAt());
 
-                ProductVariant productVariant = cart.getProductVariant();
-                productVariant.setQuantity(productVariant.getQuantity() + cart.getQuantity());
-                productVariantRepository.save(productVariant);
-
+                productVariantService.updateProductVariantQuantity(cart.getProductVariant().getProductVariantId(), cart.getQuantity());
                 cartRepository.save(cart);
                 orderItems.add(orderItem);
-            } catch (Exception e) {
-                throw new BadRequestException("Cập nhật trạng thái giỏ hàng thất bại!");
             }
 
+            return orderItems;
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Cập nhật trạng thái giỏ hàng thất bại!");
         }
-        return orderItems;
+
     }
 }

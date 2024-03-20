@@ -17,6 +17,7 @@ import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
 import hcmute.kltn.vtv.repository.user.OrderRepository;
 import hcmute.kltn.vtv.service.user.*;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,7 +154,6 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-
     @Override
     @Transactional
     public OrderResponse addNewOrderWithProductVariant(OrderRequestWithProductVariant request, String username) {
@@ -206,39 +206,50 @@ public class OrderServiceImpl implements IOrderService {
             throw new BadRequestException("Không tìm thấy đơn hàng!");
         }
 
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), order.getShippingMethod()).getShippingDTO();
 
-        return OrderResponse.orderResponse(order, "Lấy chi tiết đơn hàng thành công.", "OK");
+
+        return OrderResponse.orderResponse(order, shippingDTO, "Lấy chi tiết đơn hàng thành công.", "OK");
 
     }
 
 
+    //
     @Override
     @Transactional
-    public OrderResponse cancelOrder(String username, UUID orderId) {
-        Order order = orderRepository.findByOrderIdAndStatus(orderId, OrderStatus.PENDING)
-                .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng!"));
-        if (order == null || !order.getCustomer().getUsername().equals(username)) {
-            throw new BadRequestException("Không tìm thấy đơn hàng!");
-        }
+    public OrderResponse completeOrderById(String username, UUID orderId) {
+        Order order = orderRepository.findByOrderIdAndCustomerUsername(orderId, username)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng theo mã đơn hàng của tài khoản!"));
 
-        order.setStatus(OrderStatus.CANCEL);
-        order.setUpdateAt(LocalDateTime.now());
-        try {
-            Order save = orderRepository.save(order);
-
-            if (save.getVoucherOrders() != null) {
-                for (VoucherOrder voucherOrder : save.getVoucherOrders()) {
-                    voucherOrderService.cancelVoucherOrder(voucherOrder.getVoucherOrderId());
-                }
+        if (order.getStatus().equals(OrderStatus.SHIPPING) || order.getStatus().equals(OrderStatus.DELIVERED)) {
+            order.setStatus(OrderStatus.COMPLETED);
+            order.setUpdateAt(LocalDateTime.now());
+            try {
+                orderRepository.save(order);
+                return OrderResponse.orderResponse(order, "Xác nhận đã nhận hàng thành công.", "Success");
+            } catch (Exception e) {
+                throw new InternalServerErrorException("Hoàn thành đơn hàng thất bại!");
             }
-
-            List<OrderItem> orderItems = orderItemService.cancelOrderItem(save);
-            save.setOrderItems(orderItems);
-
-            return OrderResponse.orderResponse(save, "Hủy đơn hàng thành công.", "Success");
-        } catch (Exception e) {
-            throw new BadRequestException("Hủy đơn hàng thất bại!");
         }
+
+        throw new BadRequestException("Không thể hoàn thành đơn hàng! Chỉ có thể hoàn thành đơn hàng đang giao hàng hoặc đã giao hàng.");
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse cancelOrderById(String username, UUID orderId) {
+        Order order = orderRepository.findByOrderIdAndCustomerUsername(orderId, username)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng theo mã đơn hàng của tài khoản!"));
+
+        if (order.getStatus().equals(OrderStatus.PENDING)) {
+            return cancelOrder(order);
+        }
+        if (order.getStatus().equals(OrderStatus.PROCESSING)) {
+            return waitingOrder(order);
+        }
+
+        throw new BadRequestException("Không thể hủy đơn hàng! Chỉ có thể hủy đơn hàng đang chờ xử lý hoặc yêu cầu hủy đơn hàng đang xử lý.");
     }
 
 
@@ -254,6 +265,42 @@ public class OrderServiceImpl implements IOrderService {
             case WAITING -> "Lấy danh sách đơn hàng yêu cầu xử lý thành công.";
             default -> "Lấy danh sách đơn hàng thành công.";
         };
+    }
+
+
+    @Transactional
+    public OrderResponse cancelOrder(Order order) {
+        order.setStatus(OrderStatus.CANCEL);
+        order.setUpdateAt(LocalDateTime.now());
+        try {
+            orderRepository.save(order);
+
+            if (order.getVoucherOrders() != null) {
+                for (VoucherOrder voucherOrder : order.getVoucherOrders()) {
+                    voucherOrderService.cancelVoucherOrder(voucherOrder.getVoucherOrderId());
+                }
+            }
+
+            List<OrderItem> orderItems = orderItemService.cancelOrderItem(order);
+            order.setOrderItems(orderItems);
+
+            return OrderResponse.orderResponse(order, "Hủy đơn hàng thành công.", "Success");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Hủy đơn hàng thất bại!");
+        }
+    }
+
+
+    @Transactional
+    public OrderResponse waitingOrder(Order order) {
+        order.setStatus(OrderStatus.WAITING);
+        order.setUpdateAt(LocalDateTime.now());
+        try {
+            Order save = orderRepository.save(order);
+            return OrderResponse.orderResponse(save, "Yêu cầu hủy đơn hàng thành công.", "Success");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Yêu cầu hủy đơn hàng thất bại!");
+        }
     }
 
 
@@ -288,7 +335,6 @@ public class OrderServiceImpl implements IOrderService {
 
     private Order createAddNewOrderWithCart(OrderRequestWithCart request, String username) {
         Address address = addressService.checkAddress(request.getAddressId(), username);
-
         Order order = createBaseOrder(username, request.getShopId(), address);
         order.setStatus(OrderStatus.PENDING);
         if (!request.getNote().isEmpty()) {
@@ -386,7 +432,8 @@ public class OrderServiceImpl implements IOrderService {
         order.setCount(getTotalCount(orderItems));
     }
 
-    private void addOrderItemsToOrderByMapProductVariant(Order order, Map<Long,Integer> productVariantsAndQuantities, String username) {
+
+    private void addOrderItemsToOrderByMapProductVariant(Order order, Map<Long, Integer> productVariantsAndQuantities, String username) {
         List<OrderItem> orderItems = orderItemService.addNewOrderItemsByyMapProductVariant(order, productVariantsAndQuantities, username);
         order.setOrderItems(orderItems);
         order.setTotalPrice(getTotalPrice(orderItems));
@@ -445,6 +492,7 @@ public class OrderServiceImpl implements IOrderService {
 
         return totalPrice;
     }
+
 
     private int getTotalCount(List<OrderItem> orderItems) {
         int count = 0;

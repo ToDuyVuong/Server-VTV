@@ -23,8 +23,7 @@ public interface IOrderItemService {
 
     List<OrderItem> createOrderItemsByMapProductVariantIdsAndQuantities(Customer customer, Map<Long, Integer> mapProductVariantIdsAndQuantities);
 
-    @Transactional
-    List<OrderItem> saveOrderItem(Order order);
+
 
     @Transactional
     List<OrderItem> cancelOrderItem(Order order);

@@ -29,6 +29,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     Optional<Order> findByOrderIdAndStatus(UUID orderId, OrderStatus status);
 
+    Optional<Order> findByOrderIdAndCustomerUsername(UUID orderId, String username);
+
     Optional<List<Order>> findAllByShopId(Long shopId);
 
     Optional<List<Order>> findAllByShopIdAndStatus(Long shopId, OrderStatus status);
