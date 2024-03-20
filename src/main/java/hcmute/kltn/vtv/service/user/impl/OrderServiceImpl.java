@@ -1,6 +1,6 @@
 package hcmute.kltn.vtv.service.user.impl;
 
-import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCartIds;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCart;
 import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithProductVariant;
 import hcmute.kltn.vtv.model.dto.shipping.ShippingDTO;
 import hcmute.kltn.vtv.model.entity.user.*;
@@ -12,7 +12,6 @@ import hcmute.kltn.vtv.service.location.IDistanceLocationService;
 import hcmute.kltn.vtv.service.shipping.IShippingService;
 import hcmute.kltn.vtv.service.vtv.shippingstrategy.*;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
-import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
 import hcmute.kltn.vtv.repository.user.OrderRepository;
@@ -63,7 +62,7 @@ public class OrderServiceImpl implements IOrderService {
         Long shopId = orderItems.get(0).getCart().getProductVariant().getProduct().getShop().getShopId();
         Address address = addressService.getAddressActiveByUsername(username);
 
-        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
+        Order order = createBaseOrder(username, shopId, address);
         updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, "COD");
         updateShippingInCreateOrder(order, "VTV Express");
 
@@ -82,7 +81,7 @@ public class OrderServiceImpl implements IOrderService {
         productVariantService.checkProductVariantsSameShop(new ArrayList<>(productVariantIdsAndQuantities.keySet()), shopId);
         Address address = addressService.getAddressActiveByUsername(username);
 
-        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
+        Order order = createBaseOrder(username, shopId, address);
         List<OrderItem> orderItems = orderItemService.createOrderItemsByMapProductVariantIdsAndQuantities(order.getCustomer(),
                 productVariantIdsAndQuantities);
         updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, "COD");
@@ -97,9 +96,12 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public OrderResponse createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username) {
-        productVariantService.checkDuplicateProductVariantIds(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()));
+    public OrderResponse createOrderWithProductVariant(OrderRequestWithProductVariant request, String username) {
         Long shopId = getShopIdOfProductVariantId(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()).get(0));
+        if (!request.getShopId().equals(shopId)) {
+            throw new BadRequestException("Mã cửa hàng không hợp lệ!");
+        }
+
         productVariantService.checkProductVariantsSameShop(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()), shopId);
         Address address = addressService.checkAddress(request.getAddressId(), username);
 
@@ -114,7 +116,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public OrderResponse createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username) {
+    public OrderResponse createOrderWithCart(OrderRequestWithCart request, String username) {
         cartService.checkDuplicateCartIds(request.getCartIds());
         cartService.checkListCartSameShop(username, request.getCartIds());
         Address address = addressService.checkAddress(request.getAddressId(), username);
@@ -130,89 +132,51 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public OrderResponse addNewOrderByOrderRequestWithCart(OrderRequestWithCartIds request, String username) {
+    public OrderResponse addNewOrderWithCart(OrderRequestWithCart request, String username) {
         cartService.checkDuplicateCartIds(request.getCartIds());
         cartService.checkListCartSameShop(username, request.getCartIds());
-        Address address = addressService.checkAddress(request.getAddressId(), username);
 
-        Order order = createBaseOrder(username, request.getShopId(), address);
-        order.setStatus(OrderStatus.PENDING);
-        if (!request.getNote().isEmpty()) {
-            order.setNote(request.getNote());
-        }
+        // Add new order base
+        Order order = createAddNewOrderWithCart(request, username);
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), request.getShippingMethod()).getShippingDTO();
         try {
-            orderRepository.save(order);
             addOrderItemsToOrder(order, request.getCartIds(), username);
             addVoucherOrderToOrder(order, request.getShopVoucherCode(), request.getSystemVoucherCode());
             updateShippingInCreateOrder(order, request.getShippingMethod());
-            ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(address.getWard().getWardCode(),
-                    order.getShopWardCode().getWardCode(), "VTV Express").getShippingDTO();
             orderRepository.save(order);
+
+            return OrderResponse.orderResponse(order, shippingDTO, "Đặt hàng thành công từ danh sách sản phẩm.", "Success");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Đặt hàng thất bại từ danh sách sản phẩm! " + e.getMessage());
+        }
+    }
+
+
+
+    @Override
+    @Transactional
+    public OrderResponse addNewOrderWithProductVariant(OrderRequestWithProductVariant request, String username) {
+        Long shopId = getShopIdOfProductVariantId(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()).get(0));
+        if (!request.getShopId().equals(shopId)) {
+            throw new BadRequestException("Mã cửa hàng không hợp lệ!");
+        }
+        productVariantService.checkProductVariantsSameShop(new ArrayList<>(request.getProductVariantIdsAndQuantities().keySet()), shopId);
+        Order order = createAddNewOrderWithCart(OrderRequestWithCart.convertWithProductVariantToWithCart(request), username);
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                order.getShopWardCode().getWardCode(), request.getShippingMethod()).getShippingDTO();
+        try {
+            addOrderItemsToOrderByMapProductVariant(order, request.getProductVariantIdsAndQuantities(), username);
+            addVoucherOrderToOrder(order, request.getShopVoucherCode(), request.getSystemVoucherCode());
+            updateShippingInCreateOrder(order, request.getShippingMethod());
+            orderRepository.save(order);
+
             return OrderResponse.orderResponse(order, shippingDTO, "Đặt hàng thành công từ danh sách sản phẩm trong giỏ hàng.", "Success");
         } catch (Exception e) {
-            throw new InternalServerErrorException("Tạo đơn hàng mới thất bại! " + e.getMessage() + " " + e.getCause());
+            throw new InternalServerErrorException("Đặt hàng thất bại từ danh sách sản phẩm trong giỏ hàng! " + e.getMessage());
         }
     }
 
-
-    @Override
-    public OrderResponse createOrderUpdate(CreateOrderUpdateRequest request) {
-        Order order = createTemporaryOrderUpdate(request);
-
-        return OrderResponse.orderResponse(order, "Cập nhật đơn hàng thành công.", "Success");
-    }
-
-    @Transactional
-    @Override
-    public OrderResponse saveOrder(CreateOrderUpdateRequest request) {
-        Order order = createTemporaryOrderUpdate(request);
-
-        // Sau này nếu có nhiều hình thước thanh toán sẻ sử lý ở đây.
-        switch (order.getPaymentMethod()) {
-            case "COD":
-                order.setStatus(OrderStatus.PENDING);
-                break;
-            default:
-                order.setStatus(OrderStatus.PENDING);
-                break;
-        }
-
-        order.setCreateAt(LocalDateTime.now());
-        order.setUpdateAt(LocalDateTime.now());
-
-        try {
-            Order save = orderRepository.save(order);
-
-            if (request.getVoucherShopId() != null) {
-                VoucherOrder voucherOrder = voucherOrderService.saveVoucherOrder(request.getVoucherShopId(), save,
-                        true);
-                // voucherOrder.setOrder(save);
-                save.setVoucherOrders(List.of(voucherOrder));
-            }
-
-            if (request.getVoucherSystemId() != null) {
-                VoucherOrder voucherOrder = voucherOrderService.saveVoucherOrder(request.getVoucherSystemId(), save,
-                        false);
-                if (save.getVoucherOrders() != null) {
-                    List<VoucherOrder> voucherOrders = new ArrayList<>(save.getVoucherOrders());
-                    voucherOrders.add(voucherOrder);
-
-                    save.setVoucherOrders(voucherOrders);
-                } else {
-                    save.setVoucherOrders(List.of(voucherOrder));
-                }
-            }
-
-            List<OrderItem> orderItems = orderItemService.saveOrderItem(save);
-            save.setOrderItems(orderItems);
-
-
-            return OrderResponse.orderResponse(save, "Đặt hàng thành công.", "Success");
-
-        } catch (Exception e) {
-            throw new BadRequestException("Đặt hàng thất bại! " + e.getMessage() + " " + e.getCause());
-        }
-    }
 
     @Override
     public ListOrderResponse getOrders(String username) {
@@ -221,6 +185,7 @@ public class OrderServiceImpl implements IOrderService {
         return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng thành công.", "OK");
 
     }
+
 
     @Override
     public ListOrderResponse getOrdersByStatus(String username, OrderStatus status) {
@@ -231,6 +196,7 @@ public class OrderServiceImpl implements IOrderService {
 
         return ListOrderResponse.listOrderResponse(orders, message, "OK");
     }
+
 
     @Override
     public OrderResponse getOrderDetail(String username, UUID orderId) {
@@ -244,6 +210,7 @@ public class OrderServiceImpl implements IOrderService {
         return OrderResponse.orderResponse(order, "Lấy chi tiết đơn hàng thành công.", "OK");
 
     }
+
 
     @Override
     @Transactional
@@ -274,6 +241,7 @@ public class OrderServiceImpl implements IOrderService {
         }
     }
 
+
     @Override
     public String messageByOrderStatus(OrderStatus status) {
 
@@ -289,12 +257,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-
-
-
-    private Order createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username, Long shopId, Address address) {
+    private Order createOrderByOrderRequestWithCartIds(OrderRequestWithCart request, String username, Long shopId, Address address) {
         List<OrderItem> orderItems = orderItemService.createOrderItemsByCartIds(username, request.getCartIds());
-        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
+        Order order = createBaseOrder(username, shopId, address);
         updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, request.getPaymentMethod());
         if (!request.getNote().isEmpty()) {
             order.setNote(request.getNote());
@@ -307,7 +272,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
     private Order createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username, Long shopId, Address address) {
-        Order order = createOrderByUsernameAndShopIdAndAddress(username, shopId, address);
+        Order order = createBaseOrder(username, shopId, address);
         List<OrderItem> orderItems = orderItemService.createOrderItemsByMapProductVariantIdsAndQuantities(order.getCustomer(),
                 request.getProductVariantIdsAndQuantities());
         updateCreateOrderByOrderItemsPaymentMethod(order, orderItems, request.getPaymentMethod());
@@ -321,55 +286,20 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    private Order createTemporaryOrderUpdate(CreateOrderUpdateRequest request) {
-        Order order = createTemporaryOrder(request.getUsername(), request.getCartIds());
+    private Order createAddNewOrderWithCart(OrderRequestWithCart request, String username) {
+        Address address = addressService.checkAddress(request.getAddressId(), username);
 
-        if (request.getAddressId() != null && request.getAddressId().equals(order.getAddress().getAddressId())) {
-            order.setAddress(addressService.checkAddress(request.getAddressId(), request.getUsername()));
-        }
-
-        // order.setPaymentMethod(request.getPaymentMethod());
-
-        if (request.getShippingMethod().equals(order.getShippingMethod())) {
-            order.setShippingMethod(request.getShippingMethod());
-            order.setShippingFee(calculateShippingFee(order.getShippingMethod(), order.getTotalPrice()));
-        }
-
+        Order order = createBaseOrder(username, request.getShopId(), address);
+        order.setStatus(OrderStatus.PENDING);
         if (!request.getNote().isEmpty()) {
             order.setNote(request.getNote());
         }
+        try {
 
-//        if (request.getVoucherShopId() != null) {
-//            Long discount = voucherOrderService.calculateVoucher(request.getVoucherShopId(), order.getShopId(),
-//                    order.getTotalPrice(), true);
-//            order.setDiscount(order.getDiscount() + discount);
-//        }
-//
-//        if (request.getVoucherSystemId() != null) {
-//            Long discount = voucherOrderService.calculateVoucher(request.getVoucherSystemId(), null,
-//                    order.getTotalPrice(), false);
-//            order.setDiscount(order.getDiscount() + discount);
-//        }
-
-//        order.setPaymentTotal(order.getTotalPrice() + order.getShippingFee() - order.getDiscount());
-        order.setTotalPrice(order.getTotalPrice());
-
-        return order;
-    }
-
-    private Long calculateShippingFee(String shippingMethod, Long totalPrice) {
-        IShippingStrategy shippingStrategy = null;
-        if (shippingMethod.equals("GHTK")) {
-            shippingStrategy = new GiaoHangTietKiemShippingStrategy();
-        } else {
-            shippingStrategy = new GiaoHangHoaTocShippingStrategy();
+            return orderRepository.save(order);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Tạo mẫu đơn hàng mới thất bại! " + e.getMessage());
         }
-        return shippingStrategy.calculateShippingCost(totalPrice);
-    }
-
-
-    private Order createOrderByUsernameAndShopIdAndAddress(String username, Long shopId, Address address) {
-        return createBaseOrder(username, shopId, address);
     }
 
 
@@ -449,13 +379,20 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-
     private void addOrderItemsToOrder(Order order, List<UUID> cartIds, String username) {
         List<OrderItem> orderItems = orderItemService.addNewOrderItemsByCartIds(order, cartIds, username);
         order.setOrderItems(orderItems);
         order.setTotalPrice(getTotalPrice(orderItems));
         order.setCount(getTotalCount(orderItems));
     }
+
+    private void addOrderItemsToOrderByMapProductVariant(Order order, Map<Long,Integer> productVariantsAndQuantities, String username) {
+        List<OrderItem> orderItems = orderItemService.addNewOrderItemsByyMapProductVariant(order, productVariantsAndQuantities, username);
+        order.setOrderItems(orderItems);
+        order.setTotalPrice(getTotalPrice(orderItems));
+        order.setCount(getTotalCount(orderItems));
+    }
+
 
     private void addVoucherOrderToOrder(Order order, String shopVoucherCode, String systemVoucherCode) {
         List<VoucherOrder> voucherOrders = new ArrayList<>();
@@ -497,59 +434,6 @@ public class OrderServiceImpl implements IOrderService {
         int distanceLocation = distanceLocationService.calculateDistance(customerWardCode, shopWardCode);
 
         return shippingStrategy.calculateShippingCost(distanceLocation);
-    }
-
-
-//    private Order createOrderByCartIds( Customer customer, Address address, Shop shop, List<UUID> cartIds) {
-//        checkListCartSameShop(customer.getUsername(), cartIds);
-//        List<OrderItem> orderItems = orderItemService.createOrderItems(customer.getUsername(), cartIds);
-//
-//        return createOrderByCustomerAndOrderItemsAndAddressAndShopAndShippingMethodAndPaymentMethod(
-//                customer, orderItems, address, shop, "VTV Express", "COD");
-//    }
-
-
-    private Order createTemporaryOrder(String username, List<UUID> cartIds) {
-
-        Customer customer = customerService.getCustomerByUsername(username);
-
-//        checkListCartSameShop(username, cartIds);
-
-        List<OrderItem> orderItems = orderItemService.createOrderItemsByCartIds(username, cartIds);
-        Address address = addressService.getAddressActiveByUsername(username);
-
-        Long totalPrice = getTotalPrice(orderItems);
-        Long discount = 0L;
-
-        IShippingStrategy shippingStrategy = new GiaoHangNhanhShippingStrategy();
-        Long shippingFee = shippingStrategy.calculateShippingCost(totalPrice);
-
-        Long totalPayment = totalPrice + shippingFee - discount;
-        Long shopId = orderItems.get(0).getCart().getProductVariant().getProduct().getShop().getShopId();
-        String shopName = orderItems.get(0).getCart().getProductVariant().getProduct().getShop()
-                .getName();
-
-        Order order = new Order();
-        order.setCustomer(customer);
-        order.setOrderItems(orderItems);
-        order.setAddress(address);
-        order.setStatus(OrderStatus.WAITING);
-        order.setTotalPrice(totalPrice);
-        order.setVoucherOrders(null);
-        order.setPaymentMethod("COD");
-        order.setShippingMethod("GHN");
-        order.setPaymentTotal(totalPayment);
-        order.setDiscountShop(0L);
-        order.setDiscountSystem(0L);
-
-        order.setNote(null);
-        order.setOrderDate(new Date());
-        order.setOrderItems(orderItems);
-        order.setCount(getTotalCount(orderItems));
-        order.setShopId(shopId);
-        order.setShopName(shopName);
-        order.setShippingFee(shippingFee);
-        return order;
     }
 
 

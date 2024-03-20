@@ -10,11 +10,18 @@ import hcmute.kltn.vtv.model.extra.CartStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ICartService {
     @Transactional
     CartResponse addNewCart(CartRequest request, String username);
+
+    @Transactional
+    List<UUID> getCartIdsAfterAddNewCartsByMapProductVariantIdAndQuantity(Map<Long, Integer> mapProductVariantIdAndQuantity, String username);
+
+    @Transactional
+    List<Cart> addNewCartOrderByMapProductVariant(Map<Long, Integer> mapProductVariantIdAndQuantity, String username);
 
     @Transactional
     CartResponse updateCart(UUID cartId, int quantity, String username);

@@ -3,6 +3,7 @@ package hcmute.kltn.vtv.service.guest.impl;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vendor.ProductVariantRepository;
+import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
@@ -20,6 +21,8 @@ public class ProductVariantServiceImpl implements IProductVariantService {
 
     @Autowired
     private ProductVariantRepository productVariantRepository;
+    @Autowired
+    private IProductService productService;
 
 
     @Override
@@ -37,7 +40,7 @@ public class ProductVariantServiceImpl implements IProductVariantService {
         }
 
         if (productVariant.getQuantity() < quantity) {
-            throw new BadRequestException("Số lượng sản phẩm trong kho không đủ.");
+            throw new BadRequestException("Số lượng sản phẩm trong kho không đủ!");
         }
 
         return productVariant;
@@ -67,7 +70,6 @@ public class ProductVariantServiceImpl implements IProductVariantService {
     }
 
 
-
     @Override
     public void checkDuplicateProductVariantIds(List<Long> productVariantIds) {
         if (productVariantIds.size() != productVariantIds.stream().distinct().count()) {
@@ -89,8 +91,11 @@ public class ProductVariantServiceImpl implements IProductVariantService {
         ProductVariant productVariant = getProductVariantById(productVariantId);
         productVariant.setQuantity(productVariant.getQuantity() + quantity);
 
+
         try {
             productVariantRepository.save(productVariant);
+            productService.updateProductSold(productVariant.getProduct().getProductId(), quantity);
+
         } catch (Exception e) {
             throw new BadRequestException("Cập nhật số lượng sản phẩm trong kho thất bại!");
         }

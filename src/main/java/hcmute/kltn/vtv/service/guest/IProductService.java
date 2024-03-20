@@ -9,6 +9,8 @@ public interface IProductService {
     ProductResponse getProductDetail(Long productId);
 
 
+    void updateProductSold(Long productId, int quantity);
+
     ListProductResponse getListProductByShopId(Long shopId);
 
     ListProductPageResponse getListProductPageByCategoryId(Long categoryId, int page, int size);

@@ -16,6 +16,9 @@ public interface IOrderItemService {
     @Transactional
     List<OrderItem> addNewOrderItemsByCartIds(Order order, List<UUID> cartIds, String username);
 
+    @Transactional
+    List<OrderItem> addNewOrderItemsByyMapProductVariant(Order order, Map<Long, Integer> productVariantsAndQuantities, String username);
+
     List<OrderItem> createOrderItemsByCartIds(String username, List<UUID> cartIds);
 
     List<OrderItem> createOrderItemsByMapProductVariantIdsAndQuantities(Customer customer, Map<Long, Integer> mapProductVariantIdsAndQuantities);

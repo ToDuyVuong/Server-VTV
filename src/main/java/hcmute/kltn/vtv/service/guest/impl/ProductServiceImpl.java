@@ -43,6 +43,19 @@ public class ProductServiceImpl implements IProductService {
 
 
     @Override
+    public void updateProductSold(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
+        product.setSold(product.getSold() - quantity);
+        try {
+            productRepository.save(product);
+        }catch (Exception e){
+            throw new NotFoundException("Cập nhật số lượng sản phẩm bán thất bại!");
+        }
+    }
+
+
+    @Override
     public ListProductResponse getListProductByShopId(Long shopId) {
         List<Product> products = productRepository.findByShopShopIdAndStatus(shopId, Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm nào trong cửa hàng này!"));

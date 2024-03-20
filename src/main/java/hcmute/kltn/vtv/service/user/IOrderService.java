@@ -1,12 +1,10 @@
 package hcmute.kltn.vtv.service.user;
 
-import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
-import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCartIds;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCart;
 import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithProductVariant;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
-import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,18 +19,16 @@ public interface IOrderService {
     @Transactional
     OrderResponse createOrderByMapProductVariantsAndQuantities(String username, Map<Long, Integer> productVariantIdsAndQuantities);
     @Transactional
-    OrderResponse createOrderByOrderRequestWithProductVariant(OrderRequestWithProductVariant request, String username);
+    OrderResponse createOrderWithProductVariant(OrderRequestWithProductVariant request, String username);
     @Transactional
-    OrderResponse createOrderByOrderRequestWithCartIds(OrderRequestWithCartIds request, String username);
+    OrderResponse createOrderWithCart(OrderRequestWithCart request, String username);
 
     @Transactional
-    OrderResponse addNewOrderByOrderRequestWithCart(OrderRequestWithCartIds request, String username);
+    OrderResponse addNewOrderWithCart(OrderRequestWithCart request, String username);
+
 
     @Transactional
-    OrderResponse createOrderUpdate(CreateOrderUpdateRequest request);
-
-    @Transactional
-    OrderResponse saveOrder(CreateOrderUpdateRequest request);
+    OrderResponse addNewOrderWithProductVariant(OrderRequestWithProductVariant request, String username);
 
     ListOrderResponse getOrders(String username);
 

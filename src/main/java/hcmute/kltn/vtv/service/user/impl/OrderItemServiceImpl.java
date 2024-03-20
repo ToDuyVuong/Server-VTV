@@ -17,6 +17,7 @@ import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.repository.vendor.ProductVariantRepository;
 import hcmute.kltn.vtv.service.user.ICartService;
 import hcmute.kltn.vtv.service.user.IOrderItemService;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -100,11 +101,30 @@ public class OrderItemServiceImpl implements IOrderItemService {
     @Transactional
     public List<OrderItem> addNewOrderItemsByCartIds(Order order, List<UUID> cartIds, String username) {
         List<OrderItem> orderItems = new ArrayList<>();
-        for (UUID cartId : cartIds) {
-            orderItems.add(addNewOrderItem(order, cartId, username));
+        try {
+            cartIds.forEach(cartId -> orderItems.add(addNewOrderItem(order, cartId, username)));
+
+            return orderItems;
+        } catch (Exception e) {
+            throw new BadRequestException("Thêm mới sản phẩm vào đơn hàng thất bại!");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public List<OrderItem> addNewOrderItemsByyMapProductVariant(Order order, Map<Long, Integer> productVariantsAndQuantities, String username) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        try {
+            List<UUID> cartIds = cartService.getCartIdsAfterAddNewCartsByMapProductVariantIdAndQuantity(productVariantsAndQuantities, username);
+            cartIds.forEach(cartId -> orderItems.add(addNewOrderItem(order, cartId, username)));
+
+            return orderItems;
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Thêm mới từ mã biến thể sản phẩm vào đơn hàng thất bại! " + e.getMessage());
         }
 
-        return orderItems;
+
     }
 
 

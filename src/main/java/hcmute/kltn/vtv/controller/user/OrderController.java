@@ -1,13 +1,11 @@
 package hcmute.kltn.vtv.controller.user;
 
-import hcmute.kltn.vtv.model.data.user.request.CreateOrderUpdateRequest;
-import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCartIds;
+import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithCart;
 import hcmute.kltn.vtv.model.data.user.request.OrderRequestWithProductVariant;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
 import hcmute.kltn.vtv.model.data.user.response.OrderResponse;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
-import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.service.user.IOrderService;
 import hcmute.kltn.vtv.service.user.impl.OrderItemServiceImpl;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,22 +44,12 @@ public class OrderController {
     }
 
     @PostMapping("/create-update/with-cart")
-    public ResponseEntity<OrderResponse> createOrderWithCart(@RequestBody OrderRequestWithCartIds orderRequestWithCartIds,
-                                                              HttpServletRequest request) {
-        OrderRequestWithCartIds.validate(orderRequestWithCartIds);
-
-        String username = (String) request.getAttribute("username");
-        return ResponseEntity.ok(orderService.createOrderByOrderRequestWithCartIds(orderRequestWithCartIds, username));
-    }
-
-
-    @PostMapping("/add/with-cart")
-    public ResponseEntity<OrderResponse> addNewOrderByOrderRequestWithCart(@RequestBody OrderRequestWithCartIds orderRequestWithCartIds,
+    public ResponseEntity<OrderResponse> createOrderWithCart(@RequestBody OrderRequestWithCart orderRequestWithCart,
                                                              HttpServletRequest request) {
-        OrderRequestWithCartIds.validate(orderRequestWithCartIds);
+        OrderRequestWithCart.validate(orderRequestWithCart);
 
         String username = (String) request.getAttribute("username");
-        return ResponseEntity.ok(orderService.addNewOrderByOrderRequestWithCart(orderRequestWithCartIds, username));
+        return ResponseEntity.ok(orderService.createOrderWithCart(orderRequestWithCart, username));
     }
 
 
@@ -74,10 +61,10 @@ public class OrderController {
         }
 
         productVariantIdsAndQuantities.forEach((k, v) -> {
-            if (k == null || v == null ) {
+            if (k == null || v == null) {
                 throw new BadRequestException("Danh sách sản phẩm không hợp lệ!");
             }
-            if (v <= 0){
+            if (v <= 0) {
                 throw new BadRequestException("Số lượng biến thể sản phẩm của mã biến thể sản phẩm " + k + " không hợp lệ!");
             }
         });
@@ -86,18 +73,34 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrderByMapProductVariantsAndQuantities(username, productVariantIdsAndQuantities));
     }
 
+
     @PostMapping("/create-update/with-product-variant")
     public ResponseEntity<OrderResponse> createOrderWithProductVariant(@RequestBody OrderRequestWithProductVariant orderRequestWithProductVariant,
+                                                                       HttpServletRequest request) {
+        OrderRequestWithProductVariant.validate(orderRequestWithProductVariant);
+        String username = (String) request.getAttribute("username");
+
+        return ResponseEntity.ok(orderService.createOrderWithProductVariant(orderRequestWithProductVariant, username));
+    }
+
+
+    @PostMapping("/add/with-cart")
+    public ResponseEntity<OrderResponse> addNewOrderWithCart(@RequestBody OrderRequestWithCart orderRequestWithCart,
+                                                                           HttpServletRequest request) {
+        OrderRequestWithCart.validate(orderRequestWithCart);
+        String username = (String) request.getAttribute("username");
+
+        return ResponseEntity.ok(orderService.addNewOrderWithCart(orderRequestWithCart, username));
+    }
+
+    @PostMapping("/add/with-product-variant")
+    public ResponseEntity<OrderResponse> addNewOrderWithProductVariant(@RequestBody OrderRequestWithProductVariant orderRequestWithProductVariant,
                                                                                      HttpServletRequest request) {
         OrderRequestWithProductVariant.validate(orderRequestWithProductVariant);
         String username = (String) request.getAttribute("username");
 
-        return ResponseEntity.ok(orderService.createOrderByOrderRequestWithProductVariant(orderRequestWithProductVariant, username));
+        return ResponseEntity.ok(orderService.addNewOrderWithProductVariant(orderRequestWithProductVariant, username));
     }
-
-
-
-
 
 
     @GetMapping("/list")

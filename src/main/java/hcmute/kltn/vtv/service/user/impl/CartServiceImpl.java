@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +53,49 @@ public class CartServiceImpl implements ICartService {
             return CartResponse.cartResponse(cart, "Thêm sản phẩm vào giỏ hàng thành công.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Thêm sản phẩm vào giỏ hàng thất bại.");
+        }
+    }
+
+    @Override
+    @Transactional
+    public List<UUID> getCartIdsAfterAddNewCartsByMapProductVariantIdAndQuantity(Map<Long, Integer> mapProductVariantIdAndQuantity, String username) {
+        List<Cart> carts = addNewCartOrderByMapProductVariant(mapProductVariantIdAndQuantity, username);
+        List<UUID> cartIds = new ArrayList<>();
+        carts.forEach(cart -> cartIds.add(cart.getCartId()));
+
+        return cartIds;
+    }
+
+
+    @Override
+    @Transactional
+    public List<Cart> addNewCartOrderByMapProductVariant(Map<Long, Integer> mapProductVariantIdAndQuantity, String username) {
+        Customer customer = customerService.getCustomerByUsername(username);
+        List<Cart> carts = new ArrayList<>();
+        try {
+            mapProductVariantIdAndQuantity.forEach((productVariantId, quantity) -> {
+                Cart cart = addNewCartByProductVariantIdAndQuantity(productVariantId, quantity, customer);
+                carts.add(cart);
+            });
+            return carts;
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Thêm danh sách sản phẩm khi đặt hàng thất bại! " + e.getMessage());
+        }
+    }
+
+
+
+    @Transactional
+    public Cart addNewCartByProductVariantIdAndQuantity(Long productVariantId, int quantity, Customer customer) {
+        ProductVariant productVariant = productVariantService.checkAndProductVariantAvailableWithQuantity(
+                productVariantId, quantity);
+        Cart cart = createCartByProductVariant(productVariant, quantity, customer);
+        cart.setStatus(CartStatus.CART);
+        try {
+
+            return cartRepository.save(cart);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Thêm sản phẩm vào giỏ hàng trong lúc đặt hàng thất bại.");
         }
     }
 
