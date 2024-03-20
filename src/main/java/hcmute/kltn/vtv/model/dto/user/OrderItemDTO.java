@@ -27,22 +27,21 @@ public class OrderItemDTO {
 
     private Long price;
 
+    private Long totalPrice;
+
     private ProductVariantDTO productVariantDTO;
 
 
     public static OrderItemDTO convertEntityToDTO(OrderItem orderItem) {
-        ProductVariantDTO productVariantDTO = ProductVariantDTO
-                .convertEntityToDTO(orderItem.getCart().getProductVariant());
         OrderItemDTO orderItemDTO = new OrderItemDTO();
-        if (orderItem.getOrderItemId() != null) {
-            orderItemDTO.setOrderItemId(orderItem.getOrderItemId());
-            orderItemDTO.setOrderId(orderItem.getOrder().getOrderId());
-        }
-
+        orderItemDTO.setProductVariantDTO(ProductVariantDTO.convertEntityToDTO(orderItem.getCart().getProductVariant()));
+        orderItemDTO.setOrderItemId(orderItem.getOrderItemId());
+        orderItemDTO.setOrderId(orderItem.getOrder().getOrderId());
         orderItemDTO.setCartId(orderItem.getCart().getCartId());
-        orderItemDTO.setProductVariantDTO(productVariantDTO);
         orderItemDTO.setQuantity(orderItem.getCart().getQuantity());
-        orderItemDTO.setPrice(orderItem.getCart().getProductVariant().getPrice());
+        orderItemDTO.setPrice(orderItem.getPrice());
+        orderItemDTO.setTotalPrice(orderItem.getPrice() * orderItem.getCart().getQuantity());
+
         return orderItemDTO;
     }
 

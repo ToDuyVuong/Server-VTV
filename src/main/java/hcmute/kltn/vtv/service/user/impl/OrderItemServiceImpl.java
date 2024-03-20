@@ -73,6 +73,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
         Cart cart = cartService.getCartByCartIdAndUsername(cartId, username);
         orderItem.setOrder(null);
         orderItem.setCart(cart);
+        orderItem.setPrice(cart.getProductVariant().getPrice());
         return orderItem;
     }
 
@@ -83,6 +84,8 @@ public class OrderItemServiceImpl implements IOrderItemService {
         Cart cart = cartService.getCartByCartIdAndUsername(cartId, username);
         orderItem.setOrder(order);
         orderItem.setCart(cart);
+        orderItem.setPrice(cart.getProductVariant().getPrice());
+
         try {
             productVariantService.updateProductVariantQuantity(cart.getProductVariant().getProductVariantId(), -cart.getQuantity());
             cartService.updateOrderCart(cartId, username, CartStatus.ORDER);
@@ -141,6 +144,7 @@ public class OrderItemServiceImpl implements IOrderItemService {
                 .checkAndProductVariantAvailableWithQuantity(productVariantId, quantity);
         OrderItem orderItem = new OrderItem();
         orderItem.setCart(cartService.createCartByProductVariant(productVariant, quantity, customer));
+        orderItem.setPrice(orderItem.getCart().getProductVariant().getPrice());
 
         return orderItem;
     }
