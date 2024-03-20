@@ -53,6 +53,10 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private final IShippingService shippingService;
 
+    @Autowired
+    private final IMailService mailService;
+
+
     @Override
     @Transactional
     public OrderResponse createOrderByCartIds(String username, List<UUID> cartIds) {
@@ -147,6 +151,9 @@ public class OrderServiceImpl implements IOrderService {
             updateShippingInCreateOrder(order, request.getShippingMethod());
             orderRepository.save(order);
 
+            String messageMail = "Đặt hàng thành công.";
+            mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
+
             return OrderResponse.orderResponse(order, shippingDTO, "Đặt hàng thành công từ danh sách sản phẩm.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Đặt hàng thất bại từ danh sách sản phẩm! " + e.getMessage());
@@ -170,6 +177,10 @@ public class OrderServiceImpl implements IOrderService {
             addVoucherOrderToOrder(order, request.getShopVoucherCode(), request.getSystemVoucherCode());
             updateShippingInCreateOrder(order, request.getShippingMethod());
             orderRepository.save(order);
+
+            String messageMail = "Đặt hàng thành công.";
+            mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
+
 
             return OrderResponse.orderResponse(order, shippingDTO, "Đặt hàng thành công từ danh sách sản phẩm trong giỏ hàng.", "Success");
         } catch (Exception e) {
@@ -227,6 +238,10 @@ public class OrderServiceImpl implements IOrderService {
             order.setUpdateAt(LocalDateTime.now());
             try {
                 orderRepository.save(order);
+                ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                        order.getShopWardCode().getWardCode(), order.getShippingMethod()).getShippingDTO();
+                String messageMail = "Xác nhận đã nhận hàng thành công.";
+                mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
                 return OrderResponse.orderResponse(order, "Xác nhận đã nhận hàng thành công.", "Success");
             } catch (Exception e) {
                 throw new InternalServerErrorException("Hoàn thành đơn hàng thất bại!");
@@ -284,6 +299,11 @@ public class OrderServiceImpl implements IOrderService {
             List<OrderItem> orderItems = orderItemService.cancelOrderItem(order);
             order.setOrderItems(orderItems);
 
+            ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                    order.getShopWardCode().getWardCode(), order.getShippingMethod()).getShippingDTO();
+            String messageMail = "Hủy đơn hàng thành công.";
+            mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
+
             return OrderResponse.orderResponse(order, "Hủy đơn hàng thành công.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Hủy đơn hàng thất bại!");
@@ -297,6 +317,13 @@ public class OrderServiceImpl implements IOrderService {
         order.setUpdateAt(LocalDateTime.now());
         try {
             Order save = orderRepository.save(order);
+
+            ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                    order.getShopWardCode().getWardCode(), order.getShippingMethod()).getShippingDTO();
+            String messageMail = "Yêu cầu hủy đơn hàng thành công.";
+            mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
+
+
             return OrderResponse.orderResponse(save, "Yêu cầu hủy đơn hàng thành công.", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Yêu cầu hủy đơn hàng thất bại!");

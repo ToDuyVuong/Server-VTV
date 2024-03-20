@@ -1,9 +1,12 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.model.dto.shipping.ShippingDTO;
+import hcmute.kltn.vtv.model.entity.user.*;
+import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
+import hcmute.kltn.vtv.model.extra.VoucherType;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.SendEmailResponse;
 import hcmute.kltn.vtv.model.dto.user.MailDTO;
-import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.user.IMailService;
 import hcmute.kltn.vtv.service.user.IOtpService;
@@ -17,9 +20,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class MailServiceImpl implements IMailService {
@@ -29,6 +33,547 @@ public class MailServiceImpl implements IMailService {
     private ICustomerService customerService;
     @Autowired
     private IOtpService otpService;
+
+
+    @Override
+    public void sendOrderConfirmationEmail(Order order, ShippingDTO shippingDTO, String message) {
+        String mailSubject = "Xác nhận đơn hàng #" + order.getOrderId() + " - trên hệ thống VTV";
+
+        Customer customer = order.getCustomer();
+        MailDTO mailDTO = createOrderConfirmationMailDTO(customer.getEmail(), mailSubject, message, order, shippingDTO);
+
+
+        // Tạo một luồng mới để gửi email
+        new Thread(() -> {
+            try {
+                sendEmail(mailDTO);
+            } catch (BadRequestException e) {
+                throw new InternalServerErrorException("Có lỗi xảy ra khi gửi email xác nhận đơn hàng: " + e.getMessage());
+            }
+        }).start();
+    }
+
+
+    private MailDTO createOrderConfirmationMailDTO(String mailTo, String mailSubject, String message, Order order, ShippingDTO shippingDTO) {
+        MailDTO mail = new MailDTO();
+        mail.setMailFrom("conc5288@gmail.com");
+        mail.setMailTo(mailTo);
+        mail.setMailSubject(mailSubject);
+
+
+        StringBuilder mailContent = new StringBuilder(generateHtmlContent(order, shippingDTO, message));
+        mail.setMailContent(mailContent.toString());
+
+        return mail;
+    }
+
+
+    private String generateHtmlContent(Order order, ShippingDTO shippingDTO, String message) {
+        StringBuilder htmlContent = new StringBuilder();
+
+        htmlContent.append("<div style='background-color: #f0f0f0; padding: 10px;'>");
+        htmlContent.append("<p>").append(message).append("</p>");
+        htmlContent.append("</div>");
+
+
+        htmlContent.append("<div>");
+        htmlContent.append("<p>");
+        htmlContent.append("Xin chào ").append(order.getCustomer().getFullName()).append(",\n\n");
+        htmlContent.append("Đơn hàng #").append(order.getOrderId()).append(".\n").append(message);
+        htmlContent.append("</p>");
+        htmlContent.append("</div>");
+
+
+        // Start HTML content
+        htmlContent.append("<html>");
+        htmlContent.append("<head>");
+        htmlContent.append("<style>");
+        htmlContent.append("body { font-family: Arial, sans-serif;}");
+        htmlContent.append("h2 { color: #333;}");
+        htmlContent.append("h3 { color: #555;}");
+        htmlContent.append("p { margin: 5px 0;}");
+        htmlContent.append("table { width: 100%; border-collapse: collapse;}");
+        htmlContent.append("th, td { border: 1px solid #ddd; padding: 8px;}");
+        htmlContent.append("th { background-color: #f2f2f2;}");
+        htmlContent.append("</style>");
+        htmlContent.append("</head>");
+        htmlContent.append("<body>");
+        htmlContent.append("<h2 style='color: red; font-weight: bold; text-align: center;'>Chi tiết hóa đơn</h2>");
+        htmlContent.append("<hr>");
+
+        htmlContent.append("<br>");
+        createHtmlContentOrderDetail(htmlContent, order);
+        htmlContent.append("<br>");
+        createHtmlContentCustomer(htmlContent, order.getCustomer());
+        htmlContent.append("<br>");
+        createHtmlContentAddress(htmlContent, order.getAddress());
+        htmlContent.append("<br>");
+        String fullAddressShop = order.getShopWardCode().getName() + ", "
+                + order.getShopWardCode().getDistrict().getName() + ", "
+                + order.getShopWardCode().getDistrict().getProvince().getName();
+        createHtmlContentShopDetail(htmlContent, order.getShopName(), fullAddressShop);
+        htmlContent.append("<br>");
+        createHtmlContentOrderItem(htmlContent, order);
+        htmlContent.append("<br>");
+        createHtmlContentShipping(htmlContent, shippingDTO);
+        htmlContent.append("<br>");
+        createHtmlContentVoucherOrder(htmlContent, order.getVoucherOrders());
+
+
+        htmlContent.append("</body>");
+        htmlContent.append("</html>");
+
+        return htmlContent.toString();
+    }
+
+    private void createHtmlContentOrderDetail(StringBuilder htmlContent, Order order) {
+        htmlContent.append("<h3>Thông tin đơn hàng:</h3>");
+        htmlContent.append("<p><strong>Mã đơn hàng: #</strong> ").append(order.getOrderId()).append("</p>");
+        htmlContent.append("<p><strong>Ngày đặt hàng:</strong> ").append(order.getCreateAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("</p>");
+        htmlContent.append("<p><strong>Tổng số tiền:</strong> ").append(formatCurrency(order.getTotalPrice())).append(" VNĐ</p>");
+        htmlContent.append("<p><strong>Phương thức thanh toán:</strong> ").append(order.getPaymentMethod()).append("</p>");
+        htmlContent.append("<p><strong>Trạng thái đơn hàng:</strong> ").append(order.getStatus()).append("</p>");
+        htmlContent.append("<p><strong>Lời nhắn:</strong> ").append(order.getNote()).append("</p>");
+    }
+
+    private void createHtmlContentShopDetail(StringBuilder htmlContent, String shopName, String shopAddress) {
+        htmlContent.append("<h3>Thông tin cửa hàng:</h3>");
+        htmlContent.append("<p><strong>Tên cửa hàng:</strong> ").append(shopName).append("</p>");
+        htmlContent.append("<p><strong>Địa chỉ cửa hàng:</strong> ").append(shopAddress).append("</p>");
+    }
+
+    private void createHtmlContentCustomer(StringBuilder htmlContent, Customer customer) {
+        htmlContent.append("<h3>Thông tin khách hàng:</h3>");
+        htmlContent.append("<p><strong>Họ và tên:</strong> ").append(customer.getFullName()).append("</p>");
+        htmlContent.append("<p><strong>Email:</strong> ").append(customer.getEmail()).append("</p>");
+    }
+
+
+    private void createHtmlContentAddress(StringBuilder htmlContent, Address address) {
+
+        String fullAddress = address.getFullAddress() + ", " + address.getWard().getName() + ", "
+                + address.getWard().getDistrict().getName() + ", " + address.getWard().getDistrict().getProvince().getName();
+        htmlContent.append("<h3>Địa chỉ giao hàng:</h3>");
+        htmlContent.append("<p><strong>Địa chỉ:</strong> ").append(fullAddress).append("</p>");
+        htmlContent.append("<p><strong>Số điện thoại:</strong> ").append(address.getPhone()).append("</p>");
+    }
+
+    private void createHtmlContentShipping(StringBuilder htmlContent, ShippingDTO shippingDTO) {
+        // Shipping details
+        htmlContent.append("<h3>Thông tin vận chuyển:</h3>");
+        htmlContent.append("<p><strong>Nhà cung cấp vận chuyển:</strong> ").append(shippingDTO.getTransportProviderFullName()).append("</p>");
+        htmlContent.append("<p><strong>Phương thức vận chuyển:</strong> ").append(shippingDTO.getTransportProviderShortName()).append("</p>");
+        htmlContent.append("<p><strong>Phí vận chuyển:</strong> ").append(formatCurrency(shippingDTO.getShippingCost())).append(" VNĐ</p>");
+        htmlContent.append("<p><strong>Thời gian dự kiến giao hàng:</strong> ").append(shippingDTO.getEstimatedDeliveryTime()).append("</p>");
+    }
+
+    private void createHtmlContentOrderItem(StringBuilder htmlContent, Order order) {
+        // Order items
+        List<OrderItem> orderItems = order.getOrderItems();
+        htmlContent.append("<h3>Sản phẩm trong đơn hàng:</h3>");
+        htmlContent.append("<table>");
+        htmlContent.append("<tr>");
+        htmlContent.append("<th>Mã sản phẩm</th>");
+        htmlContent.append("<th>Mã biến thể</th>");
+        htmlContent.append("<th>Tên sản phẩm</th>");
+        htmlContent.append("<th>Số lượng</th>");
+        htmlContent.append("<th>Giá</th>");
+        htmlContent.append("<th>Tổng giá</th>");
+        htmlContent.append("<th>Hình ảnh</th>");
+        htmlContent.append("</tr>");
+        for (OrderItem orderItem : orderItems) {
+            ProductVariant productVariant = orderItem.getCart().getProductVariant();
+            htmlContent.append("<tr>");
+            htmlContent.append("<td style='text-align: center;'>").append(productVariant.getProduct().getProductId()).append("</td>");
+            htmlContent.append("<td style='text-align: center;'>").append(productVariant.getSku()).append("</td>");
+            htmlContent.append("<td>").append(productVariant.getProduct().getName()).append("</td>");
+            htmlContent.append("<td style='text-align: center;'>").append(orderItem.getCart().getQuantity()).append("</td>");
+            htmlContent.append("<td style='text-align: center;'>").append(formatCurrency(orderItem.getPrice())).append(" VNĐ</td>");
+            htmlContent.append("<td style='text-align: center;'>").append(formatCurrency(orderItem.getPrice() * orderItem.getCart().getQuantity())).append(" VNĐ</td>");
+            htmlContent.append("<td style='text-align: center;'><img src='").append(productVariant.getImage()).append("' width='50'></td>");
+            htmlContent.append("</tr>");
+        }
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='text-align: right;'><strong>").append("Tổng số lượng sản phẩm").append("</td>");
+        htmlContent.append("<td style='text-align: center;'><strong>").append(formatCurrency(order.getPaymentTotal())).append(" VNĐ</p>").append("</td>");
+        htmlContent.append("<tr>");
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='text-align: right;'><strong>").append("Tổng tiền").append("</strong></td>");
+        htmlContent.append("<td style='text-align: center;'><strong>").append(formatCurrency(order.getTotalPrice())).append(" VNĐ</p>").append("</strong></td>");
+        htmlContent.append("<tr>");
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='color: red; font-weight: bold; text-align: right;'>").append("Giảm giá của hệ thống").append("</td>");
+        htmlContent.append("<td style='color: red; font-weight: bold; text-align: center;'>").append(formatCurrency(order.getDiscountSystem())).append(" VNĐ").append("</td>");
+        htmlContent.append("<tr>");
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='color: red; font-weight: bold; text-align: right;'>").append("Giảm giá của cửa hàng").append("</td>");
+        htmlContent.append("<td style='color: red; font-weight: bold; text-align: center;'>").append(formatCurrency(order.getDiscountShop())).append(" VNĐ").append("</td>");
+        htmlContent.append("</tr>");
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='text-align: right;'><strong>").append("Phí vận chuyển").append("</strong></td>");
+        htmlContent.append("<td style='text-align: center;'><strong>").append(formatCurrency(order.getShippingFee())).append(" VNĐ</p>").append("</strong></td>");
+        htmlContent.append("<tr>");
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='text-align: right;'><strong>").append("Tổng số tiền phải thanh toán").append("</strong></td>");
+        htmlContent.append("<td style='text-align: center;'><strong>").append(formatCurrency(order.getPaymentTotal())).append(" VNĐ</p>").append("</strong></td>");
+        htmlContent.append("<tr>");
+
+
+        htmlContent.append("</table>");
+    }
+
+    private void createHtmlContentVoucherOrder(StringBuilder htmlContent, List<VoucherOrder> voucherOrders) {
+        if (!voucherOrders.isEmpty()) {
+            htmlContent.append("<h3>Thông tin voucher:</h3>");
+            htmlContent.append("<table>");
+            htmlContent.append("<tr>");
+            htmlContent.append("<th>Mã voucher</th>");
+            htmlContent.append("<th>Mã từ</th>");
+            htmlContent.append("<th>Giảm giá</th>");
+            htmlContent.append("<th>Mô tả</th>");
+            htmlContent.append("</tr>");
+            for (VoucherOrder voucherOrder : voucherOrders) {
+                htmlContent.append("<tr>");
+                htmlContent.append("<style='text-align: center;>").append(voucherOrder.getVoucher().getCode()).append("</td>");
+                htmlContent.append("<style='text-align: center;>");
+                if (voucherOrder.isType()) {
+                    htmlContent.append("Hệ thống");
+                } else {
+                    htmlContent.append("Cửa hàng");
+                }
+
+                htmlContent.append("<td style='text-align: center;'>");
+                if (voucherOrder.getVoucher().getType() == VoucherType.PERCENTAGE_SYSTEM || voucherOrder.getVoucher().getType() == VoucherType.PERCENTAGE_SHOP) {
+                    htmlContent.append(voucherOrder.getVoucher().getDiscount()).append(" %");
+                } else {
+                    htmlContent.append(formatCurrency((long) voucherOrder.getVoucher().getDiscount())).append(" VNĐ");
+                }
+                htmlContent.append("</td>");
+                htmlContent.append("<td>").append(voucherOrder.getVoucher().getDescription()).append("</td>");
+                htmlContent.append("</tr>");
+            }
+            htmlContent.append("</table>");
+        }
+    }
+
+
+//    private String generateHtmlContent(Order order, ShippingDTO shippingDTO) {
+//        StringBuilder htmlContent = new StringBuilder();
+//
+//        // Start HTML content
+//        htmlContent.append("<html>");
+//        htmlContent.append("<head>");
+//        htmlContent.append("<style>");
+//        htmlContent.append("body { font-family: Arial, sans-serif;}");
+//        htmlContent.append("h2 { color: #333;}");
+//        htmlContent.append("h3 { color: #555;}");
+//        htmlContent.append("p { margin: 5px 0;}");
+//        htmlContent.append("table { width: 100%; border-collapse: collapse;}");
+//        htmlContent.append("th, td { border: 1px solid #ddd; padding: 8px;}");
+//        htmlContent.append("th { background-color: #f2f2f2;}");
+//        htmlContent.append("</style>");
+//        htmlContent.append("</head>");
+//        htmlContent.append("<body>");
+//        htmlContent.append("<h2>Chi tiết hóa đơn</h2>");
+//        htmlContent.append("<hr>");
+//
+//        // Order details
+//        htmlContent.append("<h3>Thông tin đơn hàng:</h3>");
+//        htmlContent.append("<p><strong>Mã đơn hàng:</strong> ").append(order.getOrderId()).append("</p>");
+//        htmlContent.append("<p><strong>Ngày đặt hàng:</strong> ").append(order.getCreateAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("</p>");
+//        htmlContent.append("<p><strong>Tổng số tiền:</strong> ").append(formatCurrency(order.getTotalPrice())).append(" VNĐ</p>");
+//
+//        // Customer details
+//        Customer customer = order.getCustomer();
+//        htmlContent.append("<h3>Thông tin khách hàng:</h3>");
+//        htmlContent.append("<p><strong>Họ và tên:</strong> ").append(customer.getFullName()).append("</p>");
+//        htmlContent.append("<p><strong>Email:</strong> ").append(customer.getEmail()).append("</p>");
+//
+//        // Address details
+//        Address address = order.getAddress();
+//        htmlContent.append("<h3>Địa chỉ giao hàng:</h3>");
+//        htmlContent.append("<p><strong>Địa chỉ:</strong> ").append(address.getFullAddress()).append("</p>");
+//        htmlContent.append("<p><strong>Số điện thoại:</strong> ").append(address.getPhone()).append("</p>");
+//
+//        // Shipping details
+//        htmlContent.append("<h3>Thông tin vận chuyển:</h3>");
+//        htmlContent.append("<p><strong>Nhà cung cấp vận chuyển:</strong> ").append(shippingDTO.getTransportProviderFullName()).append("</p>");
+//        htmlContent.append("<p><strong>Phương thức vận chuyển:</strong> ").append(order.getShippingMethod()).append("</p>");
+//        htmlContent.append("<p><strong>Phí vận chuyển:</strong> ").append(formatCurrency(shippingDTO.getShippingCost())).append(" VNĐ</p>");
+//        htmlContent.append("<p><strong>Thời gian dự kiến giao hàng:</strong> ").append(shippingDTO.getEstimatedDeliveryTime()).append("</p>");
+//
+//        // Order items
+//        List<OrderItem> orderItems = order.getOrderItems();
+//        htmlContent.append("<h3>Sản phẩm trong đơn hàng:</h3>");
+//        htmlContent.append("<table>");
+//        htmlContent.append("<tr>");
+//        htmlContent.append("<th>Mã sản phẩm</th>");
+//        htmlContent.append("<th>Mã biến thể</th>");
+//        htmlContent.append("<th>Tên sản phẩm</th>");
+//        htmlContent.append("<th>Số lượng</th>");
+//        htmlContent.append("<th>Giá</th>");
+//        htmlContent.append("<th>Tổng giá</th>");
+//        htmlContent.append("<th>Hình ảnh</th>");
+//        htmlContent.append("</tr>");
+//        for (OrderItem orderItem : orderItems) {
+//            ProductVariant productVariant = orderItem.getCart().getProductVariant();
+//            htmlContent.append("<tr>");
+//            htmlContent.append("<td>").append(productVariant.getProduct().getProductId()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getProductVariantId()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getProduct().getName()).append("</td>");
+//            htmlContent.append("<td>").append(orderItem.getCart().getQuantity()).append("</td>");
+//            htmlContent.append("<td>").append(formatCurrency(productVariant.getPrice())).append(" VNĐ</td>");
+//            htmlContent.append("<td><img src='").append(productVariant.getImage()).append("' width='50'></td>");
+//            htmlContent.append("</tr>");
+//        }
+//        htmlContent.append("</table>");
+//
+//
+//        // VoucherOrder details
+//        // VoucherOrder details
+//        List<VoucherOrder> voucherOrders = order.getVoucherOrders();
+//        if (!voucherOrders.isEmpty()) {
+//            htmlContent.append("<h3>Thông tin voucher:</h3>");
+//            htmlContent.append("<table>");
+//            htmlContent.append("<tr>");
+//            htmlContent.append("<th>Mã voucher</th>");
+//            htmlContent.append("<th>Giảm giá</th>");
+//            htmlContent.append("<th>Mô tả</th>");
+//            htmlContent.append("</tr>");
+//            for (VoucherOrder voucherOrder : voucherOrders) {
+//                htmlContent.append("<tr>");
+//                htmlContent.append("<td>").append(voucherOrder.getVoucher().getCode()).append("</td>");
+//                htmlContent.append("<td>");
+//                if (voucherOrder.getVoucher().getType() == VoucherType.PERCENTAGE_SYSTEM || voucherOrder.getVoucher().getType() == VoucherType.PERCENTAGE_SHOP) {
+//                    htmlContent.append(voucherOrder.getVoucher().getDiscount()).append(" %");
+//                } else {
+//                    htmlContent.append(formatCurrency((long) voucherOrder.getVoucher().getDiscount())).append(" VNĐ");
+//                }
+//                htmlContent.append("</td>");
+//                htmlContent.append("<td>").append(voucherOrder.getVoucher().getDescription()).append("</td>");
+//                htmlContent.append("</tr>");
+//            }
+//            htmlContent.append("</table>");
+//        }
+//
+//
+//
+//        // End HTML content
+//        htmlContent.append("</body>");
+//        htmlContent.append("</html>");
+//
+//        return htmlContent.toString();
+//    }
+
+    private String formatCurrency(Long price) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        return formatter.format(price);
+    }
+
+
+//    private String generateHtmlContent(Order order, ShippingDTO shippingDTO) {
+//        StringBuilder htmlContent = new StringBuilder();
+//
+//        // Start HTML content
+//        htmlContent.append("<html>");
+//        htmlContent.append("<head>");
+//        htmlContent.append("<style>");
+//        htmlContent.append("body { font-family: Arial, sans-serif;}");
+//        htmlContent.append("h2 { color: #333;}");
+//        htmlContent.append("h3 { color: #555;}");
+//        htmlContent.append("p { margin: 5px 0;}");
+//        htmlContent.append("table { width: 100%; border-collapse: collapse;}");
+//        htmlContent.append("th, td { border: 1px solid #ddd; padding: 8px;}");
+//        htmlContent.append("th { background-color: #f2f2f2;}");
+//        htmlContent.append("</style>");
+//        htmlContent.append("</head>");
+//        htmlContent.append("<body>");
+//        htmlContent.append("<h2>Chi tiết hóa đơn</h2>");
+//        htmlContent.append("<hr>");
+//
+//        // Order details
+//        htmlContent.append("<h3>Thông tin đơn hàng:</h3>");
+//        htmlContent.append("<p><strong>ID đơn hàng:</strong> ").append(order.getOrderId()).append("</p>");
+//        htmlContent.append("<p><strong>Ngày đặt hàng:</strong> ").append(order.getCreateAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("</p>");
+//        htmlContent.append("<p><strong>Tổng số tiền:</strong> ").append(order.getTotalPrice()).append("</p>");
+//
+//        // Customer details
+//        Customer customer = order.getCustomer();
+//        htmlContent.append("<h3>Thông tin khách hàng:</h3>");
+//        htmlContent.append("<p><strong>Họ và tên:</strong> ").append(customer.getFullName()).append("</p>");
+//        htmlContent.append("<p><strong>Email:</strong> ").append(customer.getEmail()).append("</p>");
+//
+//        // Address details
+//        Address address = order.getAddress();
+//        htmlContent.append("<h3>Địa chỉ giao hàng:</h3>");
+//        htmlContent.append("<p><strong>Địa chỉ:</strong> ").append(address.getFullAddress()).append("</p>");
+//        htmlContent.append("<p><strong>Số điện thoại:</strong> ").append(address.getPhone()).append("</p>");
+//
+//        // Shipping details
+//        htmlContent.append("<h3>Thông tin vận chuyển:</h3>");
+//        htmlContent.append("<p><strong>Nhà cung cấp vận chuyển:</strong> ").append(shippingDTO.getTransportProviderFullName()).append("</p>");
+//        htmlContent.append("<p><strong>Phương thức vận chuyển:</strong> ").append(order.getShippingMethod()).append("</p>");
+//        htmlContent.append("<p><strong>Phí vận chuyển:</strong> ").append(shippingDTO.getShippingCost()).append("</p>");
+//        htmlContent.append("<p><strong>Thời gian dự kiến giao hàng:</strong> ").append(shippingDTO.getEstimatedDeliveryTime()).append("</p>");
+//
+//        // Order items
+//        List<OrderItem> orderItems = order.getOrderItems();
+//        htmlContent.append("<h3>Sản phẩm trong đơn hàng:</h3>");
+//        htmlContent.append("<table>");
+//        htmlContent.append("<tr>");
+//        htmlContent.append("<th>Mã sản phẩm</th>");
+//        htmlContent.append("<th>Mã biến thể</th>");
+//        htmlContent.append("<th>Tên sản phẩm</th>");
+//        htmlContent.append("<th>Số lượng</th>");
+//        htmlContent.append("<th>Giá</th>");
+//        htmlContent.append("<th>Hình ảnh</th>");
+//        htmlContent.append("</tr>");
+//        for (OrderItem orderItem : orderItems) {
+//            ProductVariant productVariant = orderItem.getCart().getProductVariant();
+//            htmlContent.append("<tr>");
+//            htmlContent.append("<td>").append(productVariant.getProduct().getProductId()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getProductVariantId()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getProduct().getName()).append("</td>");
+//            htmlContent.append("<td>").append(orderItem.getCart().getQuantity()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getPrice()).append("</td>");
+//            htmlContent.append("<td><img src='").append(productVariant.getImage()).append("' width='50'></td>");
+//            htmlContent.append("</tr>");
+//        }
+//        htmlContent.append("</table>");
+//
+//        // End HTML content
+//        htmlContent.append("</body>");
+//        htmlContent.append("</html>");
+//
+//        return htmlContent.toString();
+//    }
+
+
+//    private String generateHtmlContent(Order order, ShippingDTO shippingDTO) {
+//        StringBuilder htmlContent = new StringBuilder();
+//
+//        // Start HTML content
+//        htmlContent.append("<html>");
+//        htmlContent.append("<head>");
+//        htmlContent.append("<style>");
+//        htmlContent.append("body { font-family: Arial, sans-serif;}");
+//        htmlContent.append(".container { max-width: 600px; margin: auto; padding: 20px;}");
+//        htmlContent.append("h2, h3 { color: #333;}");
+//        htmlContent.append("table { width: 100%; border-collapse: collapse;}");
+//        htmlContent.append("th, td { border: 1px solid #ddd; padding: 8px;}");
+//        htmlContent.append("th { background-color: #f2f2f2;}");
+//        htmlContent.append(".order-details { margin-bottom: 20px;}");
+//        htmlContent.append(".shipping-details { margin-bottom: 20px;}");
+//        htmlContent.append(".product-details { margin-bottom: 20px;}");
+//        htmlContent.append(".product-details img { max-width: 100px;}");
+//        htmlContent.append("</style>");
+//        htmlContent.append("</head>");
+//        htmlContent.append("<body>");
+//        htmlContent.append("<div class='container'>");
+//        htmlContent.append("<h2>Chi tiết đơn hàng</h2>");
+//        htmlContent.append("<div class='order-details'>");
+//        htmlContent.append("<h3>Thông tin đơn hàng</h3>");
+//        htmlContent.append("<p><strong>ID đơn hàng:</strong> ").append(order.getOrderId()).append("</p>");
+//        htmlContent.append("<p><strong>Ngày đặt hàng:</strong> ").append(order.getCreateAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("</p>");
+//        htmlContent.append("<p><strong>Tổng số tiền:</strong> ").append(order.getTotalPrice()).append("</p>");
+//        htmlContent.append("</div>");
+//
+//        // Customer details
+//        Customer customer = order.getCustomer();
+//        htmlContent.append("<div class='customer-details'>");
+//        htmlContent.append("<h3>Thông tin khách hàng</h3>");
+//        htmlContent.append("<p><strong>Họ và tên:</strong> ").append(customer.getFullName()).append("</p>");
+//        htmlContent.append("<p><strong>Email:</strong> ").append(customer.getEmail()).append("</p>");
+//        htmlContent.append("</div>");
+//
+//        // Address details
+//        Address address = order.getAddress();
+//        htmlContent.append("<div class='shipping-details'>");
+//        htmlContent.append("<h3>Địa chỉ giao hàng</h3>");
+//        htmlContent.append("<p><strong>Địa chỉ:</strong> ").append(address.getFullAddress()).append("</p>");
+//        htmlContent.append("<p><strong>Số điện thoại:</strong> ").append(address.getPhone()).append("</p>");
+//        htmlContent.append("</div>");
+//
+//        // Shipping details
+//        htmlContent.append("<div class='shipping-details'>");
+//        htmlContent.append("<h3>Thông tin vận chuyển</h3>");
+//        htmlContent.append("<p><strong>Nhà cung cấp vận chuyển:</strong> ").append(shippingDTO.getTransportProviderFullName()).append("</p>");
+//        htmlContent.append("<p><strong>Phương thức vận chuyển:</strong> ").append(order.getShippingMethod()).append("</p>");
+//        htmlContent.append("<p><strong>Phí vận chuyển:</strong> ").append(shippingDTO.getShippingCost()).append("</p>");
+//        htmlContent.append("<p><strong>Thời gian dự kiến giao hàng:</strong> ").append(shippingDTO.getEstimatedDeliveryTime()).append("</p>");
+//        htmlContent.append("</div>");
+//
+//        // Order items
+//        List<OrderItem> orderItems = order.getOrderItems();
+//        htmlContent.append("<div class='product-details'>");
+//        htmlContent.append("<h3>Sản phẩm trong đơn hàng</h3>");
+//        htmlContent.append("<table>");
+//        htmlContent.append("<tr>");
+//        htmlContent.append("<th>Mã sản phẩm</th>");
+//        htmlContent.append("<th>Mã biến thể</th>");
+//        htmlContent.append("<th>Tên sản phẩm</th>");
+//        htmlContent.append("<th>Số lượng</th>");
+//        htmlContent.append("<th>Giá</th>");
+//        htmlContent.append("<th>Hình ảnh</th>");
+//        htmlContent.append("</tr>");
+//        for (OrderItem orderItem : orderItems) {
+//            ProductVariant productVariant = orderItem.getCart().getProductVariant();
+//            htmlContent.append("<tr>");
+//            htmlContent.append("<td>").append(productVariant.getProduct().getProductId()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getProductVariantId()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getProduct().getName()).append("</td>");
+//            htmlContent.append("<td>").append(orderItem.getCart().getQuantity()).append("</td>");
+//            htmlContent.append("<td>").append(productVariant.getPrice()).append("</td>");
+//            htmlContent.append("<td><img src='").append(productVariant.getImage()).append("' alt='Product Image'></td>");
+//            htmlContent.append("</tr>");
+//        }
+//        htmlContent.append("</table>");
+//        htmlContent.append("</div>");
+//
+//        // End HTML content
+//        htmlContent.append("</div>");
+//        htmlContent.append("</body>");
+//        htmlContent.append("</html>");
+//
+//        return htmlContent.toString();
+//    }
+
 
     private void sendEmail(MailDTO mail) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -102,11 +647,6 @@ public class MailServiceImpl implements IMailService {
     }
 
 
-
-
-
-
-
     private MailDTO createMailDTO(String mailTo, String mailSubject, String message, String username, String otp) {
 
         MailDTO mail = new MailDTO();
@@ -145,7 +685,6 @@ public class MailServiceImpl implements IMailService {
 
         return mailContent;
     }
-
 
 
 }
