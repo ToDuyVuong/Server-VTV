@@ -23,6 +23,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     // @Param("endDate") Date endDate
     // );
 
+    Optional<List<Order>> findAllByStatus(OrderStatus status);
+
     Optional<List<Order>> findAllByCustomerUsername(String username);
 
     Optional<List<Order>> findAllByCustomerUsernameAndStatus(String username, OrderStatus status);

@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.controller.vtv;
 
+import hcmute.kltn.vtv.service.vtv.IOrderSchedulerService;
 import hcmute.kltn.vtv.service.vtv.ITokenSchedulerService;
 import hcmute.kltn.vtv.service.vtv.IVoucherSchedulerService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ public class DailyUpdateScheduler {
     private final IVoucherSchedulerService voucherSchedulerService;
     @Autowired
     private final ITokenSchedulerService tokenSchedulerService;
+    @Autowired
+    private final IOrderSchedulerService orderSchedulerService;
 
     @PostConstruct
     public void onServerStart() {
@@ -25,6 +28,7 @@ public class DailyUpdateScheduler {
         voucherSchedulerService.checkExpirationVoucher();
         tokenSchedulerService.checkExpirationToken();
         tokenSchedulerService.deleteTokenExpiredAndRevoked();
+        orderSchedulerService.autoCompleteOrderAfterFiveDayDelivered();
     }
 
     // This method will be executed every day at midnight
@@ -34,6 +38,7 @@ public class DailyUpdateScheduler {
         voucherSchedulerService.checkExpirationVoucher();
         tokenSchedulerService.checkExpirationToken();
         tokenSchedulerService.deleteTokenExpiredAndRevoked();
+        orderSchedulerService.autoCompleteOrderAfterFiveDayDelivered();
     }
 }
 
