@@ -36,7 +36,8 @@ public class OrderItemDTO {
         OrderItemDTO orderItemDTO = new OrderItemDTO();
         orderItemDTO.setProductVariantDTO(ProductVariantDTO.convertEntityToDTO(orderItem.getCart().getProductVariant()));
         orderItemDTO.setOrderItemId(orderItem.getOrderItemId());
-        orderItemDTO.setOrderId(orderItem.getOrder().getOrderId());
+        if (orderItem.getOrder() != null)
+            orderItemDTO.setOrderId(orderItem.getOrder().getOrderId());
         orderItemDTO.setCartId(orderItem.getCart().getCartId());
         orderItemDTO.setQuantity(orderItem.getCart().getQuantity());
         orderItemDTO.setPrice(orderItem.getPrice());

@@ -109,7 +109,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
-        String errorMessage = "Dữ liệu không hợp lệ.";
+        String errorMessage = "Phương thức không hợp lệ! " + ex.getMessage();
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, 400, "Thông báo",
                 errorMessage);
 
@@ -166,7 +166,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        String errorMessage = "Dữ liệu không hợp lệ.";
+        String errorMessage = "Dữ liệu không hợp lệ!";
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, 400, "Thông báo", errorMessage);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -191,7 +191,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        String errorMessage = "Dữ liệu không hợp lệ.";
+        String errorMessage = "Dữ liệu không hợp lệ! Định dạng dữ liệu không đúng.";
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, 400, "Thông báo", errorMessage);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -200,7 +200,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
-        String errorMessage = "Dữ liệu không hợp lệ.";
+        String errorMessage = "Dữ liệu không hợp lệ! Thông tin không được để trống.";
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, 400, "Thông báo", errorMessage);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
