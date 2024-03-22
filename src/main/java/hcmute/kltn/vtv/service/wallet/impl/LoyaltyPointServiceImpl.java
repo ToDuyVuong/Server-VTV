@@ -22,14 +22,13 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
     private final ICustomerService customerService;
 
 
-
-    @Override
     @Async
+    @Override
     @Transactional
     public void addNewLoyaltyPointAfterRegister(String username) {
         if(!loyaltyPointRepository.existsByUsername(username)){
             try {
-                loyaltyPointRepository.save(createLoyaltyPointByUserName(username));
+                loyaltyPointRepository.save(createLoyaltyPointByUserame(username));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -39,7 +38,8 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
 
 
 
-    private LoyaltyPoint createLoyaltyPointByUserName(String username) {
+
+    private LoyaltyPoint createLoyaltyPointByUserame(String username) {
         LoyaltyPoint loyaltyPoint = new LoyaltyPoint();
         loyaltyPoint.setUsername(username);
         loyaltyPoint.setTotalPoint(0L);
