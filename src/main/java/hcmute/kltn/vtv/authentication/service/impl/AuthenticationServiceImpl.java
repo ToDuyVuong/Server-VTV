@@ -17,6 +17,7 @@ import hcmute.kltn.vtv.repository.user.CustomerRepository;
 import hcmute.kltn.vtv.repository.user.TokenRepository;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.vtv.IFcmService;
+import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import hcmute.kltn.vtv.util.exception.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +56,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IFcmService fcmService;
     @Autowired
     private final ICustomerService customerService;
+    @Autowired
+    private final ILoyaltyPointService loyaltyPointService;
 
     @Override
     @Transactional
@@ -65,6 +68,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         try {
             customerRepository.save(customer);
+            loyaltyPointService.addNewLoyaltyPointAfterRegister(customer.getUsername());
 
             String message = "Đăng ký tài khoản khách hàng thành công, " +
                     "vui lòng kiểm tra email để kích hoạt tài khoản." +

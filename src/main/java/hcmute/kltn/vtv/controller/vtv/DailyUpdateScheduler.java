@@ -1,8 +1,11 @@
 package hcmute.kltn.vtv.controller.vtv;
 
+import hcmute.kltn.vtv.model.entity.user.Customer;
+import hcmute.kltn.vtv.repository.user.CustomerRepository;
 import hcmute.kltn.vtv.service.vtv.IOrderSchedulerService;
 import hcmute.kltn.vtv.service.vtv.ITokenSchedulerService;
 import hcmute.kltn.vtv.service.vtv.IVoucherSchedulerService;
+import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +26,9 @@ public class DailyUpdateScheduler {
     @Autowired
     private final IOrderSchedulerService orderSchedulerService;
 
+
+
+
     @PostConstruct
     public void onServerStart() {
         System.out.println("Server started at " + LocalDate.now() + " - Performing initial update...");
@@ -29,6 +36,9 @@ public class DailyUpdateScheduler {
         tokenSchedulerService.checkExpirationToken();
         tokenSchedulerService.deleteTokenExpiredAndRevoked();
         orderSchedulerService.autoCompleteOrderAfterFiveDayDelivered();
+
+
+
     }
 
     // This method will be executed every day at midnight

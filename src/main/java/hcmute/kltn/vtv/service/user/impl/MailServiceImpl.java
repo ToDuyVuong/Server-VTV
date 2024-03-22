@@ -17,6 +17,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,21 +37,19 @@ public class MailServiceImpl implements IMailService {
 
 
     @Override
+    @Async
     public void sendOrderConfirmationEmail(Order order, ShippingDTO shippingDTO, String message) {
         String mailSubject = "Xác nhận đơn hàng #" + order.getOrderId() + " - trên hệ thống VTV";
 
         Customer customer = order.getCustomer();
         MailDTO mailDTO = createOrderConfirmationMailDTO(customer.getEmail(), mailSubject, message, order, shippingDTO);
 
-
-        // Tạo một luồng mới để gửi email
-        new Thread(() -> {
-            try {
-                sendEmail(mailDTO);
-            } catch (BadRequestException e) {
-                throw new InternalServerErrorException("Có lỗi xảy ra khi gửi email xác nhận đơn hàng: " + e.getMessage());
-            }
-        }).start();
+        try {
+            sendEmail(mailDTO);
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+//            throw new InternalServerErrorException("Có lỗi xảy ra khi gửi email xác nhận đơn hàng: " + e.getMessage());
+        }
     }
 
 
