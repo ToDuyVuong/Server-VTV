@@ -11,6 +11,8 @@ public interface LoyaltyPointRepository extends JpaRepository<LoyaltyPoint, Long
 
     boolean existsByUsername(String username);
 
+    boolean existsByLoyaltyPointIdAndUsername(Long loyaltyPointId, String username);
+
 
     Optional<LoyaltyPoint> findByUsername(String username);
 }
