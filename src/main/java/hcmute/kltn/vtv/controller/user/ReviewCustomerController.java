@@ -25,37 +25,34 @@ public class ReviewCustomerController {
     private ReviewRepository reviewRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<ReviewResponse> addNewReview(@RequestBody ReviewRequest reviewRequest,
-            HttpServletRequest request) {
+    public ResponseEntity<ReviewResponse> addNewReview(@ModelAttribute ReviewRequest reviewRequest,
+                                                       HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
         reviewRequest.validate();
 
         return ResponseEntity.ok(reviewService.addNewReview(reviewRequest, username));
     }
 
+
     @GetMapping("/detail/by-order-item/{orderItemId}")
     public ResponseEntity<ReviewResponse> getReviewDetailByOrderItemId(@PathVariable UUID orderItemId) {
-        if (orderItemId == null) {
-            throw new BadRequestException("Mã đánh giá không được để trống!");
-        }
+
         return ResponseEntity.ok(reviewService.getReviewByOrderItemId(orderItemId));
     }
 
+
     @PatchMapping("/delete/{reviewId}")
     public ResponseEntity<ReviewResponse> deleteReview(@PathVariable UUID reviewId,
-            HttpServletRequest request) {
-        if (reviewId == null) {
-            throw new BadRequestException("Mã đánh giá không được để trống!");
-        }
+                                                       HttpServletRequest request) {
+
         String username = (String) request.getAttribute("username");
         return ResponseEntity.ok(reviewService.deleteReview(reviewId, username));
     }
 
-    @GetMapping("exist/{orderItemId}")
+
+    @GetMapping("/exist/by-order-item/{orderItemId}")
     public ResponseEntity<Boolean> checkReviewExist(@PathVariable UUID orderItemId) {
-        if (orderItemId == null) {
-            throw new BadRequestException("Mã đánh giá không được để trống!");
-        }
+
         return ResponseEntity.ok(reviewRepository.existsByOrderItemOrderItemId(orderItemId));
     }
 

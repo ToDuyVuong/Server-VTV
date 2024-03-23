@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface IOrderItemService {
+    OrderItem getOrderItemById(UUID orderItemId);
+
     OrderItemResponse getOrderItemByOrderItemId(UUID orderItemId);
 
     @Transactional
@@ -27,4 +29,10 @@ public interface IOrderItemService {
 
     @Transactional
     List<OrderItem> cancelOrderItem(Order order);
+
+    void checkExistOrderItem(UUID orderItemId);
+
+    void checkExistOrderItemByIdAndUsername(UUID orderItemId, String username);
+
+    void checkOrderCompletedBeforeReview(UUID orderItemId);
 }

@@ -331,6 +331,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
+
+
+
     private Order createOrderByOrderRequestWithCartIds(OrderRequestWithCart request, String username, Long shopId, Address address) {
         List<OrderItem> orderItems = orderItemService.createOrderItemsByCartIds(username, request.getCartIds());
         Order order = createBaseOrder(username, shopId, address);

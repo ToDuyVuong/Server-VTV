@@ -14,14 +14,6 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-    // @Query("SELECT SUM(o.totalMoney) FROM Order o WHERE o.shopId = :shopId AND
-    // o.status = :status AND o.orderDate BETWEEN :startDate AND :endDate")
-    // Long sumPaymentTotalByShopIdAndStatusAndOrderDateBetween(
-    // @Param("shopId") Long shopId,
-    // @Param("status") Status status,
-    // @Param("startDate") Date startDate,
-    // @Param("endDate") Date endDate
-    // );
 
     Optional<List<Order>> findAllByStatus(OrderStatus status);
 

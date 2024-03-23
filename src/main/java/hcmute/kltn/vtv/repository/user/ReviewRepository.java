@@ -14,6 +14,11 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     boolean existsByOrderItemOrderItemId(UUID orderItemId);
 
+    boolean existsByReviewIdAndCustomerUsername(UUID reviewId, String username);
+
+
+    boolean existsByReviewIdAndProductShopCustomerUsername(UUID reviewId, String username);
+
     boolean existsByReviewIdAndStatus(UUID reviewId, Status status);
 
     boolean existsByReviewId(UUID reviewId);

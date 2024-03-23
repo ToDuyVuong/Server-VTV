@@ -4,20 +4,18 @@ import hcmute.kltn.vtv.model.entity.user.Cart;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.user.Order;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
-import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.extra.CartStatus;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.service.guest.IProductVariantService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.OrderItemResponse;
-import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.CartRepository;
 import hcmute.kltn.vtv.repository.user.OrderItemRepository;
-import hcmute.kltn.vtv.repository.vendor.ProductRepository;
-import hcmute.kltn.vtv.repository.vendor.ProductVariantRepository;
 import hcmute.kltn.vtv.service.user.ICartService;
 import hcmute.kltn.vtv.service.user.IOrderItemService;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,29 +41,15 @@ public class OrderItemServiceImpl implements IOrderItemService {
 
 
     @Override
+    public OrderItem getOrderItemById(UUID orderItemId) {
+        return orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy sản phẩm của đơn hàng theo mã sản phẩm của đơn hàng!"));
+    }
+
+    @Override
     public OrderItemResponse getOrderItemByOrderItemId(UUID orderItemId) {
-        OrderItem orderItem = orderItemRepository.findById(orderItemId)
-                .orElseThrow(() -> new BadRequestException("Mã đơn hàng không tồn tại!"));
-
-        OrderItemResponse response = new OrderItemResponse();
-        response.setOrderItemId(orderItem.getOrderItemId());
-        response.setOrderId(orderItem.getOrder().getOrderId());
-        response.setCartId(orderItem.getCart().getCartId());
-        response.setProductVariantId(orderItem.getCart().getProductVariant().getProductVariantId());
-        response.setSku(orderItem.getCart().getProductVariant().getSku());
-        response.setProductVariantImage(orderItem.getCart().getProductVariant().getImage());
-        response.setQuantity(orderItem.getCart().getQuantity());
-        response.setPrice(orderItem.getCart().getProductVariant().getPrice());
-        response.setProductId(orderItem.getCart().getProductVariant().getProduct().getProductId());
-        response.setProductName(orderItem.getCart().getProductVariant().getProduct().getName());
-        response.setProductImage(orderItem.getCart().getProductVariant().getProduct().getImage());
-        response.setShopId(orderItem.getCart().getProductVariant().getProduct().getShop().getShopId());
-        response.setShopName(orderItem.getCart().getProductVariant().getProduct().getShop().getName());
-        response.setCode(200);
-        response.setMessage("Lấy thông tin chi tiết về sản phẩm trong đơn hàng thành công!");
-        response.setStatus("OK");
-
-        return response;
+        OrderItem orderItem = getOrderItemById(orderItemId);
+        return OrderItemResponse.orderItemResponse(orderItem, "Lấy thông tin chi tiết về sản phẩm trong đơn hàng thành công!", "OK");
     }
 
     public OrderItem createOrderItem(UUID cartId, String username) {
@@ -182,4 +166,29 @@ public class OrderItemServiceImpl implements IOrderItemService {
         }
 
     }
+
+
+    @Override
+    public void checkExistOrderItem(UUID orderItemId) {
+        if (!orderItemRepository.existsById(orderItemId)) {
+            throw new NotFoundException("Mã sản phẩm của đơn hàng không tồn tại!");
+        }
+    }
+
+    @Override
+    public void checkExistOrderItemByIdAndUsername(UUID orderItemId, String username) {
+        if (!orderItemRepository.existsByOrderItemIdAndCartCustomerUsername(orderItemId, username)) {
+            throw new NotFoundException("Bạn không có quyền truy cập sản phẩm của đơn hàng này!");
+        }
+    }
+
+
+    @Override
+    public void checkOrderCompletedBeforeReview(UUID orderItemId) {
+        if (!orderItemRepository.existsByOrderItemIdAndOrderStatus(orderItemId, OrderStatus.COMPLETED)) {
+            throw new BadRequestException("Đơn hàng chưa hoàn thành. Bạn không thể đánh giá sản phẩm!");
+        }
+    }
+
+
 }

@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.repository.wallet.LoyaltyPointRepository;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointHistoryService;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,31 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    @Async
+    @Override
+    @Transactional
+    public void plusLoyaltyPointByUsername(String username, Long point, String type) {
+        LoyaltyPoint loyaltyPoint = getLoyaltyPointByUsername(username);
+        loyaltyPoint.setTotalPoint(loyaltyPoint.getTotalPoint() + point);
+        loyaltyPoint.setUpdateAt(LocalDateTime.now());
+        try {
+
+            loyaltyPointRepository.save(loyaltyPoint);
+            loyaltyPointHistoryService.addNewLoyaltyPointHistoryByLoyaltyPointId(loyaltyPoint, point, type, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Override
+    public LoyaltyPoint getLoyaltyPointByUsername(String username) {
+        return loyaltyPointRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy thông tin điểm tích lũy của tài khoản " + username));
     }
 
 
