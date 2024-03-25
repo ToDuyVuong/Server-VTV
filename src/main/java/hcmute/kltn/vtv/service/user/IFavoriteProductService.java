@@ -2,7 +2,7 @@ package hcmute.kltn.vtv.service.user;
 
 import hcmute.kltn.vtv.model.data.user.response.FavoriteProductResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListFavoriteProductResponse;
-import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
+import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface IFavoriteProductService {

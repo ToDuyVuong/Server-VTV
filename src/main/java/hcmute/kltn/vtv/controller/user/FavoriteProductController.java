@@ -3,7 +3,7 @@ package hcmute.kltn.vtv.controller.user;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.FavoriteProductResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListFavoriteProductResponse;
-import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
+import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import hcmute.kltn.vtv.service.user.IFavoriteProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

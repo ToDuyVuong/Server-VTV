@@ -4,7 +4,7 @@ import hcmute.kltn.vtv.service.guest.IReviewService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.FavoriteProductResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListFavoriteProductResponse;
-import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
+import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.entity.user.FavoriteProduct;
 import hcmute.kltn.vtv.model.entity.vendor.Product;

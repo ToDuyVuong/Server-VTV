@@ -2,6 +2,7 @@ package hcmute.kltn.vtv.repository.vendor;
 
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.entity.vendor.Product;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +28,22 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByBrandBrandId(Long brandId);
 
-    boolean existsByNameAndStatus(String name, Status status);
+    @Query(value =
+            "SELECT COUNT(DISTINCT o.order_id) " +
+                    "FROM `order` o " +
+                    "JOIN order_item oi " +
+                    "ON o.order_id = oi.order_id " +
+                    "JOIN cart c " +
+                    "ON oi.cart_id = c.cart_id " +
+                    "JOIN product_variant pv " +
+                    "ON c.product_variant_id = pv.product_variant_id " +
+                    "JOIN product p " +
+                    "ON pv.product_id = p.product_id " +
+                    "WHERE p.product_id = :productId " +
+                    "AND o.status = :status",
+            nativeQuery = true)
+
+    int countOrdersByProductId(Long productId, OrderStatus status);
 
     boolean existsByName(String name);
 
@@ -38,22 +54,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByProductIdAndShopCustomerUsername(Long productId, String username);
 
 
-    Optional<List<Product>> findAllByShopShopIdAndStatus(Long shopId, Status status);
 
-    Optional<List<Product>> findAllByCategoryCategoryIdAndShopShopIdAndStatus(Long categoryId, Long shopId,
-                                                                                      Status status);
-
-    Optional<List<Product>> findAllByNameContainingAndShopShopIdAndStatus(String name, Long shopId,
-                                                                                  Status status);
-
-    Optional<List<Product>> findAllByNameContainingAndStatus(String name, Status status);
 
 
     Optional<List<Product>> findByShopShopIdAndStatusOrderBySoldDescNameAsc(Long shopId, Status status);
 
     Optional<List<Product>> findByStatusOrderBySoldDescNameAsc(Status status);
-
-    Optional<List<Product>> findByShopShopIdAndStatusOrderByCreateAtDesc(Long shopId, Status status);
 
 
     @Query("SELECT p FROM Product p JOIN p.productVariants v " +

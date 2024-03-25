@@ -1,4 +1,4 @@
-package hcmute.kltn.vtv.model.data.vendor.response;
+package hcmute.kltn.vtv.model.data.guest;
 
 import hcmute.kltn.vtv.model.dto.vendor.ProductDTO;
 import hcmute.kltn.vtv.model.entity.vendor.Product;

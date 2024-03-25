@@ -3,7 +3,7 @@ package hcmute.kltn.vtv.service.vendor;
 
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.request.ProductRequest;
-import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
+import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import hcmute.kltn.vtv.model.extra.Status;
 import org.springframework.transaction.annotation.Transactional;
 

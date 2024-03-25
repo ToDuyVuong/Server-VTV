@@ -2,14 +2,11 @@ package hcmute.kltn.vtv.controller.guest;
 
 import hcmute.kltn.vtv.model.data.paging.response.ListProductPageResponse;
 import hcmute.kltn.vtv.model.data.vendor.response.ListProductResponse;
-import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
+import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import hcmute.kltn.vtv.service.guest.IFavoriteProductGuestService;
 import hcmute.kltn.vtv.service.guest.IPageService;
-import hcmute.kltn.vtv.service.guest.IProductPageService;
 import hcmute.kltn.vtv.service.guest.IProductService;
-import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

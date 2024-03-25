@@ -10,7 +10,7 @@ import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.guest.ICategoryService;
 import hcmute.kltn.vtv.service.vtv.IImageService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
-import hcmute.kltn.vtv.model.data.vendor.response.ProductResponse;
+import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import hcmute.kltn.vtv.model.entity.vtv.*;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.service.vendor.IProductShopService;
