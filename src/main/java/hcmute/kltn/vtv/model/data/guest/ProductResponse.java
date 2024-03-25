@@ -16,22 +16,31 @@ public class ProductResponse extends ResponseAbstract {
     private String categoryName;
     private Long categoryParentId;
     private String categoryParentName;
+    private Long shopId;
     private String shopName;
+    private String shopAvatar;
+    private int countOrder;
     private ProductDTO productDTO;
 
 
-    public static ProductResponse productResponse(Product product, String message, String status) {
+    public static ProductResponse productResponse(Product product, int countOrder, String message, String status) {
         ProductResponse response = new ProductResponse();
         response.setProductDTO(ProductDTO.convertEntityToDTO(product));
         response.setCategoryId(product.getCategory().getCategoryId());
         response.setCategoryName(product.getCategory().getName());
-        response.setCategoryParentId(product.getCategory().getParent().getCategoryId());
-        response.setCategoryParentName(product.getCategory().getParent().getName());
+        response.setCategoryParentId(product.getCategory().getParent() != null ? product.getCategory().getParent().getCategoryId() : null);
+        response.setCategoryParentName(product.getCategory().getParent() != null ? product.getCategory().getParent().getName() : null);
+        response.setShopId(product.getShop().getShopId());
         response.setShopName(product.getShop().getName());
+        response.setShopAvatar(product.getShop().getAvatar());
+        response.setCountOrder(countOrder);
         response.setMessage(message);
         response.setStatus(status);
         response.setCode(200);
         return response;
     }
+
+
+
 
 }

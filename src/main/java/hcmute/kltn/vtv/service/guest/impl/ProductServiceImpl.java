@@ -5,6 +5,7 @@ import hcmute.kltn.vtv.model.data.vendor.response.ListProductResponse;
 import hcmute.kltn.vtv.model.data.guest.ProductResponse;
 import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.repository.vtv.CategoryRepository;
@@ -37,10 +38,16 @@ public class ProductServiceImpl implements IProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Sản phẩm không tồn tại!"));
 
+        int countOrder = productRepository.countOrdersByProductId(productId, OrderStatus.COMPLETED.toString());
 
-        return ProductResponse.productResponse(product, "Lấy thông tin sản phẩm thành công!", "OK");
+        return ProductResponse.productResponse(product, countOrder,"Lấy thông tin sản phẩm thành công!", "OK");
     }
 
+
+    @Override
+    public int countOrdersByProductId(Long productId, OrderStatus status) {
+        return productRepository.countOrdersByProductId(productId, status.toString());
+    }
 
     @Override
     public void updateProductSold(Long productId, int quantity) {

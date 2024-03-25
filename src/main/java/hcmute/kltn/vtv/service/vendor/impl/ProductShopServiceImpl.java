@@ -5,6 +5,7 @@ import hcmute.kltn.vtv.model.data.vendor.request.ProductRequest;
 import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
 import hcmute.kltn.vtv.model.entity.vendor.Shop;
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.repository.vtv.BrandRepository;
 import hcmute.kltn.vtv.repository.vendor.ProductRepository;
 import hcmute.kltn.vtv.service.guest.ICategoryService;
@@ -61,8 +62,8 @@ public class ProductShopServiceImpl implements IProductShopService {
             productRepository.save(product);
             List<ProductVariant> productVariants = productVariantShopService.addNewProductVariants(request.getProductVariantRequests(), product);
             product.setProductVariants(productVariants);
-
-            return ProductResponse.productResponse(product, "Thêm sản phẩm mới trong cửa hàng thành công!", "Success");
+            int countOrder = productRepository.countOrdersByProductId(product.getProductId(), OrderStatus.COMPLETED.toString());
+            return ProductResponse.productResponse(product, countOrder, "Thêm sản phẩm mới trong cửa hàng thành công!", "Success");
         } catch (Exception e) {
             imageService.deleteImageInFirebase(product.getImage());
             throw new InternalServerErrorException("Thêm sản phẩm mới trong cửa hàng thất bại!");
@@ -84,7 +85,8 @@ public class ProductShopServiceImpl implements IProductShopService {
             List<ProductVariant> productVariants = productVariantShopService.updateProductVariants(request.getProductVariantRequests(), product);
             product.setProductVariants(productVariants);
 
-            return ProductResponse.productResponse(product, "Cập nhật sản phẩm trong cửa hàng thành công!", "Success");
+            int countOrder = productRepository.countOrdersByProductId(product.getProductId(), OrderStatus.COMPLETED.toString());
+            return ProductResponse.productResponse(product, countOrder, "Cập nhật sản phẩm trong cửa hàng thành công!", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Cập nhật sản phẩm trong cửa hàng thất bại! " + e.getMessage());
 
@@ -103,7 +105,8 @@ public class ProductShopServiceImpl implements IProductShopService {
             productVariantShopService.updateStatusProductVariants(productId, product.getProductVariants(), status);
             Product productUpdate = getProductByProductId(productId);
 
-            return ProductResponse.productResponse(productUpdate, "Cập nhật trạng thái sản phẩm trong cửa hàng thành công!", "Success");
+            int countOrder = productRepository.countOrdersByProductId(product.getProductId(), OrderStatus.COMPLETED.toString());
+            return ProductResponse.productResponse(productUpdate, countOrder, "Cập nhật trạng thái sản phẩm trong cửa hàng thành công!", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Cập nhật trạng thái sản phẩm trong cửa hàng thất bại!");
         }
@@ -122,7 +125,8 @@ public class ProductShopServiceImpl implements IProductShopService {
             productVariantShopService.updateStatusProductVariants(productId, product.getProductVariants(), Status.ACTIVE);
             Product productUpdate = getProductByProductId(productId);
 
-            return ProductResponse.productResponse(productUpdate, "Khôi phục sản phẩm trong cửa hàng thành công!", "Success");
+            int countOrder = productRepository.countOrdersByProductId(product.getProductId(), OrderStatus.COMPLETED.toString());
+            return ProductResponse.productResponse(productUpdate, countOrder, "Khôi phục sản phẩm trong cửa hàng thành công!", "Success");
         } catch (Exception e) {
             throw new InternalServerErrorException("Khôi phục sản phẩm trong cửa hàng thất bại!");
         }

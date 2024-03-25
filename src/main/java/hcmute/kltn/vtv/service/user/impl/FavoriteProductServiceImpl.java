@@ -1,5 +1,6 @@
 package hcmute.kltn.vtv.service.user.impl;
 
+import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.service.guest.IReviewService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.FavoriteProductResponse;
@@ -54,8 +55,9 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
     public ProductResponse getProductByFavoriteProductId(Long favoriteProductId, String username) {
         FavoriteProduct favoriteProduct = getFavoriteProductById(favoriteProductId);
 
+        int countOrder = productService.countOrdersByProductId(favoriteProduct.getProduct().getProductId(), OrderStatus.COMPLETED);
 
-        return  ProductResponse.productResponse(favoriteProduct.getProduct(),
+        return  ProductResponse.productResponse(favoriteProduct.getProduct(), countOrder,
                 "Lấy thông tin sản phẩm yêu thích thành công.", "OK");
     }
 

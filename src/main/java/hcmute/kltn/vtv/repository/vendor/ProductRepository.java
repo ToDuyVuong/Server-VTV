@@ -31,19 +31,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value =
             "SELECT COUNT(DISTINCT o.order_id) " +
                     "FROM `order` o " +
-                    "JOIN order_item oi " +
-                    "ON o.order_id = oi.order_id " +
-                    "JOIN cart c " +
-                    "ON oi.cart_id = c.cart_id " +
-                    "JOIN product_variant pv " +
-                    "ON c.product_variant_id = pv.product_variant_id " +
-                    "JOIN product p " +
-                    "ON pv.product_id = p.product_id " +
+                    "JOIN order_item oi ON o.order_id = oi.order_id " +
+                    "JOIN cart c ON oi.cart_id = c.cart_id " +
+                    "JOIN product_variant pv ON c.product_variant_id = pv.product_variant_id " +
+                    "JOIN product p ON pv.product_id = p.product_id " +
                     "WHERE p.product_id = :productId " +
                     "AND o.status = :status",
             nativeQuery = true)
+    int countOrdersByProductId(Long productId, String status);
 
-    int countOrdersByProductId(Long productId, OrderStatus status);
+
+
+
 
     boolean existsByName(String name);
 
