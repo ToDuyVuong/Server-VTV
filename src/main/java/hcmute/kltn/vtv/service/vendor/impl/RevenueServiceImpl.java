@@ -32,10 +32,10 @@ public class RevenueServiceImpl implements IRevenueService {
         Date endDate = endOfDay(request.getEndDate());
         long totalMoney = 0;
 
-        int totalOrder = orderRepository.countAllByShopIdAndStatusAndOrderDateBetween(shop.getShopId(),
+        int totalOrder = orderRepository.countAllByShopShopIdAndStatusAndOrderDateBetween(shop.getShopId(),
                 OrderStatus.COMPLETED, startDate, endDate);
         List<Order> orders = orderRepository
-                .findAllByShopIdAndStatusAndOrderDateBetween(shop.getShopId(), OrderStatus.COMPLETED, startDate, endDate)
+                .findAllByShopShopIdAndStatusAndOrderDateBetween(shop.getShopId(), OrderStatus.COMPLETED, startDate, endDate)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng nào."));
         List<StatisticsDTO> statisticsDTOs = listStatisticsDTO(orders, request.getStartDate(), request.getEndDate());
 

@@ -12,7 +12,11 @@ public interface ILoyaltyPointService {
 
     @Async
     @Transactional
-    void plusLoyaltyPointByUsername(String username, Long point, String type);
+    void updatePointInLoyaltyPointByUsername(String username, Long point, String type);
+
+    @Async
+    @Transactional
+    void subtractLoyaltyPointByUsername(String username, Long point, String type);
 
     LoyaltyPointResponse getLoyaltyPointResponseByUsername(String username);
 

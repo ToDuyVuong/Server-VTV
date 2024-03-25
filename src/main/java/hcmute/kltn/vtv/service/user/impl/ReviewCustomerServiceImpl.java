@@ -5,16 +5,12 @@ import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.request.ReviewRequest;
 import hcmute.kltn.vtv.model.data.user.response.ReviewResponse;
-import hcmute.kltn.vtv.model.dto.user.ReviewDTO;
 import hcmute.kltn.vtv.model.entity.user.OrderItem;
-import hcmute.kltn.vtv.model.entity.vendor.Product;
 import hcmute.kltn.vtv.model.entity.user.Review;
 import hcmute.kltn.vtv.model.extra.Status;
-import hcmute.kltn.vtv.repository.user.OrderItemRepository;
 import hcmute.kltn.vtv.repository.user.ReviewRepository;
 import hcmute.kltn.vtv.service.user.*;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
-import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,7 +47,7 @@ public class ReviewCustomerServiceImpl implements IReviewCustomerService {
         try {
 
             reviewRepository.save(review);
-            loyaltyPointService.plusLoyaltyPointByUsername(username, 200L, "REVIEW");
+            loyaltyPointService.updatePointInLoyaltyPointByUsername(username, 200L, "REVIEW");
             return ReviewResponse.reviewResponse(review, "Thêm mới đánh giá thành công!", "Success");
         } catch (Exception e) {
             imageService.deleteImageInFirebase(review.getImage());

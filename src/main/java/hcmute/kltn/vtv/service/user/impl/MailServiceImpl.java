@@ -3,6 +3,7 @@ package hcmute.kltn.vtv.service.user.impl;
 import hcmute.kltn.vtv.model.dto.shipping.ShippingDTO;
 import hcmute.kltn.vtv.model.entity.user.*;
 import hcmute.kltn.vtv.model.entity.vendor.ProductVariant;
+import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPoint;
 import hcmute.kltn.vtv.model.extra.VoucherType;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.user.response.SendEmailResponse;
@@ -109,10 +110,7 @@ public class MailServiceImpl implements IMailService {
         htmlContent.append("<br>");
         createHtmlContentAddress(htmlContent, order.getAddress());
         htmlContent.append("<br>");
-        String fullAddressShop = order.getShopWardCode().getName() + ", "
-                + order.getShopWardCode().getDistrict().getName() + ", "
-                + order.getShopWardCode().getDistrict().getProvince().getName();
-        createHtmlContentShopDetail(htmlContent, order.getShopName(), fullAddressShop);
+         createHtmlContentShopDetail(htmlContent, order);
         htmlContent.append("<br>");
         createHtmlContentShipping(htmlContent, shippingDTO);
         htmlContent.append("<br>");
@@ -135,10 +133,15 @@ public class MailServiceImpl implements IMailService {
         htmlContent.append("<p><strong>Lời nhắn:</strong> ").append(order.getNote()).append("</p>");
     }
 
-    private void createHtmlContentShopDetail(StringBuilder htmlContent, String shopName, String shopAddress) {
+    private void createHtmlContentShopDetail(StringBuilder htmlContent, Order order) {
+        String fullAddressShop = order.getShop().getAddress() + ", " + order.getShop().getWard().getName() + ", "
+                + order.getShop().getWard().getDistrict().getName() + ", " + order.getShop().getWard().getDistrict().getProvince().getName();
+
         htmlContent.append("<h3>Thông tin cửa hàng:</h3>");
-        htmlContent.append("<p><strong>Tên cửa hàng:</strong> ").append(shopName).append("</p>");
-        htmlContent.append("<p><strong>Địa chỉ cửa hàng:</strong> ").append(shopAddress).append("</p>");
+        htmlContent.append("<p><strong>Tên cửa hàng:</strong> ").append(order.getShop().getName()).append("</p>");
+        htmlContent.append("<p><strong>Email:</strong> ").append(order.getShop().getEmail()).append("</p>");
+        htmlContent.append("<p><strong>Liên hệ:</strong> ").append(order.getShop().getPhone()).append("</p>");
+        htmlContent.append("<p><strong>Địa chỉ cửa hàng:</strong> ").append(fullAddressShop).append("</p>");
     }
 
     private void createHtmlContentCustomer(StringBuilder htmlContent, Customer customer) {
@@ -165,6 +168,8 @@ public class MailServiceImpl implements IMailService {
         htmlContent.append("<p><strong>Phí vận chuyển:</strong> ").append(formatCurrency(shippingDTO.getShippingCost())).append(" VNĐ</p>");
         htmlContent.append("<p><strong>Thời gian dự kiến giao hàng:</strong> ").append(shippingDTO.getEstimatedDeliveryTime()).append("</p>");
     }
+
+
 
     private void createHtmlContentOrderItem(StringBuilder htmlContent, Order order) {
         // Order items
@@ -225,6 +230,16 @@ public class MailServiceImpl implements IMailService {
         htmlContent.append("<td>");
         htmlContent.append("<td style='color: red; font-weight: bold; text-align: right;'>").append("Giảm giá của cửa hàng").append("</td>");
         htmlContent.append("<td style='color: red; font-weight: bold; text-align: center;'>").append(formatCurrency(order.getDiscountShop())).append(" VNĐ").append("</td>");
+        htmlContent.append("</tr>");
+
+
+        htmlContent.append("<tr>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td>");
+        htmlContent.append("<td style='color: red; font-weight: bold; text-align: right;'>").append("Điềm tích lũy").append("</td>");
+        htmlContent.append("<td style='color: red; font-weight: bold; text-align: center;'>").append(order.getLoyaltyPointHistory() != null ? formatCurrency(order.getLoyaltyPointHistory().getPoint()) : 0).append(" VNĐ").append("</td>");
         htmlContent.append("</tr>");
 
         htmlContent.append("<tr>");

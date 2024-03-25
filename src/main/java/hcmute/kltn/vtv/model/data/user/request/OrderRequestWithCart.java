@@ -46,7 +46,6 @@ public class OrderRequestWithCart extends BaseOrderRequest {
         orderRequestWithCart.setPaymentMethod(request.getPaymentMethod());
         orderRequestWithCart.setShippingMethod(request.getShippingMethod());
         orderRequestWithCart.setNote(request.getNote());
-        orderRequestWithCart.setShopId(request.getShopId());
 
         return orderRequestWithCart;
     }

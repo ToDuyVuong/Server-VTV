@@ -25,27 +25,27 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     Optional<Order> findByOrderIdAndCustomerUsername(UUID orderId, String username);
 
-    Optional<List<Order>> findAllByShopId(Long shopId);
+    Optional<List<Order>> findAllByShopShopId(Long shopId);
 
-    Optional<List<Order>> findAllByShopIdAndStatus(Long shopId, OrderStatus status);
+    Optional<List<Order>> findAllByShopShopIdAndStatus(Long shopId, OrderStatus status);
 
-    Optional<List<Order>> findAllByShopIdAndOrderDateBetween(Long shopId, Date startOrderDate, Date endOrderDate);
+    Optional<List<Order>> findAllByShopShopIdAndOrderDateBetween(Long shopId, Date startOrderDate, Date endOrderDate);
 
-    Optional<List<Order>> findAllByShopIdAndOrderDateBetweenAndStatus(Long shopId, Date startOrderDate,
+    Optional<List<Order>> findAllByShopShopIdAndOrderDateBetweenAndStatus(Long shopId, Date startOrderDate,
             Date endOrderDate, OrderStatus status);
 
-    int countAllByShopIdAndStatusAndOrderDateBetween(Long shopId, OrderStatus status, Date startDate, Date endDate);
+    int countAllByShopShopIdAndStatusAndOrderDateBetween(Long shopId, OrderStatus status, Date startDate, Date endDate);
 
-    Optional<List<Order>> findAllByShopIdAndStatusAndOrderDateBetween(Long shopId, OrderStatus status, Date startDate,
+    Optional<List<Order>> findAllByShopShopIdAndStatusAndOrderDateBetween(Long shopId, OrderStatus status, Date startDate,
             Date endDate);
 
-    Optional<Page<Order>> findAllByShopIdOrderByCreateAtDesc(Long shopId, PageRequest pageRequest);
+    Optional<Page<Order>> findAllByShopShopIdOrderByCreateAtDesc(Long shopId, PageRequest pageRequest);
 
-    Optional<Page<Order>> findAllByShopIdAndStatusOrderByCreateAtDesc(Long shopId, OrderStatus status,
+    Optional<Page<Order>> findAllByShopShopIdAndStatusOrderByCreateAtDesc(Long shopId, OrderStatus status,
             PageRequest pageRequest);
 
-    int countAllByShopIdAndStatus(Long shopId, OrderStatus status);
+    int countAllByShopShopIdAndStatus(Long shopId, OrderStatus status);
 
-    int countAllByShopId(Long shopId);
+    int countAllByShopShopId(Long shopId);
 
 }

@@ -4,7 +4,6 @@ import hcmute.kltn.vtv.model.data.wallet.response.LoyaltyPointResponse;
 import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPoint;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.wallet.LoyaltyPointRepository;
-import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointHistoryService;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
@@ -22,7 +21,6 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
 
     private final LoyaltyPointRepository loyaltyPointRepository;
     private final ILoyaltyPointHistoryService loyaltyPointHistoryService;
-    private final ICustomerService customerService;
 
 
     @Async
@@ -31,7 +29,7 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
     public void addNewLoyaltyPointAfterRegister(String username) {
         if(!loyaltyPointRepository.existsByUsername(username)){
             try {
-                loyaltyPointRepository.save(createLoyaltyPointByUserame(username));
+                loyaltyPointRepository.save(createLoyaltyPointByUsername(username));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -42,14 +40,31 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
     @Async
     @Override
     @Transactional
-    public void plusLoyaltyPointByUsername(String username, Long point, String type) {
+    public void updatePointInLoyaltyPointByUsername(String username, Long point, String type) {
         LoyaltyPoint loyaltyPoint = getLoyaltyPointByUsername(username);
         loyaltyPoint.setTotalPoint(loyaltyPoint.getTotalPoint() + point);
         loyaltyPoint.setUpdateAt(LocalDateTime.now());
         try {
 
             loyaltyPointRepository.save(loyaltyPoint);
-            loyaltyPointHistoryService.addNewLoyaltyPointHistoryByLoyaltyPointId(loyaltyPoint, point, type, true);
+            loyaltyPointHistoryService.addNewLoyaltyPointHistoryByLoyaltyPointId(loyaltyPoint, point, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Async
+    @Override
+    @Transactional
+    public void subtractLoyaltyPointByUsername(String username, Long point, String type) {
+        LoyaltyPoint loyaltyPoint = getLoyaltyPointByUsername(username);
+        loyaltyPoint.setTotalPoint(loyaltyPoint.getTotalPoint() - point);
+        loyaltyPoint.setUpdateAt(LocalDateTime.now());
+        try {
+
+            loyaltyPointRepository.save(loyaltyPoint);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,7 +97,7 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
 
 
 
-    private LoyaltyPoint createLoyaltyPointByUserame(String username) {
+    private LoyaltyPoint createLoyaltyPointByUsername(String username) {
         LoyaltyPoint loyaltyPoint = new LoyaltyPoint();
         loyaltyPoint.setUsername(username);
         loyaltyPoint.setTotalPoint(0L);

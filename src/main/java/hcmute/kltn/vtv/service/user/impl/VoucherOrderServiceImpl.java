@@ -37,7 +37,7 @@ public class VoucherOrderServiceImpl implements IVoucherOrderService {
     public VoucherOrder saveVoucherOrder(Long voucherId, Order order, boolean isShop) {
         Voucher voucher;
         if (isShop) {
-            voucher = voucherShopService.checkVoucherShop(voucherId, order.getShopId());
+            voucher = voucherShopService.checkVoucherShop(voucherId, order.getShop().getShopId());
 
         } else {
             voucher = voucherSystemService.checkVoucherSystem(voucherId);

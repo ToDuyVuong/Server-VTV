@@ -69,10 +69,10 @@ public class OrderShopServiceImpl implements IOrderShopService {
     public PageOrderResponse getPageOrder(String username, int page, int size) {
         Shop shop = shopService.getShopByUsername(username);
 
-        int totalOrder = orderRepository.countAllByShopId(shop.getShopId());
+        int totalOrder = orderRepository.countAllByShopShopId(shop.getShopId());
         int totalPage = (int) Math.ceil((double) totalOrder / size);
 
-        Page<Order> pageOrder = orderRepository.findAllByShopIdOrderByCreateAtDesc(shop.getShopId(),
+        Page<Order> pageOrder = orderRepository.findAllByShopShopIdOrderByCreateAtDesc(shop.getShopId(),
                 PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
@@ -85,10 +85,10 @@ public class OrderShopServiceImpl implements IOrderShopService {
     public PageOrderResponse getPageOrderByStatus(String username, OrderStatus status, int page, int size) {
         Shop shop = shopService.getShopByUsername(username);
 
-        int totalOrder = orderRepository.countAllByShopIdAndStatus(shop.getShopId(), status);
+        int totalOrder = orderRepository.countAllByShopShopIdAndStatus(shop.getShopId(), status);
         int totalPage = (int) Math.ceil((double) totalOrder / size);
 
-        Page<Order> pageOrder = orderRepository.findAllByShopIdAndStatusOrderByCreateAtDesc(shop.getShopId(), status,
+        Page<Order> pageOrder = orderRepository.findAllByShopShopIdAndStatusOrderByCreateAtDesc(shop.getShopId(), status,
                 PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
@@ -117,7 +117,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     public ListOrderResponse getOrders(String username) {
         Shop shop = shopService.getShopByUsername(username);
 
-        List<Order> orders = orderRepository.findAllByShopId(shop.getShopId())
+        List<Order> orders = orderRepository.findAllByShopShopId(shop.getShopId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng thành công!", "OK");
@@ -127,7 +127,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
     public ListOrderResponse getOrdersByStatus(String username, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
 
-        List<Order> orders = orderRepository.findAllByShopIdAndStatus(shop.getShopId(), status)
+        List<Order> orders = orderRepository.findAllByShopShopIdAndStatus(shop.getShopId(), status)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         String message = orderService.messageByOrderStatus(status);
@@ -142,7 +142,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         Date startOfDay = startOfDay(orderDate);
         Date endOfDay = endOfDay(orderDate);
 
-        List<Order> orders = orderRepository.findAllByShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
+        List<Order> orders = orderRepository.findAllByShopShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng trong cùng ngày thành công.", "OK");
@@ -156,7 +156,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         Date endOfDay = endOfDay(orderDate);
 
         List<Order> orders = orderRepository
-                .findAllByShopIdAndOrderDateBetweenAndStatus(shop.getShopId(), startOfDay, endOfDay, status)
+                .findAllByShopShopIdAndOrderDateBetweenAndStatus(shop.getShopId(), startOfDay, endOfDay, status)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         String message = orderService.messageByOrderStatus(status);
@@ -171,7 +171,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         Date startOfDay = startOfDay(startOrderDate);
         Date endOfDay = endOfDay(endOrderDate);
 
-        List<Order> orders = orderRepository.findAllByShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
+        List<Order> orders = orderRepository.findAllByShopShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         return ListOrderResponse.listOrderResponse(orders, "Lấy danh sách đơn hàng trong khoảng thời gian thành công.", "OK");
@@ -186,7 +186,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         Date endOfDay = endOfDay(endOrderDate);
 
         List<Order> orders = orderRepository
-                .findAllByShopIdAndOrderDateBetweenAndStatus(shop.getShopId(), startOfDay, endOfDay, status)
+                .findAllByShopShopIdAndOrderDateBetweenAndStatus(shop.getShopId(), startOfDay, endOfDay, status)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         String message = orderService.messageByOrderStatus(status);
@@ -201,7 +201,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
-        if (!order.getShopId().equals(shop.getShopId())) {
+        if (!order.getShop().getShopId().equals(shop.getShopId())) {
             throw new NotFoundException("Không tìm thấy đơn hàng nào!");
         }
 
@@ -215,7 +215,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
-        if (!order.getShopId().equals(shop.getShopId())) {
+        if (!order.getShop().getShopId().equals(shop.getShopId())) {
             throw new NotFoundException("Không tìm thấy đơn hàng nào!");
         }
         checkStatus(order, status);
@@ -300,30 +300,6 @@ public class OrderShopServiceImpl implements IOrderShopService {
         return calendar.getTime();
     }
 
-//    private OrderResponse orderResponse(String username, Order order, String message, boolean created) {
-//
-//        OrderDTO orderDTO = OrderDTO.convertEntityToDTOCreate(order);
-//
-//        OrderResponse response = new OrderResponse();
-//        response.setUsername(username);
-//        response.setOrderDTO(orderDTO);
-//        response.setMessage(message);
-//        response.setStatus(created ? "ok" : "success");
-//        response.setCode(200);
-//        return OrderResponse.orderResponse
-//    }
-
-//    public ListOrderResponse listOrderResponse(List<Order> orders, String message, String username) {
-//        List<OrderDTO> orderDTOs = OrderDTO.convertEntitiesToDTOs(orders);
-//        ListOrderResponse response = new ListOrderResponse();
-//        response.setOrderDTOs(orderDTOs);
-//        response.setUsername(username);
-//        response.setMessage(message);
-//        response.setStatus("ok");
-//        response.setCode(200);
-//        response.setCount(orders.size());
-//        return response;
-//    }
 
     @Override
     public void checkRequestPageParams(int page, int size) {

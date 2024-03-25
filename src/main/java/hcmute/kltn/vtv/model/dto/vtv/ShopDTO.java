@@ -69,6 +69,10 @@ public class ShopDTO {
         return shopDTO;
     }
 
+
+
+
+
     public static List<ShopDTO> convertEntitiesToDTOs(List<Shop> shops) {
         List<ShopDTO> shopDTOs = new ArrayList<>();
         for (Shop shop : shops) {

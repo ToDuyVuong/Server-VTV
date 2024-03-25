@@ -1,6 +1,8 @@
 package hcmute.kltn.vtv.model.entity.user;
 
 import hcmute.kltn.vtv.model.entity.location.Ward;
+import hcmute.kltn.vtv.model.entity.vendor.Shop;
+import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPointHistory;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import jakarta.persistence.*;
@@ -24,18 +26,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderId;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-
-    private Date orderDate;
-
     private String note;
 
     private int count;
-
-    private Long shopId;
-
-    private String shopName;
 
     private Long totalPrice;
 
@@ -51,6 +44,11 @@ public class Order {
 
     private String shippingMethod;
 
+    private Date orderDate;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
     private LocalDateTime createAt;
 
     private LocalDateTime updateAt;
@@ -60,17 +58,22 @@ public class Order {
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "shop_ward_code")
-    private Ward shopWardCode;
-
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "loyalty_point_history_id")
+    private LoyaltyPointHistory loyaltyPointHistory;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<VoucherOrder> voucherOrders;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderItem> orderItems;
+
 
 }

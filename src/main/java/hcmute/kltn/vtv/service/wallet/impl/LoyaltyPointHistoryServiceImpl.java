@@ -8,6 +8,7 @@ import hcmute.kltn.vtv.repository.wallet.LoyaltyPointHistoryRepository;
 import hcmute.kltn.vtv.repository.wallet.LoyaltyPointRepository;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointHistoryService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,15 @@ import java.util.List;
 public class LoyaltyPointHistoryServiceImpl implements ILoyaltyPointHistoryService {
 
 
-    @Autowired
     private final LoyaltyPointHistoryRepository loyaltyPointHistoryRepository;
-    @Autowired
     private final LoyaltyPointRepository loyaltyPointRepository;
 
 
     @Async
     @Override
     @Transactional
-    public void addNewLoyaltyPointHistoryByLoyaltyPointId(LoyaltyPoint loyaltyPoint, Long point, String type, boolean earned) {
-        LoyaltyPointHistory loyaltyPointHistory = createLoyaltyPointHistory(loyaltyPoint, point, type, earned);
+    public void addNewLoyaltyPointHistoryByLoyaltyPointId(LoyaltyPoint loyaltyPoint, Long point, String type) {
+        LoyaltyPointHistory loyaltyPointHistory = createLoyaltyPointHistory(loyaltyPoint, point, type);
 
         try {
             loyaltyPointHistoryRepository.save(loyaltyPointHistory);
@@ -42,6 +41,21 @@ public class LoyaltyPointHistoryServiceImpl implements ILoyaltyPointHistoryServi
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    @Transactional
+    public LoyaltyPointHistory addNewLoyaltyPointHistory(LoyaltyPoint loyaltyPoint, Long point, String type) {
+        LoyaltyPointHistory loyaltyPointHistory = createLoyaltyPointHistory(loyaltyPoint, point, type);
+
+        try {
+            return loyaltyPointHistoryRepository.save(loyaltyPointHistory);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Thêm mới lịch sử điểm thưởng thất bại");
+        }
+    }
+
+
 
 
     @Override
@@ -53,12 +67,11 @@ public class LoyaltyPointHistoryServiceImpl implements ILoyaltyPointHistoryServi
     }
 
 
-    private LoyaltyPointHistory createLoyaltyPointHistory(LoyaltyPoint loyaltyPoint, Long point, String type, boolean earned) {
+    private LoyaltyPointHistory createLoyaltyPointHistory(LoyaltyPoint loyaltyPoint, Long point, String type) {
         LoyaltyPointHistory loyaltyPointHistory = new LoyaltyPointHistory();
         loyaltyPointHistory.setLoyaltyPoint(loyaltyPoint);
         loyaltyPointHistory.setPoint(point);
         loyaltyPointHistory.setType(type);
-        loyaltyPointHistory.setEarned(earned);
         loyaltyPointHistory.setStatus(Status.ACTIVE);
         loyaltyPointHistory.setCreateAt(LocalDateTime.now());
 

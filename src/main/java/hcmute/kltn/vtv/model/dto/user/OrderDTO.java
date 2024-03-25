@@ -1,6 +1,9 @@
 package hcmute.kltn.vtv.model.dto.user;
 
+import hcmute.kltn.vtv.model.dto.vtv.ShopDTO;
+import hcmute.kltn.vtv.model.dto.wallet.LoyaltyPointHistoryDTO;
 import hcmute.kltn.vtv.model.entity.user.Order;
+import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPointHistory;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.model.extra.Status;
 import lombok.AllArgsConstructor;
@@ -26,10 +29,6 @@ public class OrderDTO {
 
     private int count;
 
-    private Long shopId;
-
-    private String shopName;
-
     private Long totalPrice;
 
     private Long discountShop;
@@ -40,13 +39,15 @@ public class OrderDTO {
 
     private Long paymentTotal;
 
-    private String shopWardCode;
-
     private OrderStatus status;
 
     private Date orderDate;
 
     private AddressDTO addressDTO;
+
+    private ShopDTO shopDTO;
+
+    private LoyaltyPointHistoryDTO loyaltyPointHistoryDTO;
 
     private List<VoucherOrderDTO> voucherOrderDTOs;
 
@@ -68,35 +69,6 @@ public class OrderDTO {
     }
 
 
-
-//    public static OrderDTO convertEntityToDTOCreate(Order order) {
-//        OrderDTO orderDTO = new OrderDTO();
-//        if (order.getOrderId() != null) {
-//            orderDTO.setOrderId(order.getOrderId());
-//        }
-//        orderDTO.setNote(order.getNote());
-//        orderDTO.setPaymentMethod(order.getPaymentMethod());
-//        orderDTO.setShippingMethod(order.getShippingMethod());
-//        orderDTO.setCount(order.getCount());
-//        orderDTO.setShopId(order.getShopId());
-//        orderDTO.setShopName(order.getShopName());
-//        orderDTO.setDiscountShop(order.getDiscountShop());
-//        orderDTO.setDiscountSystem(order.getDiscountSystem());
-//        orderDTO.setPaymentTotal(order.getPaymentTotal());
-//        orderDTO.setStatus(order.getStatus());
-//        orderDTO.setOrderDate(order.getOrderDate());
-//        orderDTO.setTotalPrice(order.getTotalPrice());
-//        orderDTO.setShippingFee(order.getShippingFee());
-//        orderDTO.setShopWardCode(order.getShopWardCode().getWardCode());
-//
-//        orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
-//        orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));
-//        orderDTO.setVoucherOrderDTOs(VoucherOrderDTO.convertListEntityToListDTO(order.getVoucherOrders()));
-//
-//        return orderDTO;
-//    }
-
-
     public static OrderDTO convertEntityToDTO(Order order) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setOrderId(order.getOrderId());
@@ -104,8 +76,6 @@ public class OrderDTO {
         orderDTO.setPaymentMethod(order.getPaymentMethod());
         orderDTO.setShippingMethod(order.getShippingMethod());
         orderDTO.setCount(order.getCount());
-        orderDTO.setShopId(order.getShopId());
-        orderDTO.setShopName(order.getShopName());
         orderDTO.setDiscountShop(order.getDiscountShop());
         orderDTO.setDiscountSystem(order.getDiscountSystem());
         orderDTO.setPaymentTotal(order.getPaymentTotal());
@@ -113,7 +83,10 @@ public class OrderDTO {
         orderDTO.setOrderDate(order.getOrderDate());
         orderDTO.setTotalPrice(order.getTotalPrice());
         orderDTO.setShippingFee(order.getShippingFee());
-        orderDTO.setShopWardCode(order.getShopWardCode().getWardCode());
+
+
+        orderDTO.setShopDTO(ShopDTO.convertEntityToDTO(order.getShop()));
+        orderDTO.setLoyaltyPointHistoryDTO(LoyaltyPointHistoryDTO.convertEntityToDTO(order.getLoyaltyPointHistory()));
 
         orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
         orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));

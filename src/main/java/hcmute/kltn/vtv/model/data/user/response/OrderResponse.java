@@ -40,15 +40,6 @@ public class OrderResponse extends ResponseAbstract {
     }
 
 
-    public static OrderResponse createOrderResponse(Order order, String message, String status) {
-        OrderResponse response = new OrderResponse();
-        response.setOrderDTO(OrderDTO.convertEntityToDTO(order));
-        response.setMessage(message);
-        response.setStatus(status);
-        response.setCode(200);
-
-        return response;
-    }
 
 
 }

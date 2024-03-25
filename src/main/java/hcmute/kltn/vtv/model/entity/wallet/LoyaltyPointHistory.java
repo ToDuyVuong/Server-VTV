@@ -26,7 +26,6 @@ public class LoyaltyPointHistory {
 
     private String type;
 
-    private boolean earned;
 
     @Enumerated(EnumType.STRING)
     private Status status;

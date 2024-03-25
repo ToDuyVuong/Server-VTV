@@ -24,8 +24,6 @@ public class LoyaltyPointHistoryDTO {
 
     private String type;
 
-    private boolean earned;
-
     private Status status;
 
     private Long loyaltyPointId;
@@ -34,14 +32,17 @@ public class LoyaltyPointHistoryDTO {
 
 
     public static LoyaltyPointHistoryDTO convertEntityToDTO(LoyaltyPointHistory loyaltyPointHistory) {
+        if (loyaltyPointHistory == null) {
+            return null;
+        }
         LoyaltyPointHistoryDTO loyaltyPointHistoryDTO = new LoyaltyPointHistoryDTO();
         loyaltyPointHistoryDTO.setLoyaltyPointHistoryId(loyaltyPointHistory.getLoyaltyPointHistoryId());
         loyaltyPointHistoryDTO.setPoint(loyaltyPointHistory.getPoint());
         loyaltyPointHistoryDTO.setType(loyaltyPointHistory.getType());
-        loyaltyPointHistoryDTO.setEarned(loyaltyPointHistory.isEarned());
         loyaltyPointHistoryDTO.setStatus(loyaltyPointHistory.getStatus());
         loyaltyPointHistoryDTO.setCreateAt(loyaltyPointHistory.getCreateAt());
         loyaltyPointHistoryDTO.setLoyaltyPointId(loyaltyPointHistory.getLoyaltyPoint().getLoyaltyPointId());
+
         return loyaltyPointHistoryDTO;
     }
 

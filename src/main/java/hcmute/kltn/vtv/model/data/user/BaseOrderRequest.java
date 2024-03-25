@@ -18,7 +18,7 @@ public abstract class BaseOrderRequest {
     private String paymentMethod;
     private String shippingMethod;
     private String note;
-    private Long shopId;
+    private boolean useLoyaltyPoint;
 
     public void validate() {
         baseValidate();
@@ -32,6 +32,7 @@ public abstract class BaseOrderRequest {
         if (paymentMethod == null || paymentMethod.isEmpty()) {
             throw new BadRequestException("Phương thức thanh toán không được để trống! ");
         }
+
         if (!paymentMethod.equals("COD")) {
             throw new BadRequestException("Phương thanh toán không hợp lệ! Hiện tại chỉ hỗ trợ COD");
         }
@@ -45,10 +46,6 @@ public abstract class BaseOrderRequest {
                 !shippingMethod.equals("VTV Express")) {
             throw new BadRequestException(
                     "Phương thức vận chuyển không hợp lệ! Hiện tại chỉ hỗ trợ GHN, GHTK, VTV Express");
-        }
-
-        if (shopId == null) {
-            throw new BadRequestException("Mã cửa hàng không được để trống!");
         }
 
         trim();
