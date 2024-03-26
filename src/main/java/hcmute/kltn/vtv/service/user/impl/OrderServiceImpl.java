@@ -41,7 +41,6 @@ public class OrderServiceImpl implements IOrderService {
     private final ICustomerService customerService;
     private final IAddressService addressService;
     private final IDistanceLocationService distanceLocationService;
-    private final IShopGuestService shopGuestService;
     private final IProductVariantService productVariantService;
     private final IVoucherCustomerService voucherCustomerService;
     private final IShippingService shippingService;
@@ -291,10 +290,12 @@ public class OrderServiceImpl implements IOrderService {
                     voucherOrderService.cancelVoucherOrder(voucherOrder.getVoucherOrderId());
                 }
             }
-
+            if (order.getLoyaltyPointHistory() != null) {
+                Long point = -order.getLoyaltyPointHistory().getPoint();
+                loyaltyPointService.updatePointInLoyaltyPointByUsername(order.getCustomer().getUsername(), point, "REFUND");
+            }
             List<OrderItem> orderItems = orderItemService.cancelOrderItem(order);
             order.setOrderItems(orderItems);
-
             ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
                     order.getShop().getWard().getWardCode(), order.getShippingMethod()).getShippingDTO();
             String messageMail = "Hủy đơn hàng thành công.";
@@ -370,7 +371,6 @@ public class OrderServiceImpl implements IOrderService {
             order.setNote(request.getNote());
         }
         try {
-
             return orderRepository.save(order);
         } catch (Exception e) {
             throw new InternalServerErrorException("Tạo mẫu đơn hàng mới thất bại! " + e.getMessage());
@@ -379,10 +379,8 @@ public class OrderServiceImpl implements IOrderService {
 
 
     private Order createBaseOrder(String username, Address address) {
-        Customer customer = customerService.getCustomerByUsername(username);
-
         Order order = new Order();
-        order.setCustomer(customer);
+        order.setCustomer(customerService.getCustomerByUsername(username));
         order.setAddress(address);
         order.setDiscountShop(0L);
         order.setDiscountSystem(0L);
@@ -520,10 +518,8 @@ public class OrderServiceImpl implements IOrderService {
         if (loyaltyPoint.getTotalPoint() == 0) {
             throw new BadRequestException("Không đủ điểm thưởng để thanh toán. Điểm thưởng hiện tại của bạn là 0.");
         }
-        Long point = - (order.getTotalPrice() <= loyaltyPoint.getTotalPoint() ? order.getTotalPrice() : loyaltyPoint.getTotalPoint());
-
-        loyaltyPointService.updatePointInLoyaltyPointByUsername(order.getCustomer().getUsername(),  point, "PAYMENT");
-        LoyaltyPointHistory loyaltyPointHistory = loyaltyPointHistoryService.addNewLoyaltyPointHistory(loyaltyPoint, point, "PAYMENT");
+        Long point = -(order.getTotalPrice() <= loyaltyPoint.getTotalPoint() ? order.getTotalPrice() : loyaltyPoint.getTotalPoint());
+        LoyaltyPointHistory loyaltyPointHistory = loyaltyPointService.updatePointInLoyaltyPointByUsername(order.getCustomer().getUsername(), point, "PAYMENT");
 
         order.setLoyaltyPointHistory(loyaltyPointHistory);
         order.setPaymentTotal(order.getTotalPrice() - loyaltyPointHistory.getPoint());

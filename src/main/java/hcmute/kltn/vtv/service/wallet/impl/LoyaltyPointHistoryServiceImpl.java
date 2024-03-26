@@ -29,33 +29,20 @@ public class LoyaltyPointHistoryServiceImpl implements ILoyaltyPointHistoryServi
     private final LoyaltyPointRepository loyaltyPointRepository;
 
 
-    @Async
-    @Override
-    @Transactional
-    public void addNewLoyaltyPointHistoryByLoyaltyPointId(LoyaltyPoint loyaltyPoint, Long point, String type) {
-        LoyaltyPointHistory loyaltyPointHistory = createLoyaltyPointHistory(loyaltyPoint, point, type);
 
-        try {
-            loyaltyPointHistoryRepository.save(loyaltyPointHistory);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
     @Override
     @Transactional
     public LoyaltyPointHistory addNewLoyaltyPointHistory(LoyaltyPoint loyaltyPoint, Long point, String type) {
         LoyaltyPointHistory loyaltyPointHistory = createLoyaltyPointHistory(loyaltyPoint, point, type);
-
         try {
+
             return loyaltyPointHistoryRepository.save(loyaltyPointHistory);
         } catch (Exception e) {
             throw new InternalServerErrorException("Thêm mới lịch sử điểm thưởng thất bại");
         }
     }
-
-
 
 
     @Override
@@ -80,7 +67,7 @@ public class LoyaltyPointHistoryServiceImpl implements ILoyaltyPointHistoryServi
 
 
     private void checkExistLoyaltyPointByIdAndUsername(Long loyaltyPointId, String username) {
-        if(!loyaltyPointRepository.existsByLoyaltyPointIdAndUsername(loyaltyPointId, username)){
+        if (!loyaltyPointRepository.existsByLoyaltyPointIdAndUsername(loyaltyPointId, username)) {
             throw new BadRequestException("Mã điểm tích lũy không tồn tại hoặc không thuộc tài khoản " + username);
         }
     }

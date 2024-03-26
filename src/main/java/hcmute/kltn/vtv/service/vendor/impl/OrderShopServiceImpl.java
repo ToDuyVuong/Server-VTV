@@ -1,8 +1,11 @@
 package hcmute.kltn.vtv.service.vendor.impl;
 
 import hcmute.kltn.vtv.model.dto.shipping.ShippingDTO;
+import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPoint;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.service.shipping.IShippingService;
+import hcmute.kltn.vtv.service.wallet.ILoyaltyPointHistoryService;
+import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.PageOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
@@ -49,6 +52,8 @@ public class OrderShopServiceImpl implements IOrderShopService {
     private final IOrderService orderService;
     private final IMailService mailService;
     private final IShippingService shippingService;
+    private final ILoyaltyPointService loyaltyPointService;
+    private final ILoyaltyPointHistoryService loyaltyPointHistoryService;
 
     @Override
     public PageOrderResponse getPageOrder(String username, int page, int size) {
@@ -153,7 +158,6 @@ public class OrderShopServiceImpl implements IOrderShopService {
                 shop.getWard().getWardCode(), order.getShippingMethod()).getShippingDTO();
 
         return OrderResponse.orderResponse(order, shippingDTO, "Lấy đơn hàng thành công!", "OK");
-
     }
 
     @Override
@@ -170,11 +174,10 @@ public class OrderShopServiceImpl implements IOrderShopService {
         if (status.equals(OrderStatus.CANCEL)) {
             return cancelOrderByShop(order, shippingDTO, message);
         }
-
         order.setStatus(status);
         order.setUpdateAt(LocalDateTime.now());
-
         try {
+
             orderRepository.save(order);
 
             return OrderResponse.orderResponse(order, shippingDTO, message, "Success");
@@ -197,12 +200,13 @@ public class OrderShopServiceImpl implements IOrderShopService {
                     voucherOrderService.cancelVoucherOrder(voucherOrder.getVoucherOrderId());
                 }
             }
-
+            if (order.getLoyaltyPointHistory() != null) {
+                Long point = -order.getLoyaltyPointHistory().getPoint();
+                loyaltyPointService.updatePointInLoyaltyPointByUsername(order.getCustomer().getUsername(), point, "REFUND");
+            }
             List<OrderItem> orderItems = orderItemService.cancelOrderItem(order);
             order.setOrderItems(orderItems);
-
-            String messageMail = "Đơn hàng của bạn đã bị hủy bởi cửa hàng!";
-            mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
+            mailService.sendOrderConfirmationEmail(order, shippingDTO, "Đơn hàng của bạn đã bị hủy bởi cửa hàng!");
 
             return OrderResponse.orderResponse(order, message, "Success");
         } catch (Exception e) {
@@ -217,11 +221,13 @@ public class OrderShopServiceImpl implements IOrderShopService {
         }
     }
 
+
     private void checkExistOrderByShop(UUID orderId, Long shopId) {
         if (!orderRepository.existsByOrderIdAndShopShopId(orderId, shopId)) {
             throw new NotFoundException("Mã đơn hàng không tồn tại trong cửa hàng!");
         }
     }
+
 
     private String messageUpdateStatusOrder(OrderStatus status) {
         return switch (status) {
@@ -233,6 +239,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
             default -> "";
         };
     }
+
 
     private void checkStatus(Order order) {
 
@@ -254,6 +261,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
 
     }
 
+
     private Date startOfDay(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -263,6 +271,7 @@ public class OrderShopServiceImpl implements IOrderShopService {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
+
 
     private Date endOfDay(Date date) {
         Calendar calendar = Calendar.getInstance();
@@ -274,18 +283,5 @@ public class OrderShopServiceImpl implements IOrderShopService {
         return calendar.getTime();
     }
 
-
-//    @Override
-//    public void checkRequestPageParams(int page, int size) {
-//        if (page < 0) {
-//            throw new NotFoundException("Trang không được nhỏ hơn 0!");
-//        }
-//        if (size < 0) {
-//            throw new NotFoundException("Kích thước trang không được nhỏ hơn 0!");
-//        }
-//        if (size > 200) {
-//            throw new NotFoundException("Kích thước trang không được lớn hơn 200!");
-//        }
-//    }
 
 }

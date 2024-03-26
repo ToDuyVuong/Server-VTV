@@ -2,11 +2,13 @@ package hcmute.kltn.vtv.service.wallet.impl;
 
 import hcmute.kltn.vtv.model.data.wallet.response.LoyaltyPointResponse;
 import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPoint;
+import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPointHistory;
 import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.wallet.LoyaltyPointRepository;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointHistoryService;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -27,7 +29,7 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
     @Override
     @Transactional
     public void addNewLoyaltyPointAfterRegister(String username) {
-        if(!loyaltyPointRepository.existsByUsername(username)){
+        if (!loyaltyPointRepository.existsByUsername(username)) {
             try {
                 loyaltyPointRepository.save(createLoyaltyPointByUsername(username));
             } catch (Exception e) {
@@ -37,36 +39,18 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
     }
 
 
-    @Async
     @Override
     @Transactional
-    public void updatePointInLoyaltyPointByUsername(String username, Long point, String type) {
+    public LoyaltyPointHistory updatePointInLoyaltyPointByUsername(String username, Long point, String type) {
         LoyaltyPoint loyaltyPoint = getLoyaltyPointByUsername(username);
         loyaltyPoint.setTotalPoint(loyaltyPoint.getTotalPoint() + point);
         loyaltyPoint.setUpdateAt(LocalDateTime.now());
         try {
-
             loyaltyPointRepository.save(loyaltyPoint);
-            loyaltyPointHistoryService.addNewLoyaltyPointHistoryByLoyaltyPointId(loyaltyPoint, point, type);
+
+            return loyaltyPointHistoryService.addNewLoyaltyPointHistory(loyaltyPoint, point, type);
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    @Async
-    @Override
-    @Transactional
-    public void subtractLoyaltyPointByUsername(String username, Long point, String type) {
-        LoyaltyPoint loyaltyPoint = getLoyaltyPointByUsername(username);
-        loyaltyPoint.setTotalPoint(loyaltyPoint.getTotalPoint() - point);
-        loyaltyPoint.setUpdateAt(LocalDateTime.now());
-        try {
-
-            loyaltyPointRepository.save(loyaltyPoint);
-        } catch (Exception e) {
-            e.printStackTrace();
+            throw new InternalServerErrorException("Cập nhật điểm tích lũy thất bại");
         }
     }
 
@@ -78,7 +62,6 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
     }
 
 
-
     @Override
     public LoyaltyPoint getLoyaltyPointByUsername(String username) {
         return loyaltyPointRepository.findByUsername(username)
@@ -88,13 +71,10 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
 
     @Override
     public void checkExistLoyaltyPointByIdAndUsername(Long loyaltyPointId, String username) {
-        if(!loyaltyPointRepository.existsByLoyaltyPointIdAndUsername(loyaltyPointId, username)){
+        if (!loyaltyPointRepository.existsByLoyaltyPointIdAndUsername(loyaltyPointId, username)) {
             throw new BadRequestException("Mã điểm tích lũy không tồn tại hoặc không thuộc tài khoản " + username);
         }
     }
-
-
-
 
 
     private LoyaltyPoint createLoyaltyPointByUsername(String username) {
@@ -108,7 +88,6 @@ public class LoyaltyPointServiceImpl implements ILoyaltyPointService {
 
         return loyaltyPoint;
     }
-
 
 
 }
