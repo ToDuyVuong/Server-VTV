@@ -29,8 +29,5 @@ public class FavoriteProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public FavoriteProduct(Customer customer, Product product) {
-        this.customer = customer;
-        this.product = product;
-    }
+
 }

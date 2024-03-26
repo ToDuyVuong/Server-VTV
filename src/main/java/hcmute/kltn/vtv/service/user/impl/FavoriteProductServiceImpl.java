@@ -14,6 +14,7 @@ import hcmute.kltn.vtv.service.guest.IProductService;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.service.user.IFavoriteProductService;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
+import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,7 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
     private IProductService productService;
     @Autowired
     private FavoriteProductRepository favoriteProductRepository;
-    @Autowired
-    private final IReviewService reviewService;
+
     @Override
     @Transactional
     public FavoriteProductResponse addNewFavoriteProduct(Long productId, String username) {
@@ -93,12 +93,9 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
 
 
     private FavoriteProduct createFavoriteProductByProductIdAndUsername(Long productId, String username) {
-        Customer customer = customerService.getCustomerByUsername(username);
-        Product product = productService.getProductById(productId);
-
         FavoriteProduct favoriteProduct = new FavoriteProduct();
-        favoriteProduct.setCustomer(customer);
-        favoriteProduct.setProduct(product);
+        favoriteProduct.setCustomer(customerService.getCustomerByUsername(username));
+        favoriteProduct.setProduct(productService.getProductById(productId));
         favoriteProduct.setCreateAt(LocalDateTime.now());
 
         return favoriteProduct;
@@ -127,7 +124,7 @@ public class FavoriteProductServiceImpl implements IFavoriteProductService {
 
     private FavoriteProduct getFavoriteProductById(Long favoriteProductId) {
         return favoriteProductRepository.findById(favoriteProductId)
-                .orElseThrow(() -> new BadRequestException("Sản phẩm yêu thích không tồn tại."));
+                .orElseThrow(() -> new NotFoundException("Sản phẩm yêu thích không tồn tại."));
     }
 
 

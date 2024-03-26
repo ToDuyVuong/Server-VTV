@@ -9,6 +9,7 @@ import hcmute.kltn.vtv.model.extra.Status;
 import lombok.*;
 import org.modelmapper.ModelMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +22,15 @@ public class FavoriteProductDTO {
 
     private Long favoriteProductId;
 
-    private ProductDTO productDTO;
+    private Long productId;
+
+    private LocalDateTime createAt;
 
     public static FavoriteProductDTO convertEntityToDTO(FavoriteProduct favoriteProduct) {
-        ModelMapper modelMapper = new ModelMapper();
         FavoriteProductDTO favoriteProductDTO = new FavoriteProductDTO();
         favoriteProductDTO.setFavoriteProductId(favoriteProduct.getFavoriteProductId());
-        favoriteProductDTO.setProductDTO(modelMapper.map(favoriteProduct.getProduct(), ProductDTO.class));
+        favoriteProductDTO.setProductId(favoriteProduct.getProduct().getProductId());
+        favoriteProductDTO.setCreateAt(favoriteProduct.getCreateAt());
         return favoriteProductDTO;
     }
 
@@ -36,12 +39,9 @@ public class FavoriteProductDTO {
 
         List<FavoriteProductDTO> favoriteProductDTOs = new ArrayList<>();
         for (FavoriteProduct favoriteProduct : favoriteProducts) {
-            FavoriteProductDTO favoriteProductDTO = new FavoriteProductDTO();
-            favoriteProductDTO.setFavoriteProductId(favoriteProduct.getFavoriteProductId());
-            favoriteProductDTO.setProductDTO(getProductToDTO(favoriteProduct.getProduct()));
+            FavoriteProductDTO favoriteProductDTO = convertEntityToDTO(favoriteProduct);
             favoriteProductDTOs.add(favoriteProductDTO);
         }
-
         return favoriteProductDTOs;
 
     }

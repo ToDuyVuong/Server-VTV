@@ -16,49 +16,42 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FavoriteProductController {
 
-    @Autowired
-    private IFavoriteProductService favoriteProductService;
+    private final IFavoriteProductService favoriteProductService;
 
-    @PostMapping("/add")
-    public ResponseEntity<FavoriteProductResponse> addNewFavoriteProduct(@RequestParam Long productId,
-            HttpServletRequest request) {
-        if (productId == null) {
-            throw new BadRequestException("Mã sản phẩm không được để trống!");
-        }
+    @PostMapping("/add/{productId}")
+    public ResponseEntity<FavoriteProductResponse> addNewFavoriteProduct(@PathVariable Long productId,
+                                                                         HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
 
-        FavoriteProductResponse response = favoriteProductService.addNewFavoriteProduct(productId, username);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(favoriteProductService.addNewFavoriteProduct(productId, username));
     }
+
 
     @GetMapping("/detail/{favoriteProductId}")
-    public ResponseEntity<ProductResponse> getFavoriteProductById(
-            @PathVariable("favoriteProductId") Long favoriteProductId,
-            HttpServletRequest request) {
-        if (favoriteProductId == null) {
-            throw new BadRequestException("Mã sản phẩm yêu thích không được để trống!");
-        }
+    public ResponseEntity<ProductResponse> getProductByFavoriteProductId(
+                         @PathVariable("favoriteProductId") Long favoriteProductId,
+                         HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
-        ProductResponse response = favoriteProductService.getProductByFavoriteProductId(favoriteProductId, username);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(favoriteProductService.getProductByFavoriteProductId(favoriteProductId, username));
     }
+
 
     @GetMapping("/list")
     public ResponseEntity<ListFavoriteProductResponse> getListFavoriteProduct(HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
+
         return ResponseEntity.ok(favoriteProductService.getListFavoriteProduct(username));
     }
 
+
     @DeleteMapping("/delete/{favoriteProductId}")
-    public ResponseEntity<FavoriteProductResponse> deleteFavoriteProduct(
+    public ResponseEntity<FavoriteProductResponse> deleteFavoriteProductById(
             @PathVariable("favoriteProductId") Long favoriteProductId,
             HttpServletRequest request) {
-        if (favoriteProductId == null) {
-            throw new BadRequestException("Mã sản phẩm yêu thích không được để trống!");
-        }
         String username = (String) request.getAttribute("username");
-        FavoriteProductResponse response = favoriteProductService.deleteFavoriteProduct(favoriteProductId, username);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(favoriteProductService.deleteFavoriteProduct(favoriteProductId, username));
     }
 
 }
