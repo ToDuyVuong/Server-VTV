@@ -1,8 +1,11 @@
 package hcmute.kltn.vtv.service.vendor;
 
-import hcmute.kltn.vtv.model.data.vendor.request.StatisticsRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.StatisticsResponse;
 
+import java.util.Date;
+
 public interface IRevenueService {
-    StatisticsResponse statisticsByDate(StatisticsRequest request);
+
+
+    StatisticsResponse statisticsByDate(Date startDate, Date endDate, String username);
 }

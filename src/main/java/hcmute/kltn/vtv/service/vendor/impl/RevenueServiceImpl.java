@@ -2,7 +2,6 @@ package hcmute.kltn.vtv.service.vendor.impl;
 
 import hcmute.kltn.vtv.model.extra.OrderStatus;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
-import hcmute.kltn.vtv.model.data.vendor.request.StatisticsRequest;
 import hcmute.kltn.vtv.model.data.vendor.response.StatisticsResponse;
 import hcmute.kltn.vtv.model.dto.vtv.StatisticsDTO;
 import hcmute.kltn.vtv.model.entity.user.Order;
@@ -20,64 +19,39 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RevenueServiceImpl implements IRevenueService {
 
-    @Autowired
     private final OrderRepository orderRepository;
-    @Autowired
     private final IShopService shopService;
 
     @Override
-    public StatisticsResponse statisticsByDate(StatisticsRequest request) {
-        Shop shop = shopService.getShopByUsername(request.getUsername());
-        Date startDate = startOfDay(request.getStartDate());
-        Date endDate = endOfDay(request.getEndDate());
+    public StatisticsResponse statisticsByDate(Date startDate, Date endDate, String username) {
+        Shop shop = shopService.getShopByUsername(username);
+        startDate = startOfDay(startDate);
+        endDate = endOfDay(endDate);
         long totalMoney = 0;
-
         int totalOrder = orderRepository.countAllByShopShopIdAndStatusAndOrderDateBetween(shop.getShopId(),
                 OrderStatus.COMPLETED, startDate, endDate);
         List<Order> orders = orderRepository
                 .findAllByShopShopIdAndStatusAndOrderDateBetween(shop.getShopId(), OrderStatus.COMPLETED, startDate, endDate)
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy đơn hàng nào."));
-        List<StatisticsDTO> statisticsDTOs = listStatisticsDTO(orders, request.getStartDate(), request.getEndDate());
+        List<StatisticsDTO> statisticsDTOs = listStatisticsDTO(orders, startDate, endDate);
 
         if (!orders.isEmpty()) {
             for (Order order : orders) {
-                totalMoney += order.getPaymentTotal();
+                totalMoney += (long) (order.getTotalPrice() - order.getDiscountShop() - order.getTotalPrice() * 0.04);
             }
         }
 
-        return statisticsResponse(statisticsDTOs, request.getUsername(), totalOrder, startDate, endDate, totalMoney);
+        return StatisticsResponse.statisticsResponse(statisticsDTOs, username, totalOrder, startDate, endDate, totalMoney);
     }
 
-    private StatisticsResponse statisticsResponse(List<StatisticsDTO> statisticsDTOs, String username,
-            int totalOrder, Date startDate, Date endDate, long totalMoney) {
-
-        StatisticsResponse statisticsResponse = new StatisticsResponse();
-        statisticsResponse.setUsername(username);
-        statisticsResponse.setCount(statisticsDTOs.size());
-        statisticsResponse.setTotalOrder(totalOrder);
-        statisticsResponse.setTotalMoney(totalMoney);
-        statisticsResponse.setDateStart(ofDay(startDate));
-        statisticsResponse.setDateEnd(ofDay(endDate));
-        statisticsResponse.setStatisticsDTOs(statisticsDTOs);
-        statisticsResponse.setMessage("Thống kê doanh thu thành công.");
-        statisticsResponse.setCode(200);
-        statisticsResponse.setStatus("OK");
-
-        return statisticsResponse;
-    }
 
     private List<StatisticsDTO> listStatisticsDTO(List<Order> orders, Date startDate, Date endDate) {
-
-        //
-
-        Map<Date, List<Order>> ordersByDate = getOrdersByDate(orders, startDate, endDate);
         List<StatisticsDTO> statisticsDTOs = new ArrayList<>();
-
+        Map<Date, List<Order>> ordersByDate = getOrdersByDate(orders, startDate, endDate);
         for (Map.Entry<Date, List<Order>> entry : ordersByDate.entrySet()) {
             Date orderDate = entry.getKey();
             List<Order> ordersOnDate = entry.getValue();
-            StatisticsDTO statisticsDTO = getStatisticsDTO(ordersOnDate, orderDate);
-            statisticsDTOs.add(statisticsDTO);
+            statisticsDTOs.add(StatisticsDTO.convertOrdersAndDateToDTO(ordersOnDate, orderDate));
         }
         statisticsDTOs.sort(Comparator.comparing(StatisticsDTO::getDate));
 
@@ -126,23 +100,6 @@ public class RevenueServiceImpl implements IRevenueService {
         return datesInRange;
     }
 
-    private StatisticsDTO getStatisticsDTO(List<Order> ordersOnDate, Date orderDate) {
-        long totalMoney = 0;
-        int totalProduct = 0;
-
-        for (Order order : ordersOnDate) {
-            totalMoney += order.getPaymentTotal();
-            totalProduct += order.getOrderItems().size();
-        }
-
-        StatisticsDTO statisticsDTO = new StatisticsDTO();
-        statisticsDTO.setDate(orderDate);
-        statisticsDTO.setTotalMoney(totalMoney);
-        statisticsDTO.setTotalOrder(ordersOnDate.size());
-        statisticsDTO.setTotalProduct(totalProduct);
-
-        return statisticsDTO;
-    }
 
     private static Date startOfDay(Date date) {
         Calendar calendar = Calendar.getInstance();

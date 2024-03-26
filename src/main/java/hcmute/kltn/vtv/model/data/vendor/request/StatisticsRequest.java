@@ -14,7 +14,6 @@ public class StatisticsRequest {
 
     private Date startDate;
     private Date endDate;
-    private String username;
 
     public void validate() {
         if (startDate == null) {
