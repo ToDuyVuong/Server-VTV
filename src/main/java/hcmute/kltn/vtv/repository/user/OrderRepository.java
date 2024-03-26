@@ -14,7 +14,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
+    boolean existsByOrderId(UUID orderId);
 
+    boolean existsByOrderIdAndShopShopId(UUID orderId, Long shopId);
 
     Optional<List<Order>> findAllByStatus(OrderStatus status);
 
@@ -23,6 +25,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     Optional<List<Order>> findAllByCustomerUsernameAndStatus(String username, OrderStatus status);
 
     Optional<Order> findByOrderIdAndStatus(UUID orderId, OrderStatus status);
+
+    Optional<Order> findByOrderIdAndShopShopId(UUID orderId, Long shopId);
 
     Optional<Order> findByOrderIdAndCustomerUsername(UUID orderId, String username);
 

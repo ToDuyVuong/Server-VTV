@@ -21,13 +21,11 @@ public class PageOrderResponse extends ResponseAbstract {
     private int page;
     private int size;
     private int totalPage;
-    private ShopDTO shopDTO;
     private List<OrderDTO> orderDTOs;
 
-    public static PageOrderResponse pageOrderResponse(Page<Order> orders, Shop shop, String message, String status) {
+    public static PageOrderResponse pageOrderResponse(Page<Order> orders, String message, String status) {
         PageOrderResponse response = new PageOrderResponse();
         response.setOrderDTOs(OrderDTO.convertEntitiesToDTOs(orders.getContent()));
-        response.setShopDTO(ShopDTO.convertEntityToDTO(shop));
         response.setMessage(message);
         response.setStatus(status);
         response.setCode(200);

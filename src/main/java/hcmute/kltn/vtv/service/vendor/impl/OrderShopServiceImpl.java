@@ -1,6 +1,8 @@
 package hcmute.kltn.vtv.service.vendor.impl;
 
+import hcmute.kltn.vtv.model.dto.shipping.ShippingDTO;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
+import hcmute.kltn.vtv.service.shipping.IShippingService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.PageOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
@@ -21,12 +23,14 @@ import hcmute.kltn.vtv.service.vendor.IOrderItemShopService;
 import hcmute.kltn.vtv.service.vendor.IOrderShopService;
 import hcmute.kltn.vtv.service.vendor.IShopService;
 import hcmute.kltn.vtv.service.vendor.IVoucherShopService;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -38,85 +42,40 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderShopServiceImpl implements IOrderShopService {
 
-    @Autowired
     private final OrderRepository orderRepository;
-    @Autowired
     private final IOrderItemService orderItemService;
-    @Autowired
     private final IVoucherOrderService voucherOrderService;
-    @Autowired
-    private final ICartService cartService;
-    @Autowired
-    private final ICustomerService customerService;
-    @Autowired
-    private final IAddressService addressService;
-    @Autowired
-    private final IVoucherShopService voucherShopService;
-    @Autowired
-    private final IVoucherAdminService voucherSystemService;
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
     private final IShopService shopService;
-    @Autowired
     private final IOrderService orderService;
-    @Autowired
-    private final IOrderItemShopService orderItemShopService;
+    private final IMailService mailService;
+    private final IShippingService shippingService;
 
     @Override
     public PageOrderResponse getPageOrder(String username, int page, int size) {
         Shop shop = shopService.getShopByUsername(username);
-
-        int totalOrder = orderRepository.countAllByShopShopId(shop.getShopId());
-        int totalPage = (int) Math.ceil((double) totalOrder / size);
-
         Page<Order> pageOrder = orderRepository.findAllByShopShopIdOrderByCreateAtDesc(shop.getShopId(),
-                PageRequest.of(page - 1, size))
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
+                        PageRequest.of(page - 1, size))
+                .orElseThrow(() -> new NotFoundException("Không tìm danh sách đơn hàng nào trong cửa hàng sắp xếp theo thời gian mới nhất!"));
 
-        return getPageOrderResponse(pageOrder.getContent(), shop, page, size, totalPage,
-                "Lấy danh sách đơn hàng thành công!");
-
+        return PageOrderResponse.pageOrderResponse(pageOrder, "Lấy danh sách đơn hàng thành công!", "OK");
     }
+
 
     @Override
     public PageOrderResponse getPageOrderByStatus(String username, OrderStatus status, int page, int size) {
         Shop shop = shopService.getShopByUsername(username);
-
-        int totalOrder = orderRepository.countAllByShopShopIdAndStatus(shop.getShopId(), status);
-        int totalPage = (int) Math.ceil((double) totalOrder / size);
-
         Page<Order> pageOrder = orderRepository.findAllByShopShopIdAndStatusOrderByCreateAtDesc(shop.getShopId(), status,
-                PageRequest.of(page - 1, size))
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
+                        PageRequest.of(page - 1, size))
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào trong cửa hàng sắp xếp theo thời gian mới nhất và trạng thái!"));
+        String message = orderService.messageByOrderStatus(status);
 
-        return getPageOrderResponse(pageOrder.getContent(), shop, page, size, totalPage,
-                "Lấy danh sách đơn hàng theo trạng thái thành công!");
-
+        return PageOrderResponse.pageOrderResponse(pageOrder, message, "OK");
     }
 
-    public PageOrderResponse getPageOrderResponse(List<Order> orders, Shop shop, int page,
-            int size, int totalPage, String message) {
-
-        PageOrderResponse response = new PageOrderResponse();
-        response.setPage(page);
-        response.setSize(size);
-        response.setTotalPage(totalPage);
-        response.setCount(orders.size());
-        response.setOrderDTOs(OrderDTO.convertEntitiesToDTOs(orders));
-        response.setShopDTO(ShopDTO.convertEntityToDTO(shop));
-        response.setMessage(message);
-        response.setStatus("ok");
-        response.setCode(200);
-        return response;
-    }
 
     @Override
     public ListOrderResponse getOrders(String username) {
         Shop shop = shopService.getShopByUsername(username);
-
         List<Order> orders = orderRepository.findAllByShopShopId(shop.getShopId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
@@ -138,10 +97,8 @@ public class OrderShopServiceImpl implements IOrderShopService {
     @Override
     public ListOrderResponse getOrdersOnSameDay(String username, Date orderDate) {
         Shop shop = shopService.getShopByUsername(username);
-
         Date startOfDay = startOfDay(orderDate);
         Date endOfDay = endOfDay(orderDate);
-
         List<Order> orders = orderRepository.findAllByShopShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
@@ -151,26 +108,21 @@ public class OrderShopServiceImpl implements IOrderShopService {
     @Override
     public ListOrderResponse getOrdersOnSameDayByStatus(String username, Date orderDate, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
-
         Date startOfDay = startOfDay(orderDate);
         Date endOfDay = endOfDay(orderDate);
-
         List<Order> orders = orderRepository
                 .findAllByShopShopIdAndOrderDateBetweenAndStatus(shop.getShopId(), startOfDay, endOfDay, status)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
-
         String message = orderService.messageByOrderStatus(status);
 
-        return ListOrderResponse.listOrderResponse(orders, message, username);
+        return ListOrderResponse.listOrderResponse(orders, message, "OK");
     }
 
     @Override
     public ListOrderResponse getOrdersBetweenDate(String username, Date startOrderDate, Date endOrderDate) {
         Shop shop = shopService.getShopByUsername(username);
-
         Date startOfDay = startOfDay(startOrderDate);
         Date endOfDay = endOfDay(endOrderDate);
-
         List<Order> orders = orderRepository.findAllByShopShopIdAndOrderDateBetween(shop.getShopId(), startOfDay, endOfDay)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
@@ -181,99 +133,121 @@ public class OrderShopServiceImpl implements IOrderShopService {
     public ListOrderResponse getOrdersBetweenDateByStatus(String username, Date startOrderDate, Date endOrderDate,
                                                           OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
-
         Date startOfDay = startOfDay(startOrderDate);
         Date endOfDay = endOfDay(endOrderDate);
-
         List<Order> orders = orderRepository
                 .findAllByShopShopIdAndOrderDateBetweenAndStatus(shop.getShopId(), startOfDay, endOfDay, status)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
 
         String message = orderService.messageByOrderStatus(status);
 
-        return ListOrderResponse.listOrderResponse(orders, message, "Success");
+        return ListOrderResponse.listOrderResponse(orders, message, "OK");
     }
 
     @Override
     public OrderResponse getOrderById(String username, UUID orderId) {
         Shop shop = shopService.getShopByUsername(username);
+        Order order = orderRepository.findByOrderIdAndShopShopId(orderId, shop.getShopId())
+                .orElseThrow(() -> new NotFoundException("Ma đơn hàng không có trong danh sách đơn hàng của cửa hàng!"));
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                shop.getWard().getWardCode(), order.getShippingMethod()).getShippingDTO();
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
-
-        if (!order.getShop().getShopId().equals(shop.getShopId())) {
-            throw new NotFoundException("Không tìm thấy đơn hàng nào!");
-        }
-
-        return OrderResponse.orderResponse(order, "Lấy đơn hàng thành công!", "OK");
+        return OrderResponse.orderResponse(order, shippingDTO, "Lấy đơn hàng thành công!", "OK");
 
     }
 
     @Override
     public OrderResponse updateStatusOrder(String username, UUID orderId, OrderStatus status) {
         Shop shop = shopService.getShopByUsername(username);
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng nào!"));
-        if (!order.getShop().getShopId().equals(shop.getShopId())) {
-            throw new NotFoundException("Không tìm thấy đơn hàng nào!");
+        checkExistOrderById(orderId);
+        checkExistOrderByShop(orderId, shop.getShopId());
+        Order order = orderRepository.findByOrderIdAndShopShopId(orderId, shop.getShopId())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng trong cửa hàng!"));
+        checkStatus(order);
+        String message = "Cập nhật trạng " + messageUpdateStatusOrder(status) + " cho đơn hàng thành công!";
+        ShippingDTO shippingDTO = shippingService.getCalculateShippingByWardAndTransportProvider(order.getAddress().getWard().getWardCode(),
+                shop.getWard().getWardCode(), order.getShippingMethod()).getShippingDTO();
+        if (status.equals(OrderStatus.CANCEL)) {
+            return cancelOrderByShop(order, shippingDTO, message);
         }
-        checkStatus(order, status);
 
         order.setStatus(status);
         order.setUpdateAt(LocalDateTime.now());
 
         try {
-            Order save = orderRepository.save(order);
-            if (status.equals(Status.CANCEL)) {
-                if (save.getVoucherOrders() != null) {
-                    for (VoucherOrder voucherOrder : save.getVoucherOrders()) {
-                        voucherOrderService.cancelVoucherOrder(voucherOrder.getVoucherOrderId());
-                    }
-                }
-                List<OrderItem> orderItems = orderItemService.cancelOrderItem(save);
-                save.setOrderItems(orderItems);
-            } else {
+            orderRepository.save(order);
 
-                List<OrderItem> orderItems = orderItemShopService.updateStatusOrderItemByShop(save, status);
-                save.setOrderItems(orderItems);
+            return OrderResponse.orderResponse(order, shippingDTO, message, "Success");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Cập nhật trạng thái đơn hàng thất bại! " + e.getMessage());
+        }
+    }
+
+
+    @Transactional
+    public OrderResponse cancelOrderByShop(Order order, ShippingDTO shippingDTO, String message) {
+
+        order.setStatus(OrderStatus.CANCEL);
+        order.setUpdateAt(LocalDateTime.now());
+        try {
+            orderRepository.save(order);
+
+            if (order.getVoucherOrders() != null) {
+                for (VoucherOrder voucherOrder : order.getVoucherOrders()) {
+                    voucherOrderService.cancelVoucherOrder(voucherOrder.getVoucherOrderId());
+                }
             }
 
-            String message = messageUpdateStatusOrder(status);
+            List<OrderItem> orderItems = orderItemService.cancelOrderItem(order);
+            order.setOrderItems(orderItems);
 
-            return OrderResponse.orderResponse(save, message, "Success");
+            String messageMail = "Đơn hàng của bạn đã bị hủy bởi cửa hàng!";
+            mailService.sendOrderConfirmationEmail(order, shippingDTO, messageMail);
+
+            return OrderResponse.orderResponse(order, message, "Success");
         } catch (Exception e) {
-            throw new BadRequestException("Cập nhật trạng thái đơn hàng thất bại! " + e.getMessage());
+            throw new InternalServerErrorException("Hủy đơn hàng từ cửa hàng thất bại!");
         }
+    }
 
+
+    private void checkExistOrderById(UUID orderId) {
+        if (!orderRepository.existsByOrderId(orderId)) {
+            throw new NotFoundException("Mã đơn hàng không tồn tại!");
+        }
+    }
+
+    private void checkExistOrderByShop(UUID orderId, Long shopId) {
+        if (!orderRepository.existsByOrderIdAndShopShopId(orderId, shopId)) {
+            throw new NotFoundException("Mã đơn hàng không tồn tại trong cửa hàng!");
+        }
     }
 
     private String messageUpdateStatusOrder(OrderStatus status) {
-        switch (status) {
-            case CANCEL:
-                return "Hủy đơn hàng thành công!";
-            case COMPLETED:
-                return "Giao đơn hàng thành công!";
-            case RETURNED:
-                return "Trả đơn hàng thành công!";
-            case REFUNDED:
-                return "Hoàn tiền đơn hàng thành công!";
-            default:
-                return "Cập nhật trạng thái đơn hàng thành công!";
-        }
+        return switch (status) {
+            case CANCEL -> "hủy";
+            case PENDING -> "chờ xác nhận";
+            case PROCESSING -> "xác nhận";
+            case PICKUP_PENDING -> "chờ đơn vị vận chuyển lấy hàng";
+            case WAITING -> "chờ xử lý";
+            default -> "";
+        };
     }
 
-    private void checkStatus(Order order, OrderStatus status) {
+    private void checkStatus(Order order) {
 
         if (order.getStatus().equals(OrderStatus.CANCEL)) {
             throw new BadRequestException("Đơn hàng đã bị hủy!");
         }
+
         if (order.getStatus().equals(OrderStatus.COMPLETED)) {
             throw new BadRequestException("Đơn hàng đã được giao!");
         }
+
         if (order.getStatus().equals(OrderStatus.RETURNED)) {
             throw new BadRequestException("Đơn hàng đã được trả!");
         }
+
         if (order.getStatus().equals(OrderStatus.REFUNDED)) {
             throw new BadRequestException("Đơn hàng đã được hoàn tiền!");
         }
@@ -301,17 +275,17 @@ public class OrderShopServiceImpl implements IOrderShopService {
     }
 
 
-    @Override
-    public void checkRequestPageParams(int page, int size) {
-        if (page < 0) {
-            throw new NotFoundException("Trang không được nhỏ hơn 0!");
-        }
-        if (size < 0) {
-            throw new NotFoundException("Kích thước trang không được nhỏ hơn 0!");
-        }
-        if (size > 200) {
-            throw new NotFoundException("Kích thước trang không được lớn hơn 200!");
-        }
-    }
+//    @Override
+//    public void checkRequestPageParams(int page, int size) {
+//        if (page < 0) {
+//            throw new NotFoundException("Trang không được nhỏ hơn 0!");
+//        }
+//        if (size < 0) {
+//            throw new NotFoundException("Kích thước trang không được nhỏ hơn 0!");
+//        }
+//        if (size > 200) {
+//            throw new NotFoundException("Kích thước trang không được lớn hơn 200!");
+//        }
+//    }
 
 }

@@ -1,6 +1,7 @@
 package hcmute.kltn.vtv.controller.vendor;
 
 import hcmute.kltn.vtv.model.extra.OrderStatus;
+import hcmute.kltn.vtv.service.guest.IPageService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.model.data.paging.response.PageOrderResponse;
 import hcmute.kltn.vtv.model.data.user.response.ListOrderResponse;
@@ -11,6 +12,7 @@ import hcmute.kltn.vtv.util.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +29,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderShopController {
 
-    @Autowired
-    private IOrderShopService orderShopService;
+    private final IOrderShopService orderShopService;
+    private final IPageService pageService;
 
     @GetMapping("/list")
     public ResponseEntity<ListOrderResponse> getOrders(HttpServletRequest httpServletRequest) {
@@ -36,135 +38,105 @@ public class OrderShopController {
         return ResponseEntity.ok(orderShopService.getOrders(username));
     }
 
-    @GetMapping("/list/page")
+    @GetMapping("/page")
     public ResponseEntity<PageOrderResponse> getPageOrder(HttpServletRequest httpServletRequest,
-            @RequestParam int page,
-            @RequestParam int size) {
+                                                          @RequestParam int page,
+                                                          @RequestParam int size) {
         String username = (String) httpServletRequest.getAttribute("username");
-        orderShopService.checkRequestPageParams(page, size);
+        pageService.checkRequestOrderPageParams(page, size);
         return ResponseEntity.ok(orderShopService.getPageOrder(username, page, size));
     }
 
-    @GetMapping("/list/page/status/{status}")
+    @GetMapping("/page/status/{status}")
     public ResponseEntity<PageOrderResponse> getPageOrderByStatus(HttpServletRequest httpServletRequest,
-            @PathVariable OrderStatus status,
-            @RequestParam int page,
-            @RequestParam int size) {
+                                                                  @PathVariable OrderStatus status,
+                                                                  @RequestParam int page,
+                                                                  @RequestParam int size) {
         String username = (String) httpServletRequest.getAttribute("username");
-        orderShopService.checkRequestPageParams(page, size);
+        pageService.checkRequestOrderPageParams(page, size);
         return ResponseEntity.ok(orderShopService.getPageOrderByStatus(username, status, page, size));
     }
 
     @GetMapping("/list/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersByStatus(HttpServletRequest httpServletRequest,
-            @PathVariable OrderStatus status) {
+                                                               @PathVariable OrderStatus status) {
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(orderShopService.getOrdersByStatus(username, status));
     }
 
     @GetMapping("/list/on-same-day")
     public ResponseEntity<ListOrderResponse> getOrdersOnSameDate(HttpServletRequest httpServletRequest,
-            @RequestParam String dateString) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date date = dateFormat.parse(dateString);
-
-            String username = (String) httpServletRequest.getAttribute("username");
-            return ResponseEntity.ok(orderShopService.getOrdersOnSameDay(username, date));
-        } catch (ParseException e) {
-            throw new BadRequestException("Ngày không đúng định dạng! Định dạng ngày là dd-MM-yyyy");
-        }
+                                                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
+        String username = (String) httpServletRequest.getAttribute("username");
+        return ResponseEntity.ok(orderShopService.getOrdersOnSameDay(username, date));
     }
 
     @GetMapping("/list/between-date")
     public ResponseEntity<ListOrderResponse> getOrdersBetweenDate(HttpServletRequest httpServletRequest,
-            @RequestParam String startDateString,
-            @RequestParam String endDateString) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date startDate = dateFormat.parse(startDateString);
-            Date endDate = dateFormat.parse(endDateString);
+                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
 
-            // Chuyển đổi từ Date sang LocalDate
-            LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            // Kiểm tra xem khoảng thời gian có trong vòng 30 ngày không
-            long daysBetween = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
-            if (daysBetween > 30) {
-                throw new BadRequestException("Khoảng thời gian không được vượt quá 30 ngày.");
-            }
+        // Chuyển đổi từ Date sang LocalDate
+        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            String username = (String) httpServletRequest.getAttribute("username");
-            return ResponseEntity.ok(orderShopService.getOrdersBetweenDate(username, startDate, endDate));
-        } catch (ParseException e) {
-            throw new BadRequestException("Ngày không đúng định dạng! Định dạng ngày là dd-MM-yyyy");
+        // Kiểm tra xem khoảng thời gian có trong vòng 30 ngày không
+        long daysBetween = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+        if (daysBetween > 30) {
+            throw new BadRequestException("Khoảng thời gian không được vượt quá 30 ngày.");
         }
+
+        String username = (String) httpServletRequest.getAttribute("username");
+        return ResponseEntity.ok(orderShopService.getOrdersBetweenDate(username, startDate, endDate));
     }
 
     @GetMapping("/list/on-same-day/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersOnSameDateByStatus(HttpServletRequest httpServletRequest,
-            @RequestParam String dateString,
-            @PathVariable OrderStatus status) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date date = dateFormat.parse(dateString);
+                                                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date,
+                                                                         @PathVariable OrderStatus status) {
 
-            String username = (String) httpServletRequest.getAttribute("username");
-            return ResponseEntity.ok(orderShopService.getOrdersOnSameDayByStatus(username, date, status));
-        } catch (ParseException e) {
-            throw new BadRequestException("Ngày không đúng định dạng! Định dạng ngày là dd-MM-yyyy");
-        }
+        String username = (String) httpServletRequest.getAttribute("username");
+        return ResponseEntity.ok(orderShopService.getOrdersOnSameDayByStatus(username, date, status));
     }
 
     @GetMapping("/list/between-date/status/{status}")
     public ResponseEntity<ListOrderResponse> getOrdersBetweenDateByStatus(HttpServletRequest httpServletRequest,
-            @RequestParam String startDateString,
-            @RequestParam String endDateString,
-            @PathVariable OrderStatus status) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date startDate = dateFormat.parse(startDateString);
-            Date endDate = dateFormat.parse(endDateString);
+                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+                                                                          @PathVariable OrderStatus status) {
 
-            // Chuyển đổi từ Date sang LocalDate
-            LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        // Chuyển đổi từ Date sang LocalDate
+        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            // Kiểm tra xem khoảng thời gian có trong vòng 30 ngày không
-            long daysBetween = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
-            if (daysBetween > 30) {
-                throw new BadRequestException("Khoảng thời gian không được vượt quá 30 ngày.");
-            }
-
-            String username = (String) httpServletRequest.getAttribute("username");
-            return ResponseEntity
-                    .ok(orderShopService.getOrdersBetweenDateByStatus(username, startDate, endDate, status));
-        } catch (ParseException e) {
-            throw new BadRequestException("Ngày không đúng định dạng! Định dạng ngày là dd-MM-yyyy");
+        // Kiểm tra xem khoảng thời gian có trong vòng 30 ngày không
+        long daysBetween = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+        if (daysBetween > 30) {
+            throw new BadRequestException("Khoảng thời gian không được vượt quá 30 ngày.");
         }
+
+        String username = (String) httpServletRequest.getAttribute("username");
+        return ResponseEntity.ok(orderShopService.getOrdersBetweenDateByStatus(username, startDate, endDate, status));
     }
 
     @GetMapping("/detail/{orderId}")
     public ResponseEntity<OrderResponse> getOrderById(HttpServletRequest httpServletRequest,
-            @PathVariable UUID orderId) {
+                                                      @PathVariable UUID orderId) {
         String username = (String) httpServletRequest.getAttribute("username");
         return ResponseEntity.ok(orderShopService.getOrderById(username, orderId));
     }
 
-    @PatchMapping("/update/status/{orderId}")
+    @PatchMapping("/update/{orderId}/status/{status}")
     public ResponseEntity<OrderResponse> updateStatusOrder(HttpServletRequest httpServletRequest,
-            @PathVariable UUID orderId,
-            @RequestParam OrderStatus status) {
-        if (orderId == null) {
-            throw new NotFoundException("Mã đơn hàng không được để trống!");
+                                                           @PathVariable UUID orderId,
+                                                           @PathVariable OrderStatus status) {
+        if (status == OrderStatus.COMPLETED || status == OrderStatus.SHIPPED || status == OrderStatus.DELIVERED ||
+                status == OrderStatus.RETURNED || status == OrderStatus.REFUNDED) {
+            throw new BadRequestException("Không thể cập nhật trạng thái đơn hàng thành " + status + " từ cửa hàng.");
         }
-        if (status == null) {
-            throw new NotFoundException("Trạng thái đơn hàng không được để trống!");
-        }
-
         String username = (String) httpServletRequest.getAttribute("username");
+
         return ResponseEntity.ok(orderShopService.updateStatusOrder(username, orderId, status));
     }
-
 }

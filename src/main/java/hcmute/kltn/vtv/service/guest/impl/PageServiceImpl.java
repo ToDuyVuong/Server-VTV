@@ -26,6 +26,21 @@ public class PageServiceImpl implements IPageService {
     }
 
 
+
+    @Override
+    public void checkRequestOrderPageParams(int page, int size) {
+        if (page < 0) {
+            throw new NotFoundException("Số trang không được nhỏ hơn 0!");
+        }
+        if (size < 0) {
+            throw new NotFoundException("Số lượng đơn hàng không được nhỏ hơn 0!");
+        }
+        if (size > 200) {
+            throw new NotFoundException("Số lượng đơn hàng không được lớn hơn 200!");
+        }
+    }
+
+
     @Override
     public void checkRequestPriceRangeParams(Long minPrice, Long maxPrice) {
         if (minPrice < 0) {

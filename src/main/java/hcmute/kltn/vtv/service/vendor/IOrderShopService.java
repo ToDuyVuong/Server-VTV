@@ -31,5 +31,5 @@ public interface IOrderShopService {
 
     OrderResponse updateStatusOrder(String username, UUID orderId, OrderStatus status);
 
-    void checkRequestPageParams(int page, int size);
+
 }
