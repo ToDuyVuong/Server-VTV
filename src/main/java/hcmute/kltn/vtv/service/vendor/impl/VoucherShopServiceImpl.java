@@ -231,7 +231,7 @@ public class VoucherShopServiceImpl implements IVoucherShopService {
     private ListVoucherShopResponse listVoucherShopResponse(List<Voucher> vouchers, String message, Long shopId,
             String shopName) {
         ListVoucherShopResponse response = new ListVoucherShopResponse();
-        response.setVoucherDTOs(VoucherDTO.convertToListDTO(vouchers));
+        response.setVoucherDTOs(VoucherDTO.convertEntitiesToDTOs(vouchers));
         response.setCode(200);
         response.setMessage(message);
         response.setStatus("ok");

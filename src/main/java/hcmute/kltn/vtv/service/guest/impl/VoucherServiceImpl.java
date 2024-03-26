@@ -77,7 +77,7 @@ public class VoucherServiceImpl implements IVoucherService {
     @Override
     public ListVoucherResponse listVoucherResponse(List<Voucher> vouchers, String message) {
         ListVoucherResponse response = new ListVoucherResponse();
-        response.setVoucherDTOs(VoucherDTO.convertToListDTO(vouchers));
+        response.setVoucherDTOs(VoucherDTO.convertEntitiesToDTOs(vouchers));
         response.setMessage(message);
         response.setStatus("ok");
         response.setCount(vouchers.size());

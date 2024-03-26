@@ -11,6 +11,7 @@ import hcmute.kltn.vtv.model.entity.shipping.Deliver;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.extra.Role;
 import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import hcmute.kltn.vtv.repository.shipping.DeliverRepository;
 import hcmute.kltn.vtv.service.location.IDistrictService;
 import hcmute.kltn.vtv.service.location.IWardService;
@@ -21,7 +22,6 @@ import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,24 +32,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ManagerDeliverServiceImpl implements IManagerDeliverService {
 
-    @Autowired
-    private DeliverRepository deliverRepository;
-    @Autowired
-    private IDistrictService districtService;
-    @Autowired
-    private IWardService wardService;
-    @Autowired
-    private ICustomerService customerService;
-    @Autowired
-    private IManagerCustomerService managerCustomerService;
-    @Autowired
-    private IAuthenticationService authenticationService;
+    private final DeliverRepository deliverRepository;
+    private final IDistrictService districtService;
+    private final IWardService wardService;
+    private final ICustomerService customerService;
+    private final IManagerCustomerService managerCustomerService;
+    private final IAuthenticationService authenticationService;
 
     @Override
     @Transactional
     public DeliverResponse addNewDeliver(DeliverRequest request) {
 
-        checkEmailExist(request.getEmail());
         checkPhoneExist(request.getPhone());
 
         Customer customer = authenticationService.addNewCustomer(request.getRegisterCustomerRequest());
@@ -74,8 +67,7 @@ public class ManagerDeliverServiceImpl implements IManagerDeliverService {
         Deliver deliver = deliverRepository.findById(request.getDeliverId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy nhân viên này."));
 
-        deliver.setTypeWork(request.getTypeWork());
-        deliver.setTypeWork(request.getTypeWork());
+
         deliver.setDistrictWork(districtService.getDistrictByCode(request.getDistrictCodeWork()));
         deliver.setWardsWork(wardService.getWardsByWardsCodeWithDistrictCode(
                 request.getWardsCodeWork(), request.getDistrictCodeWork()));
@@ -128,9 +120,8 @@ public class ManagerDeliverServiceImpl implements IManagerDeliverService {
     }
 
     @Override
-    public ListDeliverResponse getListDeliverByStatusAndTypeWork(Status status, String typeWork) {
+    public ListDeliverResponse getListDeliverByStatusAndTypeWork(Status status, TypeWork typeWork) {
 
-        checkTypeWork(typeWork);
         checkStatusDeliver(status);
         String getStringStatus = getStringStatus(status);
 
@@ -161,14 +152,9 @@ public class ManagerDeliverServiceImpl implements IManagerDeliverService {
         Deliver deliver = DeliverRequest.convertRequestToEntity(request);
 
         deliver.setPhone(request.getPhone());
-        deliver.setEmail(request.getEmail());
-        deliver.setProvince(request.getProvince());
-        deliver.setDistrict(request.getDistrict());
-        deliver.setWard(request.getWard());
-        deliver.setWardCode(request.getWardCode());
+
         deliver.setFullAddress(request.getFullAddress());
         deliver.setTypeWork(request.getTypeWork());
-        deliver.setUsernameAdded(request.getUsernameAdded());
         deliver.setDistrictWork(districtService.getDistrictByCode(request.getDistrictCodeWork()));
         deliver.setWardsWork(wardService.getWardsByWardsCodeWithDistrictCode(
                 request.getWardsCodeWork(), request.getDistrictCodeWork()));
@@ -180,15 +166,10 @@ public class ManagerDeliverServiceImpl implements IManagerDeliverService {
     }
 
 
-    private void checkEmailExist(String email) {
-        if (deliverRepository.existsByEmail(email)) {
-            throw new BadRequestException("Email đã tồn tại.");
-        }
-    }
 
     private void checkPhoneExist(String phone) {
         if (deliverRepository.existsByPhone(phone)) {
-            throw new BadRequestException("Số điện thoại đã tồn tại.");
+            throw new BadRequestException("Số điện thoại nhân viên đã tồn tại.");
         }
     }
 
@@ -200,21 +181,18 @@ public class ManagerDeliverServiceImpl implements IManagerDeliverService {
         }
     }
 
-    private void checkTypeWork(String typeWork) {
-        if (!typeWork.equals("shipper") && !typeWork.equals("shipper-shop") && !typeWork.equals("shipper-warehouse") && !typeWork.equals("shipper-transshipment")) {
-            throw new BadRequestException("Loại công việc không hợp lệ. Loại công việc phải là shipper, shipper-shop, shipper-warehouse hoặc shipper-transshipment.");
-        }
-    }
 
 
 
 
 
-    private String getTypeWork(String typeWork) {
+
+    private String getTypeWork(TypeWork typeWork) {
         return switch (typeWork) {
-            case "shipper" -> "giao hàng";
-            case "shipper-shop" -> "lấy hàng tại cửa hàng";
-            case "shipper-warehouse" -> "kho hàng";
+            case SHIPPER -> "giao hàng";
+            case PICKUP -> "lấy hàng tại cửa hàng";
+            case WAREHOUSE -> "kho hàng";
+            case MANAGER -> "quản lý vận chuyển";
             default -> "trung chuyển";
         };
 

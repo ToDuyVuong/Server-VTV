@@ -21,7 +21,7 @@ public class CategoriesResponse extends ResponseAbstract {
     public static CategoriesResponse categoriesResponse(List<Category> categories, String message, String status) {
 
         CategoriesResponse response = new CategoriesResponse();
-        response.setCategoryDTOs(CategoryDTO.convertToListDTO(categories));
+        response.setCategoryDTOs(CategoryDTO.convertEntitiesToDTOs(categories));
         response.setCode(200);
         response.setMessage(message);
         response.setStatus(status);

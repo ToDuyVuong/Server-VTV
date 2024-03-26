@@ -25,7 +25,7 @@ public class Transport {
 
     private String wardCodeCustomer;
 
-    private Long orderId;
+    private UUID orderId;
 
     private LocalDateTime createAt;
 

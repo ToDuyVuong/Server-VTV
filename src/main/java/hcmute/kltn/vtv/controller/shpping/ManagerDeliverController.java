@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.model.data.shipping.request.UpdateStatusDeliverRequest;
 import hcmute.kltn.vtv.model.data.shipping.response.DeliverResponse;
 import hcmute.kltn.vtv.model.data.shipping.response.ListDeliverResponse;
 import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import hcmute.kltn.vtv.service.shipping.IManagerDeliverService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class ManagerDeliverController {
 
     @Autowired
-    private IManagerDeliverService managerDeliverService;
+    private final IManagerDeliverService managerDeliverService;
 
     @PostMapping("/add")
     public ResponseEntity<DeliverResponse> addNewDeliver(@RequestBody DeliverRequest request,
                                                          HttpServletRequest servletRequest) {
 
         String username = (String) servletRequest.getAttribute("username");
-        request.setUsernameAdded(username);
         request.validate();
 
         return ResponseEntity.ok(managerDeliverService.addNewDeliver(request));
@@ -63,7 +63,7 @@ public class ManagerDeliverController {
 
     @GetMapping("/list/status/{status}/type-work/{typeWork}")
     public ResponseEntity<ListDeliverResponse> getListDeliverByStatusAndTypeWork(@PathVariable("status") Status status,
-                                                                                 @PathVariable("typeWork") String typeWork) {
+                                                                                 @PathVariable("typeWork") TypeWork typeWork) {
 
         return ResponseEntity.ok(managerDeliverService.getListDeliverByStatusAndTypeWork(status, typeWork));
     }

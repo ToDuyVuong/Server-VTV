@@ -66,7 +66,7 @@ public class VoucherDTO {
         return voucherDTO;
     }
 
-    public static List<VoucherDTO> convertToListDTO(List<Voucher> vouchers) {
+    public static List<VoucherDTO> convertEntitiesToDTOs(List<Voucher> vouchers) {
         List<VoucherDTO> voucherDTOs = new ArrayList<>();
         for (Voucher voucher : vouchers) {
             voucherDTOs.add(convertEntityToDTO(voucher));

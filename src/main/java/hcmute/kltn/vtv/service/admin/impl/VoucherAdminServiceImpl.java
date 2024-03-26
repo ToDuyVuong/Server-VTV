@@ -194,7 +194,7 @@ public class VoucherAdminServiceImpl implements IVoucherAdminService {
 
     private ListVoucherAdminResponse listVoucherAdminResponse(List<Voucher> vouchers, String message, String username) {
         ListVoucherAdminResponse response = new ListVoucherAdminResponse();
-        response.setVoucherDTOs(VoucherDTO.convertToListDTO(vouchers));
+        response.setVoucherDTOs(VoucherDTO.convertEntitiesToDTOs(vouchers));
         response.setCode(200);
         response.setMessage(message);
         response.setStatus("ok");

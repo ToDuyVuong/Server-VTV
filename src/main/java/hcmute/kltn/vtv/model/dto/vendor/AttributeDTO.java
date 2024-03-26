@@ -22,7 +22,7 @@ public class AttributeDTO {
 
     private boolean active;
 
-    public static List<AttributeDTO> convertToListDTO(List<Attribute> attributes) {
+    public static List<AttributeDTO> convertEntitiesToDTOs(List<Attribute> attributes) {
         List<AttributeDTO> attributeDTOS = new ArrayList<>();
         for (Attribute attribute : attributes) {
             AttributeDTO attributeDTO = convertEntityToDTO(attribute);

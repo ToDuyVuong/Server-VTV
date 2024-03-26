@@ -3,9 +3,7 @@ package hcmute.kltn.vtv.model.dto.user;
 import hcmute.kltn.vtv.model.dto.vtv.ShopDTO;
 import hcmute.kltn.vtv.model.dto.wallet.LoyaltyPointHistoryDTO;
 import hcmute.kltn.vtv.model.entity.user.Order;
-import hcmute.kltn.vtv.model.entity.wallet.LoyaltyPointHistory;
 import hcmute.kltn.vtv.model.extra.OrderStatus;
-import hcmute.kltn.vtv.model.extra.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -88,9 +86,9 @@ public class OrderDTO {
         orderDTO.setShopDTO(ShopDTO.convertEntityToDTO(order.getShop()));
         orderDTO.setLoyaltyPointHistoryDTO(LoyaltyPointHistoryDTO.convertEntityToDTO(order.getLoyaltyPointHistory()));
 
-        orderDTO.setOrderItemDTOs(OrderItemDTO.convertListEntityToListDTO(order.getOrderItems()));
+        orderDTO.setOrderItemDTOs(OrderItemDTO.convertEntitiesToDTOs(order.getOrderItems()));
         orderDTO.setAddressDTO(AddressDTO.convertEntityToDTO(order.getAddress()));
-        orderDTO.setVoucherOrderDTOs(VoucherOrderDTO.convertListEntityToListDTO(order.getVoucherOrders()));
+        orderDTO.setVoucherOrderDTOs(VoucherOrderDTO.convertEntitiesToDTOs(order.getVoucherOrders()));
 
         return orderDTO;
     }

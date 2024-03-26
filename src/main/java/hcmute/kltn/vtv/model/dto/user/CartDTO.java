@@ -45,7 +45,7 @@ public class CartDTO {
         return cartDTO;
     }
 
-    public static List<CartDTO> convertToListDTO(List<Cart> carts) {
+    public static List<CartDTO> convertEntitiesToDTOs(List<Cart> carts) {
         List<CartDTO> cartDTOs = new ArrayList<>();
         for (Cart cart : carts) {
             CartDTO cartDTO = new CartDTO();

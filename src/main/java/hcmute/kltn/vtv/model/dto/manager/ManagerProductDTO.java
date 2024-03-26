@@ -38,7 +38,7 @@ public class ManagerProductDTO {
         return managerProductDTO;
     }
 
-    public static List<ManagerProductDTO> convertListEntitiesToListDTOs(List<ManagerProduct> managerProducts) {
+    public static List<ManagerProductDTO> convertEntitiesToDTOs(List<ManagerProduct> managerProducts) {
         List<ManagerProductDTO> managerProductDTOs = new ArrayList<>();
         for (ManagerProduct managerProduct : managerProducts) {
             managerProductDTOs.add(convertEntityToDTO(managerProduct));

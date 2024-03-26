@@ -21,7 +21,7 @@ public class ListCustomerVoucherResponse extends ResponseAbstract {
     public static ListCustomerVoucherResponse listCustomerVoucherResponse(List<Voucher> vouchers, String message,
                                                                           String username, String status) {
         ListCustomerVoucherResponse response = new ListCustomerVoucherResponse();
-        response.setVoucherDTOs(VoucherDTO.convertToListDTO(vouchers));
+        response.setVoucherDTOs(VoucherDTO.convertEntitiesToDTOs(vouchers));
         response.setUsername(username);
         response.setMessage(message);
         response.setStatus(status);

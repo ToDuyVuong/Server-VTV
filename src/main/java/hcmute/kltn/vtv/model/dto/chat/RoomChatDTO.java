@@ -1,7 +1,6 @@
 package hcmute.kltn.vtv.model.dto.chat;
 
 import hcmute.kltn.vtv.model.entity.chat.RoomChat;
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.util.*;
@@ -33,7 +32,7 @@ public class RoomChatDTO {
     private boolean receiverSeen;
 
 
-    public static RoomChatDTO convertEntityToDTO(RoomChat roomChat) {
+    public static RoomChatDTO convertEntitiesToDTOs(RoomChat roomChat) {
         RoomChatDTO roomChatDTO = new RoomChatDTO();
         roomChatDTO.setRomChatId(roomChat.getRomChatId());
         roomChatDTO.setSenderUsername(roomChat.getSenderUsername());
@@ -49,13 +48,13 @@ public class RoomChatDTO {
     }
 
 
-    public static List<RoomChatDTO> convertEntityToDTO(List<RoomChat> roomChats) {
+    public static List<RoomChatDTO> convertEntitiesToDTOs(List<RoomChat> roomChats) {
         List<RoomChatDTO> roomChatDTOs = new ArrayList<>();
         for (RoomChat roomChat : roomChats) {
             if (roomChat.isSenderDelete() && roomChat.isReceiverDelete()) {
                 continue;
             }
-            roomChatDTOs.add(convertEntityToDTO(roomChat));
+            roomChatDTOs.add(convertEntitiesToDTOs(roomChat));
         }
         roomChatDTOs.sort(Comparator.comparing(RoomChatDTO::getLastDate));
 

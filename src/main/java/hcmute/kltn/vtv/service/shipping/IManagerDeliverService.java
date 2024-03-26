@@ -6,6 +6,7 @@ import hcmute.kltn.vtv.model.data.shipping.request.UpdateStatusDeliverRequest;
 import hcmute.kltn.vtv.model.data.shipping.response.DeliverResponse;
 import hcmute.kltn.vtv.model.data.shipping.response.ListDeliverResponse;
 import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface IManagerDeliverService {
@@ -20,5 +21,6 @@ public interface IManagerDeliverService {
 
     ListDeliverResponse getListDeliverByStatus (Status status);
 
-    ListDeliverResponse getListDeliverByStatusAndTypeWork(Status status, String typeWork);
+
+    ListDeliverResponse getListDeliverByStatusAndTypeWork(Status status, TypeWork typeWork);
 }

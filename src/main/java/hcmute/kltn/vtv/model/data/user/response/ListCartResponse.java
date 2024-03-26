@@ -21,7 +21,7 @@ public class ListCartResponse extends ResponseAbstract {
     public static ListCartResponse listCartResponse(List<Cart> carts,
                                                     String message, String status) {
         ListCartResponse response = new ListCartResponse();
-        response.setListCartByShopDTOs(ListCartByShopDTO.convertToListDTOByShop(carts));
+        response.setListCartByShopDTOs(ListCartByShopDTO.convertEntitiesToDTOsByShop(carts));
         response.setCount(carts.size());
         response.setStatus(status);
         response.setMessage(message);

@@ -125,7 +125,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     private NotificationResponse notificationResponse(Page<Notification> notifications, String message) {
         NotificationResponse response = new NotificationResponse();
-        response.setNotificationDTOs(NotificationDTO.convertEntitiesToListDTOs(notifications.getContent()));
+        response.setNotificationDTOs(NotificationDTO.convertEntitiesToDTOs(notifications.getContent()));
         response.setTotalPage(notifications.getTotalPages());
         response.setCount(notifications.getNumberOfElements());
         response.setPage(notifications.getNumber() + 1);

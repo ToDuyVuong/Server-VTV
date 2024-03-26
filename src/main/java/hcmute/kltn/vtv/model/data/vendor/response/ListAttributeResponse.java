@@ -23,7 +23,7 @@ public class ListAttributeResponse extends ResponseAbstract {
         listAttributeResponse.setMessage(message);
         listAttributeResponse.setCode(200);
         listAttributeResponse.setCount(attributes.size());
-        listAttributeResponse.setAttributeDTOs(AttributeDTO.convertToListDTO(attributes));
+        listAttributeResponse.setAttributeDTOs(AttributeDTO.convertEntitiesToDTOs(attributes));
         return listAttributeResponse;
     }
 }

@@ -53,7 +53,7 @@ public class ProductVariantDTO {
         productVariantDTO.setQuantity(productVariant.getQuantity());
         productVariantDTO.setStatus(productVariant.getStatus());
         productVariantDTO.setCountAttribute(productVariant.getAttributes().size());
-        productVariantDTO.setAttributeDTOs(AttributeDTO.convertToListDTO(productVariant.getAttributes()));
+        productVariantDTO.setAttributeDTOs(AttributeDTO.convertEntitiesToDTOs(productVariant.getAttributes()));
         productVariantDTO.setProductId(productVariant.getProduct().getProductId());
         productVariantDTO.setProductName(productVariant.getProduct().getName());
         productVariantDTO.setProductImage(productVariant.getProduct().getImage());

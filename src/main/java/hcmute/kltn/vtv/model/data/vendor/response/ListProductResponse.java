@@ -20,7 +20,7 @@ public class ListProductResponse extends ResponseAbstract {
 
     public static ListProductResponse listProductResponse(List<Product> products, String message, String status) {
         ListProductResponse response = new ListProductResponse();
-        response.setProductDTOs(ProductDTO.convertToListDTO(products));
+        response.setProductDTOs(ProductDTO.convertEntitiesToDTOs(products));
         response.setCode(200);
         response.setMessage(message);
         response.setStatus(status);

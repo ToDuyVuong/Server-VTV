@@ -54,7 +54,7 @@ public class NotificationDTO {
     }
 
 
-    public static List<NotificationDTO> convertEntitiesToListDTOs(List<Notification> notifications) {
+    public static List<NotificationDTO> convertEntitiesToDTOs(List<Notification> notifications) {
         List<NotificationDTO> notificationDTOs = new ArrayList<>();
         for (Notification notification : notifications) {
             notificationDTOs.add(convertEntityToDTO(notification));

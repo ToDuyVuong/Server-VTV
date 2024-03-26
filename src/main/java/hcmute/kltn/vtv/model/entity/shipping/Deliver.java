@@ -4,6 +4,7 @@ import hcmute.kltn.vtv.model.entity.location.District;
 import hcmute.kltn.vtv.model.entity.location.Ward;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,19 +26,10 @@ public class Deliver {
 
     private String phone;
 
-    private String email;
-
-    private String province;
-
-    private String district;
-
-    private String ward;
-
-    private String wardCode;
-
     private String fullAddress;
 
-    private String typeWork;
+    @Enumerated(EnumType.STRING)
+    private TypeWork typeWork;
 
     private String usernameAdded;
 
@@ -52,9 +44,18 @@ public class Deliver {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transport_provider_id")
+    private TransportProvider transportProvider;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "code")
+    @JoinColumn(name = "ward_code")
+    private Ward ward;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "district_work_code")
     private District districtWork;
 
     @ManyToMany(fetch = FetchType.EAGER)

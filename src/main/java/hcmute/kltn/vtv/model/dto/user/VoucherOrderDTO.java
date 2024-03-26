@@ -39,7 +39,7 @@ public class VoucherOrderDTO {
 
     }
 
-    public static List<VoucherOrderDTO> convertListEntityToListDTO(List<VoucherOrder> voucherOrders) {
+    public static List<VoucherOrderDTO> convertEntitiesToDTOs(List<VoucherOrder> voucherOrders) {
         if (voucherOrders == null) {
             return null;
         }

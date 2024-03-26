@@ -152,7 +152,7 @@ public class ManagerProductServiceImpl implements IManagerProductService {
         listManagerProductResponse.setCount(managerProducts.size());
         listManagerProductResponse.setTotalPage(totalPage);
         listManagerProductResponse
-                .setManagerProductDTOs(ManagerProductDTO.convertListEntitiesToListDTOs(managerProducts));
+                .setManagerProductDTOs(ManagerProductDTO.convertEntitiesToDTOs(managerProducts));
         listManagerProductResponse.setMessage(message);
         listManagerProductResponse.setStatus("OK");
         listManagerProductResponse.setCode(200);

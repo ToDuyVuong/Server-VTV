@@ -24,10 +24,10 @@ public class TransportHandle {
     // vi tri cua shipper
     private String wardCode;
 
-    private boolean isActive;
+    private boolean active;
 
     // thể hiện đã xử lý thành công hay chưa
-    private boolean isHandled;
+    private boolean handled;
 
     @Enumerated(EnumType.STRING)
     private TransportStatus transportStatus;

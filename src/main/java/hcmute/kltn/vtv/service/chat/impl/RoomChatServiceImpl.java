@@ -192,7 +192,7 @@ public class RoomChatServiceImpl implements IRoomChatService {
 
     private ListRoomChatsPageResponse listRoomChatsPageResponse(Page<RoomChat> roomChatPage, int page, int size) {
         ListRoomChatsPageResponse response = new ListRoomChatsPageResponse();
-        response.setRoomChatDTOs(RoomChatDTO.convertEntityToDTO(roomChatPage.getContent()));
+        response.setRoomChatDTOs(RoomChatDTO.convertEntitiesToDTOs(roomChatPage.getContent()));
         response.setTotalPage(roomChatPage.getTotalPages());
         response.setCount(roomChatPage.getContent().size());
         response.setPage(page);
@@ -205,7 +205,7 @@ public class RoomChatServiceImpl implements IRoomChatService {
 
     private RoomChatResponse roomChatResponse(RoomChat roomChat, String message, String status) {
         RoomChatResponse response = new RoomChatResponse();
-        response.setRoomChatDTO(RoomChatDTO.convertEntityToDTO(roomChat));
+        response.setRoomChatDTO(RoomChatDTO.convertEntitiesToDTOs(roomChat));
         response.setMessage(message);
         response.setStatus(status);
         response.setCode(200);

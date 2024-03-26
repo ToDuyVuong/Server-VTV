@@ -46,7 +46,7 @@ public class OrderItemDTO {
         return orderItemDTO;
     }
 
-    public static List<OrderItemDTO> convertListEntityToListDTO(List<OrderItem> orderItems) {
+    public static List<OrderItemDTO> convertEntitiesToDTOs(List<OrderItem> orderItems) {
 
         if (orderItems == null) {
             return null;

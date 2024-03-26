@@ -3,7 +3,6 @@ package hcmute.kltn.vtv.model.dto.vtv;
 import hcmute.kltn.vtv.model.entity.vtv.Category;
 import hcmute.kltn.vtv.model.extra.Status;
 import lombok.*;
-import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,7 +43,7 @@ public class CategoryDTO {
         return categoryDTO;
     }
 
-    public static List<CategoryDTO> convertToListDTO(List<Category> categories) {
+    public static List<CategoryDTO> convertEntitiesToDTOs(List<Category> categories) {
         List<CategoryDTO> categoryDTOs = new ArrayList<>();
         categories.sort(Comparator.comparing(Category::getName));
         for (Category category : categories) {

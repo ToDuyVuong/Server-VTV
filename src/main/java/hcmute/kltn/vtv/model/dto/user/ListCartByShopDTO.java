@@ -28,7 +28,7 @@ public class ListCartByShopDTO {
 
     private List<CartDTO> carts;
 
-    public static List<ListCartByShopDTO> convertToListDTOByShop(List<Cart> carts) {
+    public static List<ListCartByShopDTO> convertEntitiesToDTOsByShop(List<Cart> carts) {
         carts.sort(Comparator.comparing(Cart::getUpdateAt));
 
         Map<Shop, List<Cart>> groupedAndSortedCarts = carts.stream()
@@ -39,7 +39,7 @@ public class ListCartByShopDTO {
 
         for (Map.Entry<Shop, List<Cart>> entry : groupedAndSortedCarts.entrySet()) {
             Shop shop = entry.getKey();
-            List<CartDTO> cartDTOs = CartDTO.convertToListDTO(entry.getValue());
+            List<CartDTO> cartDTOs = CartDTO.convertEntitiesToDTOs(entry.getValue());
 
             ListCartByShopDTO listCartByShopDTO = new ListCartByShopDTO();
             listCartByShopDTO.setShopId(shop.getShopId());

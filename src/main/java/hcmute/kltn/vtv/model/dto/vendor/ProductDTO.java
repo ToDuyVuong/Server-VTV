@@ -49,7 +49,7 @@ public class ProductDTO {
     private List<ProductVariantDTO> productVariantDTOs;
 
 
-    public static List<ProductDTO> convertToListDTO(List<Product> products) {
+    public static List<ProductDTO> convertEntitiesToDTOs(List<Product> products) {
         List<ProductDTO> productDTOs = new ArrayList<>();
         for (Product product : products) {
             productDTOs.add(convertEntityToDTO(product));

@@ -22,7 +22,8 @@ public class TransportDTO {
 
     private String wardCodeCustomer;
 
-    private Long orderId;
+    private UUID orderId;
+
 
     private TransportStatus transportStatus;
 

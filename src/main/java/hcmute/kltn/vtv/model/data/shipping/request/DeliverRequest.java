@@ -3,6 +3,7 @@ package hcmute.kltn.vtv.model.data.shipping.request;
 import hcmute.kltn.vtv.authentication.request.RegisterRequest;
 import hcmute.kltn.vtv.model.entity.shipping.Deliver;
 import hcmute.kltn.vtv.model.extra.EmailValidator;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +21,13 @@ public class DeliverRequest {
 
     private String phone;
 
-    private String email;
-
-    private String province;
-
-    private String district;
-
-    private String ward;
-
     private String wardCode;
 
     private String fullAddress;
 
-    private String typeWork;
+    private TypeWork typeWork;
 
-    private String usernameAdded;
+    private Long providerId;
 
     private String districtCodeWork;
 
@@ -56,42 +49,20 @@ public class DeliverRequest {
             throw new BadRequestException("Số điện thoại không hợp lệ.");
         }
 
-        if (this.email == null || this.email.isEmpty()) {
-            throw new BadRequestException("Email không được để trống.");
-        } else if (!EmailValidator.isValidEmail(email)) {
-            throw new BadRequestException("Email không hợp lệ.");
-        }
-        if (this.province == null || this.province.isEmpty()) {
-            throw new BadRequestException("Tỉnh/Thành phố không được để trống.");
-        }
-        if (this.district == null || this.district.isEmpty()) {
-            throw new BadRequestException("Quận/Huyện không được để trống.");
-        }
-        if (this.ward == null || this.ward.isEmpty()) {
-            throw new BadRequestException("Phường/Xã không được để trống.");
-        }
+
+
         if (this.wardCode == null || this.wardCode.isEmpty()) {
             throw new BadRequestException("Mã phường/xã không được để trống.");
         }
         if (this.fullAddress == null || this.fullAddress.isEmpty()) {
             throw new BadRequestException("Địa chỉ không được để trống.");
         }
-        if (this.typeWork == null || this.typeWork.isEmpty()) {
+        if (this.typeWork == null) {
             throw new BadRequestException("Loại công việc không được để trống.");
         }
 
-        if (!this.typeWork.equals("shipper")
-                && !this.typeWork.equals("shipper-transshipment")
-                && !this.typeWork.equals("shipper-shop")
-                && !this.typeWork.equals("shipper-warehouse")) {
-            throw new BadRequestException(
-                    "Loại công việc không hợp lệ. Loại công việc phải là shipper, shipper-transshipment, shipper-shop hoặc shipper-warehouse.");
-        }
 
 
-        if (this.usernameAdded == null || this.usernameAdded.isEmpty()) {
-            throw new BadRequestException("Tên người đăng ký không được để trống.");
-        }
         if (this.districtCodeWork == null || this.districtCodeWork.isEmpty()) {
             throw new BadRequestException("Mã quận/huyện làm việc không được để trống.");
         }
@@ -123,30 +94,17 @@ public class DeliverRequest {
 
     public void trim() {
         this.phone = this.phone.trim();
-        this.email = this.email.trim();
-        this.province = this.province.trim();
-        this.district = this.district.trim();
-        this.ward = this.ward.trim();
         this.wardCode = this.wardCode.trim();
         this.fullAddress = this.fullAddress.trim();
-        this.typeWork = this.typeWork.trim();
-        this.usernameAdded = this.usernameAdded.trim();
         this.districtCodeWork = this.districtCodeWork.trim();
     }
 
 
     public static Deliver convertRequestToEntity(DeliverRequest deliverRequest) {
         Deliver deliver = new Deliver();
-//        deliver.setDeliverId(deliverRequest.getDeliverId());
         deliver.setPhone(deliverRequest.getPhone());
-        deliver.setEmail(deliverRequest.getEmail());
-        deliver.setProvince(deliverRequest.getProvince());
-        deliver.setDistrict(deliverRequest.getDistrict());
-        deliver.setWard(deliverRequest.getWard());
-        deliver.setWardCode(deliverRequest.getWardCode());
         deliver.setFullAddress(deliverRequest.getFullAddress());
         deliver.setTypeWork(deliverRequest.getTypeWork());
-        deliver.setUsernameAdded(deliverRequest.getUsernameAdded());
 
         return deliver;
     }
