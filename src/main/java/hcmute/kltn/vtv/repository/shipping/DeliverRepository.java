@@ -15,6 +15,10 @@ public interface DeliverRepository extends JpaRepository<Deliver, Long> {
 
     boolean existsByCustomerCustomerId(Long customerId);
 
+    boolean existsByPhoneAndDeliverIdNot(String phone, Long deliverId);
+
+    boolean existsByDeliverId(Long deliverId);
+
     Optional<List<Deliver>> findAllByStatus(Status status);
 
     Optional<List<Deliver>> findAllByStatusAndTypeWork(Status status, TypeWork typeWork);

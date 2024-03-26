@@ -2,6 +2,7 @@ package hcmute.kltn.vtv.model.data.shipping.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import hcmute.kltn.vtv.model.extra.EmailValidator;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import hcmute.kltn.vtv.model.extra.UUIDDeserializer;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
 import hcmute.kltn.vtv.util.exception.DuplicateEntryException;
@@ -22,9 +23,7 @@ public class UpdateDeliverWorkRequest {
 //    @JsonDeserialize(using = UUIDDeserializer.class)
     private Long deliverId;
 
-    private String typeWork;
-
-    private String usernameAdded;
+    private TypeWork typeWork;
 
     private String districtCodeWork;
 
@@ -32,21 +31,8 @@ public class UpdateDeliverWorkRequest {
 
     public void validate() {
 
-        if (this.typeWork == null || this.typeWork.isEmpty()) {
+        if (this.typeWork == null) {
             throw new BadRequestException("Loại công việc không được để trống.");
-        }
-
-        if (!this.typeWork.equals("shipper")
-                && !this.typeWork.equals("shipper-transshipment")
-                && !this.typeWork.equals("shipper-shop")
-                && !this.typeWork.equals("shipper-warehouse")) {
-            throw new BadRequestException(
-                    "Loại công việc không hợp lệ. Loại công việc phải là shipper, shipper-transshipment, shipper-shop hoặc shipper-warehouse.");
-        }
-
-
-        if (this.usernameAdded == null || this.usernameAdded.isEmpty()) {
-            throw new BadRequestException("Tên người đăng ký không được để trống.");
         }
         if (this.districtCodeWork == null || this.districtCodeWork.isEmpty()) {
             throw new BadRequestException("Mã quận/huyện làm việc không được để trống.");
@@ -58,7 +44,7 @@ public class UpdateDeliverWorkRequest {
             throw new DuplicateEntryException("Mã phường/xã làm việc không được trùng lặp.");
         }
 
-        trim();
+        this.districtCodeWork = this.districtCodeWork.trim();
     }
 
 
@@ -75,10 +61,6 @@ public class UpdateDeliverWorkRequest {
         return false; // Không có trùng lặp
     }
 
-    public void trim() {
-        this.typeWork = this.typeWork.trim();
-        this.usernameAdded = this.usernameAdded.trim();
-        this.districtCodeWork = this.districtCodeWork.trim();
-    }
+
 
 }

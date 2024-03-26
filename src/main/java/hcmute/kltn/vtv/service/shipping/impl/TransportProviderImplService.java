@@ -50,10 +50,61 @@ public class TransportProviderImplService implements ITransportProviderService {
 
 
 
+
+
+
+    @Override
+    public void checkExistByTransportProviderId(Long transportProviderId) {
+        if(!transportProviderRepository.existsByTransportProviderId(transportProviderId)) {
+            throw new NotFoundException("Không tồn tại nhà vận chuyển theo mã nhà vận chuyển!");
+        }
+    }
+
+
+
     @Override
     public List<TransportProvider> getTransportProvidersByProvince(String provinceCodeShop, String provinceCodeCustomer) {
         return transportProviderRepository.findAllByProvinceCodeShopAndProvinceCodeCustomerAndStatus(provinceCodeShop, provinceCodeCustomer, Status.ACTIVE)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
+    }
+
+
+
+
+    @Override
+    public TransportProviderResponse getTransportProviderById(Long id) {
+        TransportProvider transportProvider = getTransportProviderByTransportProviderId(id);
+
+        return TransportProviderResponse.transportProviderResponse(transportProvider, "Lấy thông tin nhà vận chuyển thành công.", "OK");
+    }
+
+
+    @Override
+    public TransportProvider getTransportProviderByTransportProviderId(Long id) {
+
+        return transportProviderRepository.findByTransportProviderId(id)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển theo mã nhà vận chuyển!"));
+    }
+
+
+    @Override
+    public ListTransportProviderResponse getAllTransportProvidersNotProvince() {
+
+        List<TransportProvider> transportProviders = transportProviderRepository.findAllByStatus(Status.ACTIVE)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
+
+
+        return ListTransportProviderResponse.listTransportProvidersNotProvinceResponse(transportProviders);
+    }
+
+    @Override
+    public ListTransportProviderResponse getAllTransportProviders() {
+
+        List<TransportProvider> transportProviders = transportProviderRepository.findAllByStatus(Status.ACTIVE)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
+
+
+        return ListTransportProviderResponse.listTransportProvidersResponse(transportProviders);
     }
 
 
@@ -94,43 +145,6 @@ public class TransportProviderImplService implements ITransportProviderService {
         transportProvider.setUpdateAt(LocalDateTime.now());
 
         return transportProvider;
-    }
-
-
-    @Override
-    public TransportProviderResponse getTransportProviderById(Long id) {
-        TransportProvider transportProvider = getTransportProviderByTransportProviderId(id);
-
-        return TransportProviderResponse.transportProviderResponse(transportProvider, "Lấy thông tin nhà vận chuyển thành công.", "OK");
-    }
-
-
-    @Override
-    public TransportProvider getTransportProviderByTransportProviderId(Long id) {
-
-        return transportProviderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển."));
-    }
-
-
-    @Override
-    public ListTransportProviderResponse getAllTransportProvidersNotProvince() {
-
-        List<TransportProvider> transportProviders = transportProviderRepository.findAllByStatus(Status.ACTIVE)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
-
-
-        return ListTransportProviderResponse.listTransportProvidersNotProvinceResponse(transportProviders);
-    }
-
-    @Override
-    public ListTransportProviderResponse getAllTransportProviders() {
-
-        List<TransportProvider> transportProviders = transportProviderRepository.findAllByStatus(Status.ACTIVE)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhà vận chuyển nào."));
-
-
-        return ListTransportProviderResponse.listTransportProvidersResponse(transportProviders);
     }
 
 

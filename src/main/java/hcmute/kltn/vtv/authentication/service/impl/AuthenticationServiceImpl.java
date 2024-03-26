@@ -16,6 +16,7 @@ import hcmute.kltn.vtv.model.extra.Status;
 import hcmute.kltn.vtv.repository.user.CustomerRepository;
 import hcmute.kltn.vtv.repository.user.TokenRepository;
 import hcmute.kltn.vtv.service.user.ICustomerService;
+import hcmute.kltn.vtv.service.user.IMailService;
 import hcmute.kltn.vtv.service.vtv.IFcmService;
 import hcmute.kltn.vtv.service.wallet.ILoyaltyPointService;
 import hcmute.kltn.vtv.util.exception.*;
@@ -23,7 +24,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,24 +40,19 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements IAuthenticationService {
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
-    @Autowired
-    private final IJwtService jwtService;
-    @Autowired
-    private final AuthenticationManager authenticationManager;
-    @Autowired
-    private final TokenRepository tokenRepository;
+
     @Value("${application.security.jwt.refresh-token.expiration}")
     private int refreshExpiration;
-    @Autowired
+    private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final IJwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final TokenRepository tokenRepository;
     private final IFcmService fcmService;
-    @Autowired
     private final ICustomerService customerService;
-    @Autowired
     private final ILoyaltyPointService loyaltyPointService;
+    private final IMailService mailService;
+
 
     @Override
     @Transactional
@@ -69,6 +64,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         try {
             customerRepository.save(customer);
             loyaltyPointService.addNewLoyaltyPointAfterRegister(customer.getUsername());
+            mailService.activateAccountSendOtpToEmail(customer.getUsername());
 
             String message = "Đăng ký tài khoản khách hàng thành công, " +
                     "vui lòng kiểm tra email để kích hoạt tài khoản." +
@@ -84,18 +80,23 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     }
 
+
     @Override
     public Customer addNewCustomer(RegisterRequest customerRequest) {
         customerRequest.validate();
         existingCustomer(customerRequest);
         Customer customer = createCustomer(customerRequest);
-
         try {
-            return customerRepository.save(customer);
+            customerRepository.save(customer);
+            mailService.activateAccountSendOtpToEmail(customer.getUsername());
+            loyaltyPointService.addNewLoyaltyPointAfterRegister(customer.getUsername());
+
+            return customer;
         } catch (Exception e) {
-            throw new InternalServerErrorException("Thêm tài khoản khách hàng thất bại");
+            throw new InternalServerErrorException("Thêm tài khoản khách hàng thất bại!" + e.getMessage());
         }
     }
+
 
     @Override
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
@@ -110,7 +111,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             Cookie cookie = addCookie(refreshToken, refreshExpiration);
             response.addCookie(cookie);
 
-            return loginResponse(customer, jwtToken, refreshToken);
+            return LoginResponse.loginResponse(customer, jwtToken, refreshToken);
         } catch (Exception e) {
             throw new InternalServerErrorException("Đăng nhập thất bại");
         }
@@ -126,17 +127,16 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         if (username != null) {
             Customer customer = customerService.getCustomerByUsername(username);
-
             if (customer != null) {
                 if (jwtService.isTokenValid(refreshToken, customer)) {
                     String accessToken = jwtService.generateToken(customer);
-                    return refreshTokenResponse(accessToken);
+                    return RefreshTokenResponse.refreshTokenResponse(accessToken);
                 }
             } else {
                 throw new NotFoundException("Tài khoản không tồn tại.");
             }
         } else {
-            throw new BadRequestException("Lỗi xác thực token.");
+            throw new InternalServerErrorException("Lỗi xác thực token.");
         }
         return null;
     }
@@ -158,6 +158,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         } catch (Exception e) {
             throw new InternalServerErrorException("Đăng xuất thất bại");
         }
+    }
+
+
+    @Override
+    public boolean checkRole(String username, Role role) {
+        Customer customer = customerRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Tài khoản không kiềm tra quyền không tồn tại."));
+        return customer.getRoles().contains(role);
     }
 
 
@@ -210,30 +218,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
 
-
-
-
-    private LoginResponse loginResponse(Customer customer, String jwtToken, String refreshToken) {
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setCustomerDTO(CustomerDTO.convertEntityToDTO(customer));
-        loginResponse.setStatus("OK");
-        loginResponse.setMessage("Đăng nhập thành công");
-        loginResponse.setCode(200);
-        loginResponse.setAccessToken(jwtToken);
-        loginResponse.setRefreshToken(refreshToken);
-        return loginResponse;
-    }
-
-
-    private RefreshTokenResponse refreshTokenResponse(String accessToken) {
-        RefreshTokenResponse refreshTokenResponse = new RefreshTokenResponse();
-        refreshTokenResponse.setAccessToken(accessToken);
-        refreshTokenResponse.setStatus("Success");
-        refreshTokenResponse.setMessage("Lấy access token thành công.");
-        refreshTokenResponse.setCode(200);
-        return refreshTokenResponse;
-    }
-
     private Cookie addCookie(String value, int maxAge) {
         Cookie cookie = new Cookie("refreshToken", value);
         cookie.setHttpOnly(true);
@@ -274,6 +258,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new InternalServerErrorException("Xóa token thất bại");
         }
     }
+
 
     private void checkRefreshToken(String refreshToken) {
         if (refreshToken == null) {

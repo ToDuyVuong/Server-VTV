@@ -24,6 +24,8 @@ public enum Role {
 
     DELIVER(Collections.emptySet()),
 
+    DELIVER_MANAGER(Collections.emptySet()),
+
     MANAGER(Collections.emptySet()),
 
     MANAGERCUSTOMER(Collections.emptySet()),

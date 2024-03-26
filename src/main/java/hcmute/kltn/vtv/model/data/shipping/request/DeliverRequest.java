@@ -27,7 +27,7 @@ public class DeliverRequest {
 
     private TypeWork typeWork;
 
-    private Long providerId;
+    private Long transportProviderId;
 
     private String districtCodeWork;
 
@@ -44,13 +44,9 @@ public class DeliverRequest {
         if (!Pattern.matches("[0-9]+", phone)) {
             throw new BadRequestException("Số điện thoại chỉ được chứa ký tự số.");
         }
-
         if (phone.length() < 9 || phone.length() > 11) {
             throw new BadRequestException("Số điện thoại không hợp lệ.");
         }
-
-
-
         if (this.wardCode == null || this.wardCode.isEmpty()) {
             throw new BadRequestException("Mã phường/xã không được để trống.");
         }
@@ -58,11 +54,11 @@ public class DeliverRequest {
             throw new BadRequestException("Địa chỉ không được để trống.");
         }
         if (this.typeWork == null) {
-            throw new BadRequestException("Loại công việc không được để trống.");
+            throw new BadRequestException("Loại công việc không được để trống. Loại công việc phải là: SHIPPER, MANAGER, WAREHOUSE, TRANSIT hoặc PICKUP.");
         }
-
-
-
+        if (this.transportProviderId == null) {
+            throw new BadRequestException("Mã nhà cung cấp vận chuyển không được để trống.");
+        }
         if (this.districtCodeWork == null || this.districtCodeWork.isEmpty()) {
             throw new BadRequestException("Mã quận/huyện làm việc không được để trống.");
         }

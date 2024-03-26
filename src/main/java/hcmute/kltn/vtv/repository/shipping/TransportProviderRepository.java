@@ -11,9 +11,12 @@ import java.util.Optional;
 
 @Repository
 public interface TransportProviderRepository extends JpaRepository<TransportProvider, Long> {
-    // Các phương thức truy vấn cụ thể có thể được thêm ở đây
+
+    boolean existsByTransportProviderId(Long transportProviderId);
 
     Optional<List<TransportProvider>> findAllByStatus(Status status);
+
+    Optional<TransportProvider> findByTransportProviderId(Long transportProviderId);
 
     Optional<TransportProvider> findByEmail(String email);
 

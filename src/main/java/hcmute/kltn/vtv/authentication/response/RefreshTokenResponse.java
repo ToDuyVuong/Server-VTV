@@ -11,5 +11,15 @@ import lombok.*;
 @AllArgsConstructor
 public class RefreshTokenResponse extends ResponseAbstract {
 
-        private String accessToken;
+    private String accessToken;
+
+
+    public static RefreshTokenResponse refreshTokenResponse(String accessToken) {
+        RefreshTokenResponse refreshTokenResponse = new RefreshTokenResponse();
+        refreshTokenResponse.setAccessToken(accessToken);
+        refreshTokenResponse.setStatus("Success");
+        refreshTokenResponse.setMessage("Lấy access token thành công.");
+        refreshTokenResponse.setCode(200);
+        return refreshTokenResponse;
+    }
 }

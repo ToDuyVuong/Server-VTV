@@ -21,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CustomerController {
 
-    @Autowired
     private final ICustomerService customerService;
-    @Autowired
     private final IMailService mailService;
 
 

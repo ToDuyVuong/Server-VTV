@@ -16,6 +16,8 @@ public interface ITransportProviderService {
 
     TransportProvider getTransportProviderByShortName(String shortName);
 
+    void checkExistByTransportProviderId(Long transportProviderId);
+
     List<TransportProvider> getTransportProvidersByProvince(String provinceCodeShop, String provinceCodeCustomer);
 
     TransportProviderResponse getTransportProviderById(Long id);

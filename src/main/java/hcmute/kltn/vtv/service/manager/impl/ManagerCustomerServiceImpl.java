@@ -11,6 +11,7 @@ import hcmute.kltn.vtv.repository.user.CustomerRepository;
 import hcmute.kltn.vtv.repository.manager.ManagerShopRepository;
 import hcmute.kltn.vtv.service.manager.IManagerCustomerService;
 import hcmute.kltn.vtv.service.user.ICustomerService;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +90,7 @@ public class ManagerCustomerServiceImpl implements IManagerCustomerService {
         int totalPage = (int) Math.ceil((double) totalCustomer / size);
 
         Page<Customer> customers = customerRepository.findAllByFullNameContainingAndStatus(search, status,
-                PageRequest.of(page - 1, size))
+                        PageRequest.of(page - 1, size))
                 .orElseThrow(() -> new BadRequestException("Không tìm thấy danh sách khách hàng"));
         String message = "Tìm kiếm danh sách khách hàng theo tên và trạng thái thành công!";
 
@@ -115,8 +116,8 @@ public class ManagerCustomerServiceImpl implements IManagerCustomerService {
     }
 
     public ListCustomerManagerResponse listCustomerAdminResponse(List<Customer> customers,
-            int size, int page,
-            int totalPage, String message) {
+                                                                 int size, int page,
+                                                                 int totalPage, String message) {
         ListCustomerManagerResponse response = new ListCustomerManagerResponse();
         response.setCount(customers.size());
         response.setPage(page);
@@ -165,7 +166,7 @@ public class ManagerCustomerServiceImpl implements IManagerCustomerService {
         try {
             customerRepository.save(customer);
         } catch (Exception e) {
-            throw new BadRequestException("Cập nhật quyền cho tài khoản thất bại!");
+            throw new InternalServerErrorException("Cập nhật quyền cho tài khoản thất bại!");
         }
     }
 

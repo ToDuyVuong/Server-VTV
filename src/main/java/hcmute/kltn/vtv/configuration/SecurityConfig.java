@@ -122,8 +122,13 @@ public class SecurityConfig {
             "/api/manager-info/get/manger-shipping"
     };
 
+    private static final String[] DELIVER_MANAGER_ROLE = {
+            "/api/deliver/**",
+            "/api/transport-provider/manager/deliver/**"
+    };
+
     private static final String[] DELIVER_ROLE = {
-            "/api//deliver/**",
+            "/api/deliver/**",
     };
 
 
@@ -192,6 +197,9 @@ public class SecurityConfig {
 
                         .requestMatchers(PROVIDER_ROLE)
                         .hasRole(Role.PROVIDER.name())
+
+                        .requestMatchers(DELIVER_MANAGER_ROLE)
+                        .hasRole(Role.DELIVER_MANAGER.name())
 
                         .requestMatchers(WEBSOCKET_ENDPOINT)
                         .permitAll()

@@ -7,6 +7,7 @@ import lombok.Getter;
 public enum TypeWork {
     SHIPPER,
     MANAGER,
+    PROVIDER,
     WAREHOUSE,
     TRANSIT,
     PICKUP;

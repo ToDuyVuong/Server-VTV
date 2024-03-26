@@ -3,20 +3,25 @@ package hcmute.kltn.vtv.service.manager.impl;
 import hcmute.kltn.vtv.authentication.service.IAuthenticationService;
 import hcmute.kltn.vtv.model.data.manager.request.TransportProviderRegisterRequest;
 import hcmute.kltn.vtv.model.data.manager.request.UpdateTransportProviderWithProvincesRequest;
+import hcmute.kltn.vtv.model.data.shipping.request.DeliverRequest;
 import hcmute.kltn.vtv.model.data.shipping.response.ListTransportProviderResponse;
 import hcmute.kltn.vtv.model.data.shipping.response.TransportProviderResponse;
 import hcmute.kltn.vtv.model.entity.location.Province;
+import hcmute.kltn.vtv.model.entity.shipping.Deliver;
 import hcmute.kltn.vtv.model.entity.shipping.TransportProvider;
 import hcmute.kltn.vtv.model.entity.user.Customer;
 import hcmute.kltn.vtv.model.extra.Role;
 import hcmute.kltn.vtv.model.extra.Status;
+import hcmute.kltn.vtv.model.extra.TypeWork;
 import hcmute.kltn.vtv.repository.shipping.TransportProviderRepository;
 import hcmute.kltn.vtv.service.location.IProvinceService;
 import hcmute.kltn.vtv.service.manager.IManagerCustomerService;
 import hcmute.kltn.vtv.service.manager.IManagerTransportProvider;
+import hcmute.kltn.vtv.service.shipping.IManagerDeliverService;
 import hcmute.kltn.vtv.service.shipping.ITransportProviderService;
 import hcmute.kltn.vtv.service.user.ICustomerService;
 import hcmute.kltn.vtv.util.exception.BadRequestException;
+import hcmute.kltn.vtv.util.exception.InternalServerErrorException;
 import hcmute.kltn.vtv.util.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
     private final IManagerCustomerService managerCustomerService;
     private final IProvinceService provinceService;
     private final ITransportProviderService transportProviderService;
+    private final IManagerDeliverService managerDeliverService;
 
     @Override
     @Transactional
@@ -52,13 +58,17 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
         transportProvider.setCustomer(customer);
         transportProvider.setProvinces(provinces);
 
+        Deliver deliver = createDeliverWithTransportProvider(transportProvider, customer, request.getRegisterRequest().getUsername());
+
         try {
             transportProviderRepository.save(transportProvider);
+            deliver.setTransportProvider(transportProvider);
+            managerDeliverService.addNewDeliverWithProviderRegister(deliver);
 
             return TransportProviderResponse.transportProviderResponse(transportProvider,
                     "Đăng ký nhà vận chuyển thành công.", "Success");
         } catch (Exception e) {
-            throw new BadRequestException("Đăng ký nhà vận chuyển thất bại.");
+            throw new InternalServerErrorException("Đăng ký nhà vận chuyển thất bại.");
         }
     }
 
@@ -78,7 +88,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
             return TransportProviderResponse.transportProviderResponse(transportProvider,
                     "Cập nhật nhà vận chuyển thành công.", "Success");
         } catch (Exception e) {
-            throw new NotFoundException("Cập nhật nhà vận chuyển thất bại.");
+            throw new InternalServerErrorException("Cập nhật nhà vận chuyển thất bại.");
         }
     }
 
@@ -97,7 +107,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
                 .orElse(null);
 
         if (transportProvider != null) {
-            throw new NotFoundException("Email nhà vận chuyển đã tồn tại.");
+            throw new BadRequestException("Email nhà vận chuyển đã tồn tại.");
         }
     }
 
@@ -107,7 +117,7 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
                 .orElse(null);
 
         if (transportProvider != null) {
-            throw new NotFoundException("Số điện thoại nhà vận chuyển đã tồn tại.");
+            throw new BadRequestException("Số điện thoại nhà vận chuyển đã tồn tại.");
         }
     }
 
@@ -130,6 +140,24 @@ public class ManagerTransportProviderImpl implements IManagerTransportProvider {
         transportProvider.setUpdateAt(LocalDateTime.now());
 
         return transportProvider;
+    }
+
+
+    private Deliver createDeliverWithTransportProvider(TransportProvider transportProvider, Customer customer, String usernameAdded) {
+        Deliver deliver = new Deliver();
+        deliver.setFullAddress(null);
+        deliver.setTypeWork(TypeWork.PROVIDER);
+        deliver.setPhone(transportProvider.getPhone());
+        deliver.setUsernameAdded(usernameAdded);
+        deliver.setCustomer(customer);
+        deliver.setWard(null);
+        deliver.setDistrictWork(null);
+        deliver.setWardsWork(null);
+        deliver.setStatus(Status.ACTIVE);
+        deliver.setCreateAt(LocalDateTime.now());
+        deliver.setUpdateAt(LocalDateTime.now());
+
+        return deliver;
     }
 
 
