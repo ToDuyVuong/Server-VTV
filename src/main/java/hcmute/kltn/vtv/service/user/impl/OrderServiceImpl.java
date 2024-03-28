@@ -452,9 +452,7 @@ public class OrderServiceImpl implements IOrderService {
 
     private void updateLoyaltyPointHistoryInCreateOrder(Order order) {
         LoyaltyPoint loyaltyPoint = loyaltyPointService.getLoyaltyPointByUsername(order.getCustomer().getUsername());
-        if (loyaltyPoint.getTotalPoint() == 0) {
-            throw new BadRequestException("Không đủ điểm thưởng để thanh toán. Điểm thưởng hiện tại của bạn là 0.");
-        }
+
         Long point = order.getTotalPrice() <= loyaltyPoint.getTotalPoint() ? order.getTotalPrice() : loyaltyPoint.getTotalPoint();
         LoyaltyPointHistory loyaltyPointHistory = new LoyaltyPointHistory();
         loyaltyPointHistory.setPoint(point);
